@@ -19,14 +19,14 @@ export interface PortalSession {
 	customer?: string | null;
 }
 
-export type AppointmentStatus = "Open" | "Scheduled" | "Converted" | "Cancelled";
+export type RequestStatus = "Draft" | "Open" | "Triaged" | "Converted" | "Closed" | "Cancelled";
 
-export interface MyAppointment {
+export interface MyRequest {
 	name: string;
-	status: AppointmentStatus;
+	status: RequestStatus;
 	service_type?: string;
-	preferred_date?: string;
-	service_job?: string;
+	subject: string;
+	preferred_start?: string;
 	creation: string;
 }
 
@@ -50,8 +50,8 @@ export interface SignupPayload {
 	phone?: string;
 }
 
-export function bookAppointment(payload: BookingPayload): Promise<{ name: string }> {
-	return client.call<{ name: string }>("fsm.api.book_appointment", { ...payload });
+export function requestService(payload: BookingPayload): Promise<{ name: string }> {
+	return client.call<{ name: string }>("fsm.api.request_service", { ...payload });
 }
 
 export function getSession(): Promise<PortalSession> {
@@ -72,8 +72,8 @@ export function logout(): Promise<unknown> {
 	return client.call("logout", {});
 }
 
-export function getMyAppointments(): Promise<MyAppointment[]> {
-	return client.call<MyAppointment[]>("fsm.api.get_my_appointments", {}, "GET");
+export function getMyRequests(): Promise<MyRequest[]> {
+	return client.call<MyRequest[]>("fsm.api.get_my_requests", {}, "GET");
 }
 
 export function getMyJobs(): Promise<MyJob[]> {

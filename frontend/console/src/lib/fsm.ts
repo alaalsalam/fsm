@@ -37,6 +37,8 @@ export interface JobDoc {
 	customer_name?: string;
 	contact?: string;
 	status: JobStatus;
+	phase?: string;
+	service_request?: string;
 	priority?: string;
 	service_type?: string;
 	scheduled_date?: string;
@@ -62,6 +64,65 @@ export interface JobDoc {
 	total_cost?: number;
 	tasks?: JobTask[];
 	items?: { item_code: string; item_name?: string; qty: number; rate: number; amount?: number }[];
+}
+
+export interface ServiceRequestRow {
+	name: string;
+	subject: string;
+	customer?: string;
+	status: JobStatus;
+	priority?: string;
+	source: string;
+	service_type?: string;
+	preferred_start?: string;
+	creation: string;
+}
+
+export interface ServiceRequestDoc extends ServiceRequestRow {
+	description?: string;
+	phone?: string;
+	email?: string;
+	service_jobs: {
+		name: string;
+		status: JobStatus;
+		phase: string;
+		primary_technician?: string;
+		scheduled_date?: string;
+	}[];
+}
+
+export interface ServiceVisitRow {
+	name: string;
+	visit_number: number;
+	status: JobStatus;
+	primary_technician?: string;
+	scheduled_start?: string;
+	actual_check_in?: string;
+	actual_completion?: string;
+}
+
+export function listServiceRequests(status?: string): Promise<ServiceRequestRow[]> {
+	return client.call("fsm.service_operations.api.list_service_requests", { status }, "GET");
+}
+
+export function getServiceRequest(request: string): Promise<ServiceRequestDoc> {
+	return client.call("fsm.service_operations.api.get_service_request", { request }, "GET");
+}
+
+export function createJobFromRequest(request: string, idempotency_key: string): Promise<JobDoc> {
+	return client.call("fsm.service_operations.commands.create_job_from_request", {
+		request,
+		idempotency_key,
+		source: "Console",
+	});
+}
+
+export function getJobVisits(job: string): Promise<ServiceVisitRow[]> {
+	return client.call("fsm.service_operations.api.get_job_visits", { job }, "GET");
+}
+
+export function createVisit(job: string): Promise<ServiceVisitRow> {
+	return client.call("fsm.service_operations.commands.create_visit", { job, source: "Console" });
 }
 
 export type TaskStatus = "Pending" | "In Progress" | "Done";

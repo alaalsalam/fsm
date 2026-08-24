@@ -19,6 +19,8 @@ import {
 	getFeedback,
 	listFieldNotes,
 	addFieldNote,
+	getJobVisits,
+	createVisit,
 	type JobDoc,
 	type TechnicianSuggestion,
 	type JobLogistics,
@@ -26,6 +28,7 @@ import {
 	type JobMessage,
 	type JobFeedback,
 	type FieldNote,
+	type ServiceVisitRow,
 } from "@/lib/fsm";
 import { realtime, JOB_MESSAGE_EVENT, type JobMessageEvent } from "@/lib/realtime";
 
@@ -38,6 +41,26 @@ const busyTask = ref<number | null>(null);
 const completing = ref(false);
 const invoicing = ref(false);
 const note = ref("");
+const visits = ref<ServiceVisitRow[]>([]);
+const creatingVisit = ref(false);
+
+async function loadVisits() {
+	try {
+		visits.value = await getJobVisits(props.name);
+	} catch {
+		visits.value = [];
+	}
+}
+
+async function addVisit() {
+	creatingVisit.value = true;
+	try {
+		await createVisit(props.name);
+		await loadVisits();
+	} finally {
+		creatingVisit.value = false;
+	}
+}
 
 const suggestions = ref<TechnicianSuggestion[]>([]);
 const loadingSuggestions = ref(false);
@@ -236,6 +259,7 @@ async function load() {
 		loadMessages();
 		loadFeedback();
 		loadFieldNotes();
+		loadVisits();
 	} catch {
 		error.value = "Couldn't load this job.";
 	} finally {
@@ -346,6 +370,37 @@ onBeforeUnmount(() => offMessage?.());
 
 			<div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
 				<div class="space-y-6 lg:col-span-2">
+					<section class="rounded-2xl border border-border bg-bg p-4 shadow-card">
+						<div class="flex items-center justify-between">
+							<h2 class="text-lg font-bold">Service Visits</h2>
+							<button
+								type="button"
+								class="rounded-lg border border-border px-3 py-1.5 text-sm"
+								:disabled="creatingVisit"
+								@click="addVisit"
+							>
+								Create visit
+							</button>
+						</div>
+						<div class="mt-3 space-y-2">
+							<div
+								v-for="visit in visits"
+								:key="visit.name"
+								class="flex items-center justify-between rounded-xl bg-white/3 p-3"
+							>
+								<div>
+									<p class="font-medium">Visit {{ visit.visit_number }}</p>
+									<p class="text-xs text-fg-muted">
+										{{ visit.name }} · {{ datetime(visit.scheduled_start) }}
+									</p>
+								</div>
+								<StatusPill :status="visit.status" />
+							</div>
+							<p v-if="!visits.length" class="text-sm text-fg-muted">
+								No service visits yet.
+							</p>
+						</div>
+					</section>
 					<section
 						class="rounded-2xl border border-border bg-bg shadow-card backdrop-blur-xl"
 					>

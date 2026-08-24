@@ -9,6 +9,7 @@ const router = useRouter();
 
 const nav = [
 	{ name: "dispatch", label: "Dispatch", to: "/", exact: true },
+	{ name: "requests", label: "Requests", to: "/requests", exact: false },
 	{ name: "jobs", label: "Jobs", to: "/jobs", exact: false },
 	{ name: "inventory", label: "Inventory", to: "/inventory", exact: false },
 	{ name: "returns", label: "Returns", to: "/returns", exact: false },

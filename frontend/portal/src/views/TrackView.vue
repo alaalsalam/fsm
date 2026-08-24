@@ -14,7 +14,7 @@ const props = defineProps<{ job: string }>();
 
 const timeline = [
 	{ label: "Request received", done: true },
-	{ label: "Appointment confirmed", done: true },
+	{ label: "Service request confirmed", done: true },
 	{ label: "Technician on the way", done: true, active: true },
 	{ label: "Job completed", done: false },
 ];

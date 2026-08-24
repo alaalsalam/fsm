@@ -2,7 +2,7 @@
 import { ref, onMounted } from "vue";
 import { RouterLink } from "vue-router";
 import { Spinner } from "@kodlyft/ui";
-import { bookAppointment } from "@/lib/api";
+import { requestService } from "@/lib/api";
 import { session } from "@/lib/session";
 
 type ServiceId = "hvac" | "plumbing" | "electrical" | "appliance" | "pest" | "other";
@@ -38,7 +38,7 @@ async function submit() {
 	error.value = "";
 	busy.value = true;
 	try {
-		const res = await bookAppointment({ ...form.value });
+		const res = await requestService({ ...form.value });
 		booked.value = res.name;
 	} catch {
 		error.value = "Something went wrong. Please call us or try again.";
@@ -50,7 +50,7 @@ async function submit() {
 
 <template>
 	<div v-if="!booked">
-		<p class="text-xs font-semibold uppercase tracking-[0.14em] text-brand">Book a visit</p>
+		<p class="text-xs font-semibold uppercase tracking-[0.14em] text-brand">Request service</p>
 		<h1 class="mt-1 text-3xl font-bold text-cmd-fg">Request a service</h1>
 		<p class="mt-1 text-cmd-fg-muted">
 			Tell us what you need — we'll confirm a time and send a live tracking link.
@@ -180,7 +180,7 @@ async function submit() {
 				:disabled="busy"
 				class="kl-grad-brand flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-base font-semibold text-white shadow-e2 transition-[filter] hover:brightness-110 focus-visible:outline-none focus-visible:[box-shadow:var(--kl-elevation-focus)] disabled:opacity-60"
 			>
-				<Spinner v-if="busy" :size="18" /> {{ busy ? "Sending…" : "Request appointment" }}
+				<Spinner v-if="busy" :size="18" /> {{ busy ? "Sending…" : "Request service" }}
 			</button>
 
 			<p v-if="!session.session.authenticated" class="text-center text-sm text-cmd-fg-muted">
@@ -212,7 +212,7 @@ async function submit() {
 		<h2 class="text-2xl font-bold text-cmd-fg">Request received</h2>
 		<p class="mt-2 text-cmd-fg-muted">
 			Thanks {{ form.customer_name }}! We'll text {{ form.contact_phone }} to confirm your
-			appointment.
+			service request.
 		</p>
 		<p class="mt-1 font-mono text-sm text-cmd-fg-muted">Ref: {{ booked }}</p>
 		<div class="mt-6">

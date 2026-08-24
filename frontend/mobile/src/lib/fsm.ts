@@ -11,6 +11,43 @@ interface DispatchRow {
 	total_amount: number;
 }
 
+export interface MobileJob {
+	name: string;
+	customer: string;
+	customer_name?: string;
+	status: JobStatus;
+	phase?: string;
+	address_display?: string;
+	tasks?: { idx: number; task: string; status: string; note?: string }[];
+}
+
+export interface MobileVisit {
+	name: string;
+	visit_number: number;
+	status: string;
+	scheduled_start?: string;
+}
+
+export function getJob(name: string): Promise<MobileJob> {
+	return client.getDoc<MobileJob>("Service Job", name);
+}
+
+export function getJobVisits(job: string): Promise<MobileVisit[]> {
+	return client.call<MobileVisit[]>("fsm.service_operations.api.get_job_visits", { job }, "GET");
+}
+
+export function runVisitCommand(
+	command: string,
+	visit: string,
+	values: Record<string, unknown> = {},
+): Promise<MobileVisit> {
+	return client.call<MobileVisit>(`fsm.service_operations.commands.${command}`, {
+		visit,
+		source: "Mobile",
+		...values,
+	});
+}
+
 export async function getDispatchJobs(
 	params: { status?: string; technician?: string; limit?: number } = {},
 ): Promise<JobSummary[]> {

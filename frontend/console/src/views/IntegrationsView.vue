@@ -72,8 +72,8 @@ const endpoints = [
 	},
 	{
 		method: "POST",
-		path: "/api/method/fsm.api.book_appointment",
-		desc: "Public booking intake (CRM → appointment)",
+		path: "/api/method/fsm.api.request_service",
+		desc: "Public service request intake",
 	},
 ];
 

@@ -3,20 +3,20 @@ import { ref, computed, onMounted } from "vue";
 import { RouterLink } from "vue-router";
 import { StatusPill, Spinner } from "@kodlyft/ui";
 import { session } from "@/lib/session";
-import { getMyJobs, getMyAppointments, type MyJob, type MyAppointment } from "@/lib/api";
+import { getMyJobs, getMyRequests, type MyJob, type MyRequest } from "@/lib/api";
 
 const jobs = ref<MyJob[]>([]);
-const appointments = ref<MyAppointment[]>([]);
+const requests = ref<MyRequest[]>([]);
 const loading = ref(true);
 const error = ref("");
 
-const ACTIVE = ["Scheduled", "Assigned", "In Progress", "On Hold"];
+const ACTIVE = ["Planned", "Scheduled", "Dispatched", "In Progress", "On Hold"];
 const activeJobs = computed(() => jobs.value.filter((j) => ACTIVE.includes(j.status)));
 const pastJobs = computed(() => jobs.value.filter((j) => !ACTIVE.includes(j.status)));
 
-const APPT_TONE: Record<string, string> = {
+const REQUEST_TONE: Record<string, string> = {
 	Open: "bg-warning/15 text-warning",
-	Scheduled: "bg-info/15 text-info",
+	Triaged: "bg-info/15 text-info",
 	Converted: "bg-success/15 text-success",
 	Cancelled: "bg-fg-muted/15 text-fg-muted",
 };
@@ -35,7 +35,7 @@ async function load() {
 	loading.value = true;
 	error.value = "";
 	try {
-		[jobs.value, appointments.value] = await Promise.all([getMyJobs(), getMyAppointments()]);
+		[jobs.value, requests.value] = await Promise.all([getMyJobs(), getMyRequests()]);
 	} catch {
 		error.value = "Couldn't load your history. Please try again.";
 	} finally {
@@ -73,7 +73,7 @@ onMounted(load);
 				>
 					<path d="M12 5v14M5 12h14" />
 				</svg>
-				Book a service
+				Request service
 			</RouterLink>
 		</div>
 
@@ -151,28 +151,28 @@ onMounted(load);
 				</div>
 			</section>
 
-			<!-- Appointment requests -->
-			<section v-if="appointments.length">
+			<!-- Service requests -->
+			<section v-if="requests.length">
 				<h2 class="mb-3 text-lg font-bold text-cmd-fg">Requests</h2>
 				<div class="space-y-2">
 					<div
-						v-for="appt in appointments"
-						:key="appt.name"
+						v-for="request in requests"
+						:key="request.name"
 						class="flex items-center justify-between gap-3 rounded-xl border border-cmd-border bg-white/3 px-4 py-3"
 					>
 						<div class="min-w-0">
 							<p class="truncate text-sm font-medium text-cmd-fg">
-								{{ appt.service_type || "Service request" }}
+								{{ request.subject || request.service_type || "Service request" }}
 							</p>
 							<p class="truncate text-xs text-cmd-fg-muted">
-								Requested {{ date(appt.preferred_date || appt.creation) }}
+								Requested {{ date(request.preferred_start || request.creation) }}
 							</p>
 						</div>
 						<span
 							class="shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium"
-							:class="APPT_TONE[appt.status] || APPT_TONE.Open"
+							:class="REQUEST_TONE[request.status] || REQUEST_TONE.Open"
 						>
-							{{ appt.status }}
+							{{ request.status }}
 						</span>
 					</div>
 				</div>

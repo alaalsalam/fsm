@@ -2,7 +2,10 @@ import { defineConfig } from "@playwright/test";
 
 export default defineConfig({
 	testDir: "./e2e",
-	fullyParallel: true,
+	// Vite's on-demand dependency optimizer restarts when the lazy CORE routes are
+	// first requested. Serial execution keeps both viewport projects deterministic.
+	fullyParallel: false,
+	workers: 1,
 	reporter: "line",
 	use: {
 		headless: true,

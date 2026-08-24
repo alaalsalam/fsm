@@ -36,7 +36,7 @@ const unsubscribers: Array<() => void> = [];
 
 const COLUMNS: { status: JobStatus; label: string; dot: string }[] = [
 	{ status: "Scheduled", label: "Scheduled", dot: "bg-warning" },
-	{ status: "Assigned", label: "Assigned", dot: "bg-info" },
+	{ status: "Dispatched", label: "Dispatched", dot: "bg-info" },
 	{ status: "In Progress", label: "In progress", dot: "bg-brand" },
 	{ status: "On Hold", label: "On hold", dot: "bg-fg-muted" },
 ];

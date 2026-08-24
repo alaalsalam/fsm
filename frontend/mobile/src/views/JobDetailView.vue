@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import {
 	IonPage,
 	IonHeader,
@@ -12,7 +12,15 @@ import {
 } from "@ionic/vue";
 import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
 import { ChecklistItem, KlButton } from "@kodlyft/ui";
-import { startTimer, stopTimer } from "@/lib/fsm";
+import {
+	startTimer,
+	stopTimer,
+	getJob,
+	getJobVisits,
+	runVisitCommand,
+	type MobileJob,
+	type MobileVisit,
+} from "@/lib/fsm";
 
 const props = defineProps<{ id: string }>();
 
@@ -21,6 +29,11 @@ const timerBusy = ref(false);
 const elapsed = ref(0);
 const lastHours = ref<number | null>(null);
 const timerError = ref("");
+const job = ref<MobileJob>();
+const visits = ref<MobileVisit[]>([]);
+const loading = ref(true);
+const actionBusy = ref(false);
+const actionError = ref("");
 let startedAt = 0;
 let tick: ReturnType<typeof setInterval> | undefined;
 
@@ -60,14 +73,39 @@ async function toggleTimer() {
 	}
 }
 
+onMounted(async () => {
+	try {
+		[job.value, visits.value] = await Promise.all([getJob(props.id), getJobVisits(props.id)]);
+	} catch {
+		actionError.value = "Couldn't load this job from the server.";
+	} finally {
+		loading.value = false;
+	}
+});
 onUnmounted(() => clearInterval(tick));
 
-const checklist = ref([
-	{ label: "Confirm equipment model", note: "Photograph the rating plate", done: false },
-	{ label: "Inspect and test unit", done: false },
-	{ label: "Replace consumables", done: false },
-	{ label: "Customer walkthrough", done: false },
-]);
+const commandByStatus: Record<string, string> = {
+	Dispatched: "start_travel",
+	"En Route": "check_in_visit",
+	"Checked In": "start_visit_work",
+	"In Progress": "check_out_visit",
+	"Checked Out": "complete_visit",
+};
+async function advance(visit: MobileVisit) {
+	const command = commandByStatus[visit.status];
+	if (!command) return;
+	actionBusy.value = true;
+	actionError.value = "";
+	try {
+		await runVisitCommand(command, visit.name);
+		visits.value = await getJobVisits(props.id);
+		job.value = await getJob(props.id);
+	} catch {
+		actionError.value = "Couldn't update the visit. Check assignment and connection.";
+	} finally {
+		actionBusy.value = false;
+	}
+}
 
 const photos = ref<string[]>([]);
 
@@ -97,6 +135,38 @@ async function addPhoto() {
 		</IonHeader>
 		<IonContent :fullscreen="true">
 			<div class="space-y-6 p-4">
+				<IonSpinner v-if="loading" />
+				<p v-if="actionError" class="text-sm text-danger">{{ actionError }}</p>
+				<section v-if="job" class="rounded-lg border border-border bg-bg p-4">
+					<h2 class="text-lg font-bold">{{ job.customer_name || job.customer }}</h2>
+					<p class="text-sm text-fg-muted">
+						{{ job.status }} · {{ job.phase || "Planning" }}
+					</p>
+					<p class="mt-2 text-sm">{{ job.address_display }}</p>
+				</section>
+				<section v-if="visits.length">
+					<h2 class="mb-2 text-lg font-bold">Service visits</h2>
+					<div
+						v-for="visit in visits"
+						:key="visit.name"
+						class="mb-2 rounded-lg border border-border bg-bg p-4"
+					>
+						<div class="flex items-center justify-between">
+							<div>
+								<p class="font-semibold">Visit {{ visit.visit_number }}</p>
+								<p class="text-sm text-fg-muted">{{ visit.status }}</p>
+							</div>
+							<button
+								v-if="commandByStatus[visit.status]"
+								class="rounded-lg bg-brand px-3 py-2 text-sm font-semibold text-white"
+								:disabled="actionBusy"
+								@click="advance(visit)"
+							>
+								Continue
+							</button>
+						</div>
+					</div>
+				</section>
 				<section class="rounded-lg border border-border bg-bg p-4">
 					<div class="flex items-center justify-between">
 						<div>
@@ -136,11 +206,12 @@ async function addPhoto() {
 					<h2 class="mb-2 text-lg font-bold">Checklist</h2>
 					<div class="rounded-lg border border-border bg-bg">
 						<ChecklistItem
-							v-for="(item, i) in checklist"
+							v-for="(item, i) in job?.tasks || []"
 							:key="i"
-							v-model="checklist[i].done"
-							:label="item.label"
+							:model-value="item.status === 'Done'"
+							:label="item.task"
 							:note="item.note"
+							@update:model-value="() => {}"
 						/>
 					</div>
 				</section>

@@ -24,7 +24,7 @@ const statusFilter = ref<JobStatus | "">("");
 const STATUSES: JobStatus[] = [
 	"Draft",
 	"Scheduled",
-	"Assigned",
+	"Dispatched",
 	"In Progress",
 	"On Hold",
 	"Completed",

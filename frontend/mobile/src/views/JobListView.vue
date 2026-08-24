@@ -24,27 +24,20 @@ const loading = ref(true);
 const jobs = ref<JobSummary[]>([]);
 const vanStock = ref<StockRow[]>([]);
 const showStock = ref(false);
+const loadError = ref("");
 let stop: (() => void) | undefined;
-
-const SAMPLE: JobSummary[] = [
-	{ name: "JOB-0001", customer: "Acme Cooling Co.", address: "120 Main St", status: "Scheduled" },
-	{
-		name: "JOB-0002",
-		customer: "Bluewater Plumbing",
-		address: "44 Oak Ave",
-		status: "In Progress",
-	},
-];
 
 const todayCount = computed(() => jobs.value.length);
 const activeCount = computed(() => jobs.value.filter((j) => j.status === "In Progress").length);
 
 async function load() {
 	loading.value = true;
+	loadError.value = "";
 	try {
 		jobs.value = await getDispatchJobs({ limit: 100 });
 	} catch {
-		jobs.value = SAMPLE;
+		jobs.value = [];
+		loadError.value = "Couldn't load assigned jobs. Check your connection and sign in again.";
 	} finally {
 		loading.value = false;
 	}
@@ -191,6 +184,12 @@ async function refresh(event: RefresherCustomEvent) {
 				<div v-if="loading" class="flex justify-center py-12">
 					<IonSpinner />
 				</div>
+				<p
+					v-else-if="loadError"
+					class="mt-4 rounded-xl border border-danger/30 bg-danger/10 p-4 text-sm text-danger"
+				>
+					{{ loadError }}
+				</p>
 
 				<div v-else class="mt-4 flex flex-col gap-3">
 					<JobCard v-for="job in jobs" :key="job.name" :job="job" @open="open" />
