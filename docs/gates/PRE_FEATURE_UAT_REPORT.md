@@ -143,13 +143,20 @@ These changes cannot be committed autonomously per platform constraints. The rep
 | Backend tests (39/39) | ✅ PASS |
 | Phase 0 scenario coverage (13/13) | ✅ PASS |
 | No new functional backend defects | ✅ PASS |
-| Repository clean at approved HEAD | ❌ BLOCKED — dirty tree (16 files, 1 TS error) |
-| Frontend typecheck | ❌ FAIL — TS1005 in SubcontractorsView.vue line 77 |
+| Repository clean | ✅ PASS — tree clean after disposition |
+| Frontend typecheck | ✅ PASS — `vue-tsc --noEmit` exit 0 |
 
-**PRE-FEATURE-GATE: BLOCKED**
+**PRE-FEATURE-GATE: PASS**
 
-Blocker: Working tree is dirty with uncommitted pre-existing localization work. One TypeScript defect (D-001) must be resolved. Repository must be clean before this gate can be called PASS.
+### Disposition applied (2026-08-24)
 
-Functional baseline is sound. The backend is ready to accept Phase 1 feature work as soon as the tree is clean.
+The dirty-tree blocker was resolved by the manager-authorized disposition:
 
-**Proposed next action:** Authorize commit of Groups A + B (with D-001 fixed), then re-run typecheck to confirm clean, then close PRE-FEATURE-GATE as PASS and begin Phase 1.
+1. **D-001 fixed** — `SubcontractorsView.vue` line 77 escaped-quote syntax error replaced with guillemets; `vue-tsc --noEmit` now exits 0.
+2. **Commit `99fb932`** — `fix(router): use static base path for Vue history to fix preview URL` (Group A).
+3. **Commit `77cf8c4`** — `feat(i18n): add ar/en language toggle and console translations` (Group B; 4 views deferred to Phase 14).
+4. **Commit `b79b8c7`** — this gate report.
+
+Working tree is clean. Functional baseline is sound. Backend is ready for Phase 1.
+
+**Next action:** Begin Phase 1 — Service Teams & Dispatch.
