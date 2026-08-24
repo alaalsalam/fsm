@@ -34,6 +34,15 @@ export interface TechnicianSuggestion {
 	reasons: string[];
 }
 
+export interface TeamSuggestion {
+	team: string;
+	team_name: string;
+	territory: string | null;
+	team_leader: string | null;
+	score: number;
+	reasons: string[];
+}
+
 export interface JobDoc {
 	name: string;
 	customer: string;
@@ -47,6 +56,8 @@ export interface JobDoc {
 	scheduled_date?: string;
 	scheduled_end?: string;
 	primary_technician?: string;
+	assigned_service_team?: string;
+	team_leader?: string;
 	territory?: string;
 	service_address?: string;
 	address_display?: string;
@@ -177,6 +188,14 @@ export function suggestTechnicians(job: string, limit = 8): Promise<TechnicianSu
 
 export function assignTechnician(job: string, technician: string): Promise<JobDoc> {
 	return client.call<JobDoc>("fsm.scheduling.assign_technician", { job, technician });
+}
+
+export function suggestTeams(job: string, limit = 8): Promise<TeamSuggestion[]> {
+	return client.call<TeamSuggestion[]>("fsm.scheduling.suggest_teams", { job, limit }, "GET");
+}
+
+export function assignTeam(job: string, team: string): Promise<JobDoc> {
+	return client.call<JobDoc>("fsm.scheduling.assign_team", { job, team });
 }
 
 export function getJob(name: string): Promise<JobDoc> {

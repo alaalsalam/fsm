@@ -10,6 +10,8 @@ import {
 	createInvoiceFromJob,
 	suggestTechnicians,
 	assignTechnician,
+	suggestTeams,
+	assignTeam,
 	getJobLogistics,
 	requestParts,
 	updateJob,
@@ -23,6 +25,7 @@ import {
 	createVisit,
 	type JobDoc,
 	type TechnicianSuggestion,
+	type TeamSuggestion,
 	type JobLogistics,
 	type JobEstimate,
 	type JobMessage,
@@ -92,6 +95,39 @@ async function assign(technician: string) {
 			(e as { message?: string })?.message || "Couldn't assign this technician.";
 	} finally {
 		assigningTo.value = null;
+	}
+}
+
+const teamSuggestions = ref<TeamSuggestion[]>([]);
+const loadingTeamSuggestions = ref(false);
+const assigningTeamTo = ref<string | null>(null);
+const teamAssignError = ref("");
+
+async function loadTeamSuggestions() {
+	if (!job.value) return;
+	loadingTeamSuggestions.value = true;
+	teamAssignError.value = "";
+	try {
+		teamSuggestions.value = await suggestTeams(job.value.name);
+	} catch {
+		teamAssignError.value = "Couldn't load team suggestions.";
+	} finally {
+		loadingTeamSuggestions.value = false;
+	}
+}
+
+async function assignTeamTo(team: string) {
+	if (!job.value) return;
+	assigningTeamTo.value = team;
+	teamAssignError.value = "";
+	try {
+		job.value = await assignTeam(job.value.name, team);
+		teamSuggestions.value = [];
+	} catch (e) {
+		teamAssignError.value =
+			(e as { message?: string })?.message || "Couldn't assign this team.";
+	} finally {
+		assigningTeamTo.value = null;
 	}
 }
 
@@ -886,6 +922,15 @@ onBeforeUnmount(() => offMessage?.());
 							<dd class="text-fg">{{ job.primary_technician || "Unassigned" }}</dd>
 						</div>
 						<div>
+							<dt class="text-fg-muted">Service Team</dt>
+							<dd class="text-fg">
+								{{ job.assigned_service_team || "Unassigned"
+								}}<span v-if="job.team_leader" class="text-fg-muted">
+									· Lead: {{ job.team_leader }}</span
+								>
+							</dd>
+						</div>
+						<div>
 							<dt class="text-fg-muted">Response SLA</dt>
 							<dd class="text-fg">
 								<span v-if="job.responded_on" class="text-success"
@@ -1023,6 +1068,60 @@ onBeforeUnmount(() => offMessage?.());
 						<p v-else-if="!loadingSuggestions" class="text-xs text-fg-muted">
 							Tap “Suggest” to rank available technicians by skill, territory and
 							proximity.
+						</p>
+					</div>
+
+					<div
+						v-if="job.status !== 'Completed' && job.status !== 'Cancelled'"
+						class="border-t border-border pt-3"
+					>
+						<div class="mb-2 flex items-center justify-between">
+							<p class="text-fg-muted">
+								{{ job.assigned_service_team ? "Reassign team" : "Assign team" }}
+							</p>
+							<button
+								type="button"
+								:disabled="loadingTeamSuggestions"
+								class="text-xs font-medium text-brand hover:underline disabled:opacity-50"
+								@click="loadTeamSuggestions"
+							>
+								{{ loadingTeamSuggestions ? "Finding…" : "Suggest" }}
+							</button>
+						</div>
+
+						<p v-if="teamAssignError" class="mb-2 text-xs text-danger">
+							{{ teamAssignError }}
+						</p>
+
+						<ul v-if="teamSuggestions.length" class="space-y-2">
+							<li
+								v-for="s in teamSuggestions"
+								:key="s.team"
+								class="rounded-xl border border-border bg-white/2 p-2.5"
+							>
+								<div class="flex items-center justify-between gap-2">
+									<div class="min-w-0">
+										<p class="truncate text-sm font-medium text-fg">
+											{{ s.team_name }}
+										</p>
+										<p class="truncate text-xs text-fg-muted">
+											{{ s.reasons.join(" · ") || s.territory || "—" }}
+										</p>
+									</div>
+									<button
+										type="button"
+										:disabled="assigningTeamTo !== null"
+										class="kl-grad-brand inline-flex shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-white shadow-e2 transition-[filter] hover:brightness-110 disabled:opacity-60"
+										@click="assignTeamTo(s.team)"
+									>
+										<Spinner v-if="assigningTeamTo === s.team" :size="12" />
+										Assign
+									</button>
+								</div>
+							</li>
+						</ul>
+						<p v-else-if="!loadingTeamSuggestions" class="text-xs text-fg-muted">
+							Tap “Suggest” to rank service teams by skill, territory and capacity.
 						</p>
 					</div>
 				</aside>
