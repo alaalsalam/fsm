@@ -83,6 +83,24 @@ KodLyft FSM exposes 58 whitelisted methods: 51 module functions and 7 document m
 
 `frontend/api` provides one `FrappeClient` with cookie/CSRF authentication for web and token authentication for mobile, resource CRUD, whitelisted calls, uploads, and Socket.IO support. Console, Portal, and Mobile still define separate domain wrapper/type files; therefore transport is shared, but the domain contract is not yet a single generated or versioned source of truth.
 
+## Integration points
+
+| Integration | Direction | Current mechanism | Authority |
+|---|---|---|---|
+| ERPNext Customer/Contact | FSM → ERPNext | Portal registration and appointment conversion create/link native records | ERPNext/Frappe |
+| ERPNext Item/UOM | ERPNext → FSM | Service Job/Return child rows link native masters | ERPNext Stock |
+| ERPNext Warehouse/Bin | ERPNext → FSM | Technician van Warehouse and stock-level projections | ERPNext Stock |
+| ERPNext Material Request | FSM → ERPNext | `request_parts`; custom link `fsm_service_job` | ERPNext Stock |
+| ERPNext Delivery Note | ERPNext → FSM | Job logistics projection; custom link `fsm_service_job` | ERPNext Stock |
+| ERPNext Stock Entry | FSM → ERPNext | Service Return creates Material Receipt | ERPNext Stock |
+| ERPNext Sales Invoice | FSM → ERPNext | Job items create/link a draft invoice | ERPNext Accounts |
+| Frappe Webhook/API keys | External ↔ FSM | Admin integration methods and token-authenticated job APIs | Frappe Integration |
+| Frappe realtime/Socket.IO | Server → clients | Job, technician, and message events | FSM projections |
+| Capacitor device APIs | Mobile → device | Geolocation, camera, network, preferences, notifications, keyboard/status UI | Device platform |
+| Google Fonts | Web → external CDN | Console/Portal HTML preconnect and stylesheet | External presentation dependency |
+
+No payment gateway integration, external map/ETA provider, email/SMS gateway adapter, or accounting synchronization outside native ERPNext documents is implemented in the KodLyft baseline.
+
 ## Contract gaps
 
 - No API version prefix or compatibility policy.
