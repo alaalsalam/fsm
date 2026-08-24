@@ -130,7 +130,58 @@ baseline uses (dedicated test site), not the live dev site.
   (discovers all `test_*.py`: 39 baseline + 18 team = 57). Optionally scope to the new module with
   `--module fsm.tests.test_service_teams`. **Do not use `--module fsm.tests`** (zero tests).
 
-If all 57 pass → **TEAMS-GATE: PASS**, proceed to Phase 2 (Service Contracts / AMC). Otherwise fix
-within Phase 1 only.
+---
 
+## Manager gate cycle 2 — non-destructive fallback FAILED; root cause + recovery (2026-08-24)
+
+### Failed non-destructive fallback (recorded, do not reuse)
+- `run-tests --app fsm --module fsm.tests.test_service_teams --skip-before-tests` → **still failed**.
+  `--skip-before-tests` only skips the `before_tests` *hook*; it does **not** skip test-record
+  dependency creation, which runs during per-test-class setup regardless.
+- `--skip-test-records` is **deprecated and a no-op in Frappe v16** (`run-tests --help` lists it
+  `DEPRECATED`); it produces zero valid evidence. **Neither flag is acceptable Gate evidence.**
+
+### v16 test-runner inspection (evidence-based)
+- `frappe/testing/environment.py:186` `_create_global_test_record_dependencies` + per-`IntegrationTestCase`
+  setup call `make_test_records(doctype, commit=True)`.
+- `frappe/tests/utils/generators.py` `get_missing_records_doctypes` walks each doctype's **link fields**
+  and calls `get_modules(dep)` → `load_doctype_module(dep, module, "test_")`, importing e.g.
+  `erpnext/.../customer/test_customer.py`.
+- That import runs, at **module scope**, `erpnext/tests/utils.py:2988` `BootStrapTestData()` →
+  `make_master_data()` → `make_price_list()` → `make_records(...)`.
+- `make_records` guards with `frappe.db.exists(doctype, filters)` where `filters` **includes `currency`**,
+  and `make_price_list` **hardcodes `currency: "INR"`**. digit16's `Standard Buying` Price List is
+  **`SAR`** (verified: `SYS_CURRENCY=SAR`), so the guard misses, an insert is attempted, and the
+  `field:price_list_name` primary key collides → `DuplicateEntryError('Price List','Standard Buying')`.
+
+**This is an ERPNext-core test-harness defect (INR-hardcoded, non-idempotent) × a SAR site.** It fires
+on *import* of `erpnext.tests.utils` and is unavoidable for any fsm test whose dependency graph reaches
+an ERPNext master (Customer/Company/Item/Serial No/Warehouse…). The baseline `test_service_operations`
+fails identically. **The approved baseline 39-test evidence was obtained on dedicated test sites, not
+digit16** — the testing log shows `site=digit16-core-test.localhost` and `site=digit16-ib-test.localhost`.
+
+### Is there a non-destructive, apps/fsm-only recovery on digit16? — **No.**
+- `IGNORE_TEST_RECORD_DEPENDENCIES` / `EXTRA_TEST_RECORD_DEPENDENCIES` are read from the **resolved
+  doctype's** test module, not an arbitrary test file, and would have to be added to *every* fsm
+  doctype/test module for *every* ERPNext-linked doctype — brittle, alters baseline modules, and still
+  cannot stop `erpnext.tests.utils` importing via other doctypes. Not a supported or reliable fix.
+- Editing `erpnext/tests/utils.py` is **outside `apps/fsm`** (not permitted here).
+- Aligning digit16's `Standard Buying`/`Standard Selling` to INR would touch **live master data** and
+  merely moves the failure downstream (BootStrapTestData creates dozens of INR `_Test`/company/account
+  records that collide with the populated SAR site). Unreliable and out of scope ("do not modify
+  digit16 data").
+
+### Minimum external authorization required (choose one)
+1. **RECOMMENDED — run on a dedicated test database** (exactly how the baseline was certified). This
+   never touches the live digit16 data or production. Requires the manager to relax "digit16-only / no
+   new site" **for the test-run step only**, or to point to the existing `digit16-*-test.localhost`
+   harness. Command: `bench --site digit16-teams-test.localhost run-tests --app fsm`.
+2. **Authorize an ERPNext-core patch** making `BootStrapTestData.make_price_list` idempotent on
+   `price_list_name` (or currency-agnostic / `ignore_if_duplicate`). Outside `apps/fsm`.
+3. **Authorize a reversible digit16 master-data alignment** (set `Standard Buying`/`Standard Selling`
+   currency to INR for the run, then restore). Touches live data; **not recommended** (likely
+   downstream failures).
+
+**TEAMS-GATE remains FAIL/BLOCKED** pending one of the above. Not claiming PASS. Not starting Phase 2.
 No production site touched. No `ignore_permissions` on user-driven writes. No ERPNext duplication.
+No digit16 data modified or deleted; no other site created, dropped, restored, or purged.
