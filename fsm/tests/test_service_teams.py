@@ -1,9 +1,9 @@
 import frappe
 from frappe.tests.utils import FrappeTestCase
-from frappe.utils import add_days, add_to_date, now_datetime, today
+from frappe.utils import add_days, today
 
-from fsm.api import _default_customer_group, _default_territory
-from fsm.scheduling import assign_team, get_dispatch_jobs, suggest_teams
+from fsm.api import _default_customer_group, _default_territory, get_dispatch_jobs
+from fsm.scheduling import assign_team, suggest_teams
 from fsm.tests.test_security import SecurityFixture
 
 
@@ -250,12 +250,25 @@ class TestServiceTeamDispatch(FrappeTestCase, ServiceTeamMixin):
 class TestServiceTeamAuthorization(SecurityFixture, ServiceTeamMixin):
 	def setUp(self):
 		super().setUp()
+		self._remove_stale_teams()
 		self.team_a = self._make_team(
 			self.company_a,
 			[{"technician": self.technician_a, "role_in_team": "Team Leader"}],
 			leader=self.technician_a,
 			capacity=5,
 		)
+
+	def _remove_stale_teams(self):
+		"""SecurityFixture reuses fixed-name technicians; drop any team that a prior
+		run left them attached to so the overlapping-membership guard stays clean."""
+		teams = frappe.get_all(
+			"Service Team Member",
+			filters={"technician": ["in", [self.technician_a, self.technician_b]]},
+			pluck="parent",
+			distinct=True,
+		)
+		for team in set(teams):
+			frappe.delete_doc("Service Team", team, force=True, ignore_permissions=True)
 
 	def test_technician_cannot_assign_team(self):
 		frappe.set_user(self.technician_user_a)
