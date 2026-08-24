@@ -19,7 +19,12 @@ from fsm.security.scopes import current_customer
 
 
 @frappe.whitelist()
-def get_dispatch_jobs(status: str | None = None, technician: str | None = None, limit: int = 50):
+def get_dispatch_jobs(
+	status: str | None = None,
+	technician: str | None = None,
+	team: str | None = None,
+	limit: int = 50,
+):
 	"""Jobs for the console dispatch board / mobile job list (permission-aware)."""
 	require_authenticated()
 	filters: dict = {}
@@ -27,6 +32,8 @@ def get_dispatch_jobs(status: str | None = None, technician: str | None = None, 
 		filters["status"] = status
 	if technician:
 		filters["primary_technician"] = technician
+	if team:
+		filters["assigned_service_team"] = team
 
 	return frappe.get_list(
 		"Service Job",
@@ -39,6 +46,8 @@ def get_dispatch_jobs(status: str | None = None, technician: str | None = None, 
 			"priority",
 			"scheduled_date",
 			"primary_technician",
+			"assigned_service_team",
+			"team_leader",
 			"total_amount",
 			"address_display",
 			"service_request",

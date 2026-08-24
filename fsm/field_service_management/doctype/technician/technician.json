@@ -28,7 +28,9 @@
   "last_seen_longitude",
   "last_seen_on",
   "section_break_skills",
-  "skills"
+  "skills",
+  "section_break_certifications",
+  "certifications"
  ],
  "fields": [
   {
@@ -177,6 +179,17 @@
    "fieldtype": "Table",
    "label": "Skills",
    "options": "Technician Skill"
+  },
+  {
+   "fieldname": "section_break_certifications",
+   "fieldtype": "Section Break",
+   "label": "Certifications"
+  },
+  {
+   "fieldname": "certifications",
+   "fieldtype": "Table",
+   "label": "Certifications",
+   "options": "Technician Certification"
   }
  ],
  "index_web_pages_for_search": 1,

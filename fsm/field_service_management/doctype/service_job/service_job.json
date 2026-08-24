@@ -27,6 +27,8 @@
   "responded_on",
   "column_break_schedule",
   "territory",
+  "assigned_service_team",
+  "team_leader",
   "primary_technician",
   "sla_breached",
   "section_break_location",
@@ -213,6 +215,22 @@
    "label": "Service Territory",
    "options": "Service Territory",
    "search_index": 1
+  },
+  {
+   "fieldname": "assigned_service_team",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "Assigned Service Team",
+   "options": "Service Team",
+   "search_index": 1
+  },
+  {
+   "fetch_from": "assigned_service_team.team_leader",
+   "fieldname": "team_leader",
+   "fieldtype": "Link",
+   "label": "Team Leader",
+   "options": "Technician",
+   "read_only": 1
   },
   {
    "fieldname": "primary_technician",

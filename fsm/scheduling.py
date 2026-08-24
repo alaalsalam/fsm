@@ -26,6 +26,10 @@ _AVAILABLE_WEIGHT = 20
 _PROXIMITY_WEIGHT = 25
 _PROFICIENCY_BONUS = {"Beginner": 0, "Intermediate": 5, "Expert": 10}
 
+_TEAM_CAPACITY_WEIGHT = 20
+_TEAM_WORKLOAD_WEIGHT = 15
+_LIVE_JOB_STATUSES = ("Scheduled", "Dispatched", "In Progress")
+
 
 @frappe.whitelist()
 def suggest_technicians(job: str, limit: int = 10):
@@ -108,6 +112,133 @@ def get_available_technicians(
 		reverse=True,
 	)
 	return out
+
+
+@frappe.whitelist()
+def suggest_teams(job: str, limit: int = 10):
+	"""Return service teams ranked for a job, best first, with a match breakdown.
+
+	Mirrors suggest_technicians so the dispatch board can suggest a crew, not just
+	a lone technician."""
+	doc = frappe.get_doc("Service Job", job)
+	require_job_access(doc, "read", manager_only=True)
+	territories = _territory_ancestors(doc.territory)
+
+	ranked = []
+	for team in _eligible_teams(doc.company):
+		score, reasons = score_team(team, doc, territories)
+		if score is None:
+			continue
+		ranked.append(
+			{
+				"team": team.name,
+				"team_name": team.team_name,
+				"territory": team.territory,
+				"team_leader": team.team_leader,
+				"score": score,
+				"reasons": reasons,
+			}
+		)
+
+	ranked.sort(key=lambda r: r["score"], reverse=True)
+	return ranked[: bounded_int(limit, 1, 50)]
+
+
+@frappe.whitelist()
+def assign_team(job: str, team: str):
+	"""Assign a service team to a job (company + capacity checked) and return the job.
+
+	team_leader is fetched onto the job automatically via fetch_from."""
+	doc = frappe.get_doc("Service Job", job)
+	require_job_access(doc, "write", manager_only=True)
+
+	team_doc = frappe.db.get_value(
+		"Service Team", team, ["company", "status", "active", "capacity"], as_dict=True
+	)
+	if not team_doc:
+		frappe.throw(_("Service Team {0} was not found.").format(team), frappe.DoesNotExistError)
+	if team_doc.company != doc.company:
+		frappe.throw(_("The team and job must belong to the same company."), frappe.PermissionError)
+	if not team_doc.active or team_doc.status != "Active":
+		frappe.throw(_("Team {0} is not active.").format(team), frappe.ValidationError)
+	if team_doc.capacity and _team_open_job_count(team, exclude_job=doc.name) >= team_doc.capacity:
+		frappe.throw(_("Team {0} is already at capacity.").format(team), frappe.ValidationError)
+
+	doc.assigned_service_team = team
+	doc.save()
+	return doc.as_dict()
+
+
+def score_team(team, job, territories: set[str]) -> tuple[int | None, list[str]]:
+	"""Score one team against a job. Returns (score, reasons) or (None, _) when the
+	team is hard-excluded (over capacity, or every active member double-booked)."""
+	members = _team_active_members(team.name)
+
+	open_jobs = _team_open_job_count(team.name, exclude_job=job.name)
+	if team.capacity and open_jobs >= team.capacity:
+		return None, []
+
+	if members:
+		conflicted = sum(1 for m in members if _has_conflict(m, job))
+		if job.scheduled_date and conflicted >= len(members):
+			return None, []
+	else:
+		conflicted = 0
+
+	score, reasons = 0, []
+
+	if job.service_type and any(_has_skill(m, job.service_type) for m in members):
+		bonus = max((_best_proficiency_bonus(m, job.service_type) for m in members), default=0)
+		score += _SKILL_WEIGHT + bonus
+		reasons.append(_("A member has the required skill"))
+
+	if not team.territory or (territories and team.territory in territories):
+		score += _TERRITORY_WEIGHT
+		reasons.append(_("Covers the territory"))
+
+	if team.status == "Active":
+		score += _AVAILABLE_WEIGHT
+		reasons.append(_("Team is active"))
+
+	if team.capacity:
+		remaining = team.capacity - open_jobs
+		score += round(_TEAM_CAPACITY_WEIGHT * remaining / team.capacity)
+		reasons.append(_("Has spare capacity"))
+
+	if conflicted:
+		score -= _TEAM_WORKLOAD_WEIGHT * conflicted
+		reasons.append(_("{0} member(s) have a clashing booking").format(conflicted))
+
+	return score, reasons
+
+
+def _eligible_teams(company: str) -> list:
+	"""Active service teams for a company, with the fields team scoring needs."""
+	return frappe.get_list(
+		"Service Team",
+		filters={"active": 1, "status": "Active", "company": company},
+		fields=["name", "team_name", "territory", "team_leader", "status", "capacity"],
+	)
+
+
+def _team_active_members(team: str) -> list[str]:
+	"""Technician names of a team's active members."""
+	return frappe.get_all(
+		"Service Team Member",
+		filters={"parent": team, "parenttype": "Service Team", "active": 1},
+		pluck="technician",
+	)
+
+
+def _team_open_job_count(team: str, exclude_job: str | None = None) -> int:
+	"""Count of live jobs currently assigned to a team."""
+	filters = {
+		"assigned_service_team": team,
+		"status": ["in", list(_LIVE_JOB_STATUSES)],
+	}
+	if exclude_job:
+		filters["name"] = ["!=", exclude_job]
+	return frappe.db.count("Service Job", filters)
 
 
 def score_technician(tech, job, territories: set[str]) -> tuple[int | None, list[str]]:
