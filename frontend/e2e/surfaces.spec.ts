@@ -193,3 +193,109 @@ test("mobile advances an assigned visit from the job", async ({ page }) => {
 	await page.getByRole("button", { name: "Continue" }).click();
 	await expect(page.getByText("En Route")).toBeVisible();
 });
+
+test("ERPNext delivery provisioned equipment appears in Console", async ({ page }) => {
+	await page.route(/\/api\/(method|resource)\//, (route) => {
+		const url = decodeURIComponent(route.request().url());
+		if (url.includes("frappe.auth.get_logged_user"))
+			return json(route, { message: "manager@example.com" });
+		if (url.includes("/api/resource/User/"))
+			return json(route, {
+				data: { name: "manager@example.com", roles: [{ role: "FSM Manager" }] },
+			});
+		if (url.includes("get_customer_equipment"))
+			return json(route, {
+				message: [
+					{
+						name: "FSM-EQ-000001",
+						equipment_id: "FSM-EQ-000001",
+						equipment_name: "Fire Extinguisher",
+						company: "Company A",
+						customer: "Customer A",
+						customer_site: "SITE-A",
+						item_code: "FE-001",
+						item_name: "Fire Extinguisher",
+						serial_no: "SER-001",
+						status: "Active",
+						installation_date: "2026-08-24",
+						warranty_status: "Active",
+						last_service_date: null,
+					},
+				],
+			});
+		return json(route, { message: [] });
+	});
+	await page.goto("http://127.0.0.1:4174/fsm-console/equipment");
+	await expect(page.getByRole("heading", { name: "Installed Equipment" })).toBeVisible();
+	await expect(page.getByText("FSM-EQ-000001")).toBeVisible();
+	await expect(page.getByText("SER-001")).toBeVisible();
+});
+
+test("customer My Equipment displays only owned records", async ({ page }) => {
+	await page.route(/\/api\/(method|resource)\//, (route) => {
+		const url = decodeURIComponent(route.request().url());
+		if (url.includes("get_portal_session"))
+			return json(route, {
+				message: { authenticated: true, full_name: "Customer A", customer: "Customer A" },
+			});
+		if (url.includes("get_customer_equipment"))
+			return json(route, {
+				message: [
+					{
+						name: "FSM-EQ-000001",
+						equipment_id: "FSM-EQ-000001",
+						equipment_name: "Pump",
+						company: "Company A",
+						customer: "Customer A",
+						customer_site: "SITE-A",
+						item_code: "PUMP-1",
+						item_name: "Pump",
+						status: "Active",
+						warranty_status: "Active",
+					},
+				],
+			});
+		return json(route, { message: [] });
+	});
+	await page.goto("http://127.0.0.1:4175/my-equipment");
+	await expect(page.getByRole("heading", { name: "My Equipment" })).toBeVisible();
+	await expect(page.getByText("Pump", { exact: true })).toBeVisible();
+	await expect(page.getByText("FSM-EQ-000001")).toBeVisible();
+});
+
+test("mobile job displays multiple linked equipment records", async ({ page }) => {
+	await page.route(/\/api\/(method|resource)\//, (route) => {
+		const url = decodeURIComponent(route.request().url());
+		if (url.includes("/api/resource/Service Job/"))
+			return json(route, {
+				data: {
+					name: "FSM-JOB-0002",
+					customer: "Customer A",
+					status: "Dispatched",
+					tasks: [],
+				},
+			});
+		if (url.includes("get_job_equipment"))
+			return json(route, {
+				message: [
+					{
+						installed_equipment: "FSM-EQ-000001",
+						item_code: "FE-001",
+						serial_no: "SER-001",
+						equipment_status: "Active",
+					},
+					{
+						installed_equipment: "FSM-EQ-000002",
+						item_code: "FE-001",
+						serial_no: "SER-002",
+						equipment_status: "Active",
+					},
+				],
+			});
+		return json(route, { message: [] });
+	});
+	await page.goto("http://127.0.0.1:4176/jobs/FSM-JOB-0002");
+	await expect(page.getByRole("heading", { name: "Linked equipment" })).toBeVisible();
+	await expect(page.getByText("FSM-EQ-000001")).toBeVisible();
+	await expect(page.getByText("FSM-EQ-000002")).toBeVisible();
+});
