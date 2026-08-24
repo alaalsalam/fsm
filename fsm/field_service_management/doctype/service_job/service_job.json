@@ -38,6 +38,8 @@
   "section_break_checklist",
   "checklist_template",
   "tasks",
+  "section_break_equipment",
+  "equipment",
   "section_break_items",
   "items",
   "total_amount",
@@ -281,6 +283,17 @@
    "fieldtype": "Table",
    "label": "Tasks",
    "options": "Service Job Task"
+  },
+  {
+   "fieldname": "section_break_equipment",
+   "fieldtype": "Section Break",
+   "label": "Installed Equipment"
+  },
+  {
+   "fieldname": "equipment",
+   "fieldtype": "Table",
+   "label": "Installed Equipment",
+   "options": "Service Job Equipment"
   },
   {
    "fieldname": "section_break_items",

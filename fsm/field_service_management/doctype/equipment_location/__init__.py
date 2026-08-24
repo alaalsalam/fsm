@@ -1,0 +1,1 @@
+"""Equipment Location DocType."""

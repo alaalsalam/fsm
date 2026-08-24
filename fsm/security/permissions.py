@@ -1,5 +1,6 @@
 import frappe
 
+from fsm.installed_base.access import require_equipment_access, require_location_access, require_site_access
 from fsm.security.policy import require_job_access, require_manager_scope
 from fsm.security.scopes import (
 	FSM_CUSTOMER,
@@ -90,11 +91,14 @@ def event_log_query(user: str | None = None) -> str:
 		return ""
 	job_scope = service_job_query(user)
 	request_scope = service_request_query(user)
+	equipment_scope = installed_equipment_query(user)
 	return (
 		f"((`tabService Event Log`.`service_job` is not null and exists (select 1 from `tabService Job` "
 		f"where `tabService Job`.`name` = `tabService Event Log`.`service_job` and ({job_scope or '1=1'}))) "
 		f"or (`tabService Event Log`.`service_request` is not null and exists (select 1 from `tabService Request` "
-		f"where `tabService Request`.`name` = `tabService Event Log`.`service_request` and ({request_scope or '1=1'}))))"
+		f"where `tabService Request`.`name` = `tabService Event Log`.`service_request` and ({request_scope or '1=1'}))) "
+		f"or (`tabService Event Log`.`installed_equipment` is not null and exists (select 1 from `tabInstalled Equipment` "
+		f"where `tabInstalled Equipment`.`name` = `tabService Event Log`.`installed_equipment` and ({equipment_scope or '1=1'}))))"
 	)
 
 
@@ -111,7 +115,85 @@ def event_log_permission(doc, user: str | None = None, permission_type: str | No
 		return service_request_permission(
 			frappe.get_doc("Service Request", doc.service_request), user, "read"
 		)
+	if doc.installed_equipment:
+		try:
+			require_equipment_access(doc.installed_equipment, "read", user=user)
+		except (frappe.AuthenticationError, frappe.PermissionError):
+			return False
+		return True
 	return False
+
+
+def customer_site_query(user: str | None = None) -> str:
+	user = user or frappe.session.user
+	roles = user_roles(user)
+	if SYSTEM_MANAGER in roles:
+		return ""
+	if FSM_MANAGER in roles:
+		conditions = [sql_in_condition("`tabCustomer Site`.`company`", allowed_companies(user) or set())]
+		territories = allowed_territories(user)
+		if territories is not None:
+			conditions.append(sql_in_condition("`tabCustomer Site`.`territory`", territories))
+		return " and ".join(f"({condition})" for condition in conditions)
+	if FSM_CUSTOMER in roles:
+		return f"`tabCustomer Site`.`customer` = {frappe.db.escape(current_customer(user, True) or '__none__')}"
+	if FSM_TECHNICIAN in roles:
+		technician = frappe.db.escape(current_technician(user, True) or "__none__")
+		return (
+			"exists (select 1 from `tabService Job Equipment` eq join `tabService Job` job on job.name = eq.parent "
+			f"where eq.parenttype = 'Service Job' and eq.customer_site = `tabCustomer Site`.`name` and job.primary_technician = {technician})"
+		)
+	return "1=0"
+
+
+def customer_site_permission(doc, user: str | None = None, permission_type: str | None = None):
+	try:
+		require_site_access(doc, permission_type or "read", user=user)
+	except (frappe.AuthenticationError, frappe.PermissionError):
+		return False
+	return True
+
+
+def installed_equipment_query(user: str | None = None) -> str:
+	user = user or frappe.session.user
+	roles = user_roles(user)
+	if SYSTEM_MANAGER in roles:
+		return ""
+	if FSM_MANAGER in roles:
+		return sql_in_condition("`tabInstalled Equipment`.`company`", allowed_companies(user) or set())
+	if FSM_CUSTOMER in roles:
+		return f"`tabInstalled Equipment`.`customer` = {frappe.db.escape(current_customer(user, True) or '__none__')}"
+	if FSM_TECHNICIAN in roles:
+		technician = frappe.db.escape(current_technician(user, True) or "__none__")
+		return (
+			"exists (select 1 from `tabService Job Equipment` eq join `tabService Job` job on job.name = eq.parent "
+			f"where eq.parenttype = 'Service Job' and eq.installed_equipment = `tabInstalled Equipment`.`name` and job.primary_technician = {technician})"
+		)
+	return "1=0"
+
+
+def installed_equipment_permission(doc, user: str | None = None, permission_type: str | None = None):
+	try:
+		require_equipment_access(doc, permission_type or "read", user=user)
+	except (frappe.AuthenticationError, frappe.PermissionError):
+		return False
+	return True
+
+
+def equipment_location_query(user: str | None = None) -> str:
+	site_scope = customer_site_query(user)
+	return (
+		"exists (select 1 from `tabCustomer Site` where `tabCustomer Site`.`name` = "
+		f"`tabEquipment Location`.`customer_site` and ({site_scope or '1=1'}))"
+	)
+
+
+def equipment_location_permission(doc, user: str | None = None, permission_type: str | None = None):
+	try:
+		require_location_access(doc, permission_type or "read", user=user)
+	except (frappe.AuthenticationError, frappe.PermissionError):
+		return False
+	return True
 
 
 def job_child_query(doctype: str, job_field: str = "service_job", user: str | None = None) -> str:

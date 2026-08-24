@@ -4,7 +4,7 @@
  "creation": "2026-08-24 00:00:00",
  "doctype": "DocType",
  "engine": "InnoDB",
- "field_order": ["naming_series","source","status","priority","service_type","company","customer_section","customer","contact","phone","email","location_section","service_address","territory","location_column","latitude","longitude","request_section","subject","description","preferred_start","preferred_end","audit_section","opened_on","triaged_on","converted_on","closed_on"],
+ "field_order": ["naming_series","source","status","priority","service_type","company","customer_section","customer","customer_site","installed_equipment","contact","phone","email","location_section","service_address","territory","location_column","latitude","longitude","request_section","subject","description","preferred_start","preferred_end","audit_section","opened_on","triaged_on","converted_on","closed_on"],
  "fields": [
   {"default":"FSM-REQ-.YYYY.-","fieldname":"naming_series","fieldtype":"Select","label":"Series","options":"FSM-REQ-.YYYY.-","reqd":1},
   {"default":"Manual","fieldname":"source","fieldtype":"Select","in_list_view":1,"label":"Source","options":"Portal\nPhone\nEmail\nWhatsApp\nManual\nAPI","reqd":1},
@@ -14,6 +14,8 @@
   {"default":"company:Global Defaults:default_company","fieldname":"company","fieldtype":"Link","in_standard_filter":1,"label":"Company","options":"Company","reqd":1,"search_index":1},
   {"fieldname":"customer_section","fieldtype":"Section Break","label":"Customer"},
   {"fieldname":"customer","fieldtype":"Link","in_list_view":1,"label":"Customer","options":"Customer","search_index":1},
+  {"fieldname":"customer_site","fieldtype":"Link","label":"Customer Site","options":"Customer Site"},
+  {"fieldname":"installed_equipment","fieldtype":"Link","label":"Installed Equipment","options":"Installed Equipment"},
   {"fieldname":"contact","fieldtype":"Link","label":"Contact","options":"Contact"},
   {"fieldname":"phone","fieldtype":"Data","label":"Phone","options":"Phone"},
   {"fieldname":"email","fieldtype":"Data","label":"Email","options":"Email"},

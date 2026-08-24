@@ -142,6 +142,9 @@ permission_query_conditions = {
 	"Service Request": "fsm.security.permissions.service_request_query",
 	"Service Visit": "fsm.security.permissions.service_visit_query",
 	"Service Event Log": "fsm.security.permissions.event_log_query",
+	"Customer Site": "fsm.security.permissions.customer_site_query",
+	"Equipment Location": "fsm.security.permissions.equipment_location_query",
+	"Installed Equipment": "fsm.security.permissions.installed_equipment_query",
 	"Service Return": "fsm.security.permissions.service_return_query",
 	"Service Job Message": "fsm.security.permissions.message_query",
 	"Service Feedback": "fsm.security.permissions.feedback_query",
@@ -155,6 +158,9 @@ has_permission = {
 	"Service Request": "fsm.security.permissions.service_request_permission",
 	"Service Visit": "fsm.security.permissions.service_visit_permission",
 	"Service Event Log": "fsm.security.permissions.event_log_permission",
+	"Customer Site": "fsm.security.permissions.customer_site_permission",
+	"Equipment Location": "fsm.security.permissions.equipment_location_permission",
+	"Installed Equipment": "fsm.security.permissions.installed_equipment_permission",
 	"Service Return": "fsm.security.permissions.job_child_permission",
 	"Service Job Message": "fsm.security.permissions.job_child_permission",
 	"Service Feedback": "fsm.security.permissions.job_child_permission",
@@ -173,6 +179,10 @@ doc_events = {
 	},
 	"Technician": {
 		"on_update": "fsm.realtime.on_technician_update",
+	},
+	"Delivery Note": {
+		"on_submit": "fsm.installed_base.provisioning.on_delivery_note_submit",
+		"on_cancel": "fsm.installed_base.provisioning.on_delivery_note_cancel",
 	},
 }
 

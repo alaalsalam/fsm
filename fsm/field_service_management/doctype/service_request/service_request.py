@@ -20,6 +20,16 @@ class ServiceRequest(Document):
 		before = self.get_doc_before_save()
 		if before and before.status != self.status and not self.flags.fsm_command:
 			frappe.throw(_("Service Request status can only change through a command API."))
+		if self.customer_site:
+			site = frappe.get_cached_doc("Customer Site", self.customer_site)
+			if not self.customer or site.customer != self.customer or site.company != self.company:
+				frappe.throw(_("Customer Site must belong to the Request Customer and Company."))
+		if self.installed_equipment:
+			equipment = frappe.get_cached_doc("Installed Equipment", self.installed_equipment)
+			if not self.customer or equipment.customer != self.customer or equipment.company != self.company:
+				frappe.throw(_("Installed Equipment must belong to the Request Customer and Company."))
+			if self.customer_site and equipment.customer_site != self.customer_site:
+				frappe.throw(_("Installed Equipment must belong to the selected Customer Site."))
 
 	@frappe.whitelist()
 	def create_service_job(self, idempotency_key=None):

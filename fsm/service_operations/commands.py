@@ -89,6 +89,8 @@ def create_job_from_request(request: str, idempotency_key: str | None = None, so
 			"service_longitude": req.longitude, "notes": req.description, "status": "Draft",
 		}
 	)
+	if req.installed_equipment:
+		job.append("equipment", {"installed_equipment": req.installed_equipment})
 	job.flags.fsm_command = True
 	try:
 		job.insert(ignore_permissions=True)

@@ -1,0 +1,28 @@
+{
+ "actions": [],
+ "creation": "2026-08-24 00:00:00",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": ["installed_equipment","customer_site","equipment_location","item_code","serial_no","equipment_status","service_scope","notes"],
+ "fields": [
+  {"fieldname":"installed_equipment","fieldtype":"Link","in_list_view":1,"label":"Installed Equipment","options":"Installed Equipment","reqd":1},
+  {"fieldname":"customer_site","fieldtype":"Link","in_list_view":1,"label":"Customer Site","options":"Customer Site","read_only":1},
+  {"fieldname":"equipment_location","fieldtype":"Link","label":"Equipment Location","options":"Equipment Location","read_only":1},
+  {"fieldname":"item_code","fieldtype":"Link","in_list_view":1,"label":"Item","options":"Item","read_only":1},
+  {"fieldname":"serial_no","fieldtype":"Link","in_list_view":1,"label":"Serial No","options":"Serial No","read_only":1},
+  {"fieldname":"equipment_status","fieldtype":"Data","label":"Equipment Status","read_only":1},
+  {"fieldname":"service_scope","fieldtype":"Select","in_list_view":1,"label":"Service Scope","options":"Inspect\nRepair\nInstall\nCommission\nRemove\nOther"},
+  {"fieldname":"notes","fieldtype":"Small Text","label":"Notes"}
+ ],
+ "istable": 1,
+ "modified": "2026-08-24 00:00:00",
+ "modified_by": "Administrator",
+ "module": "Field Service Management",
+ "name": "Service Job Equipment",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "idx",
+ "sort_order": "ASC",
+ "states": []
+}

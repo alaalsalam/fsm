@@ -16,6 +16,9 @@ class ServiceJob(Document):
 	if TYPE_CHECKING:
 		from frappe.types import DF
 
+		from fsm.field_service_management.doctype.service_job_equipment.service_job_equipment import (
+			ServiceJobEquipment,
+		)
 		from fsm.field_service_management.doctype.service_job_item.service_job_item import ServiceJobItem
 		from fsm.field_service_management.doctype.service_job_task.service_job_task import ServiceJobTask
 
@@ -27,6 +30,7 @@ class ServiceJob(Document):
 		customer: DF.Link
 		customer_name: DF.Data | None
 		items: DF.Table[ServiceJobItem]
+		equipment: DF.Table[ServiceJobEquipment]
 		naming_series: DF.Literal["FSM-JOB-.YYYY.-"]
 		notes: DF.Text | None
 		primary_technician: DF.Link | None
@@ -60,10 +64,28 @@ class ServiceJob(Document):
 		self.apply_checklist_template()
 		self.set_address_display()
 		self.calculate_totals()
+		self.validate_equipment_rows()
 		self.normalize_tasks()
 		self.set_completion_timestamp()
 		self.track_sla()
 		self.calculate_costs()
+
+	def validate_equipment_rows(self):
+		seen = set()
+		for row in self.equipment:
+			if row.installed_equipment in seen:
+				frappe.throw(_("Installed Equipment cannot appear twice on the same Service Job."))
+			seen.add(row.installed_equipment)
+			equipment = frappe.get_cached_doc("Installed Equipment", row.installed_equipment)
+			if equipment.customer != self.customer or equipment.company != self.company:
+				frappe.throw(_("Installed Equipment must belong to the Job Customer and Company."))
+			if equipment.status in {"Returned", "Replaced", "Disposed"}:
+				frappe.throw(_("Terminal equipment cannot be added to a Service Job."))
+			row.customer_site = equipment.customer_site
+			row.equipment_location = equipment.equipment_location
+			row.item_code = equipment.item_code
+			row.serial_no = equipment.serial_no
+			row.equipment_status = equipment.status
 
 	def calculate_costs(self):
 		"""Roll up labour + materials + overhead into the job's cost fields.

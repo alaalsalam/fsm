@@ -61,6 +61,8 @@ def _links(reference) -> dict:
 			"service_job": job.name,
 			"service_visit": reference.name,
 		}
+	if reference.doctype == "Installed Equipment":
+		return {"installed_equipment": reference.name}
 	return {}
 
 

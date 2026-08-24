@@ -14,6 +14,8 @@
   "default_warehouse",
   "column_break_inventory",
   "low_stock_threshold"
+  ,"installed_base_section"
+  ,"warranty_start_basis"
  ],
  "fields": [
   {
@@ -67,6 +69,18 @@
    "fieldname": "low_stock_threshold",
    "fieldtype": "Float",
    "label": "Low Stock Threshold"
+  },
+  {
+   "fieldname": "installed_base_section",
+   "fieldtype": "Section Break",
+   "label": "Installed Base"
+  },
+  {
+   "default": "Delivery Date",
+   "fieldname": "warranty_start_basis",
+   "fieldtype": "Select",
+   "label": "Warranty Start Basis",
+   "options": "Delivery Date\nInstallation Date\nCommissioning Date"
   }
  ],
  "index_web_pages_for_search": 1,

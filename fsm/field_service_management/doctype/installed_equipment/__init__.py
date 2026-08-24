@@ -1,0 +1,1 @@
+"""Installed Equipment DocType."""
