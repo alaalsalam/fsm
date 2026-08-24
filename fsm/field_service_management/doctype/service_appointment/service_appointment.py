@@ -15,6 +15,7 @@ class ServiceAppointment(Document):
 		from frappe.types import DF
 
 		contact_phone: DF.Data | None
+		company: DF.Link
 		customer: DF.Link | None
 		customer_name: DF.Data | None
 		naming_series: DF.Literal["FSM-APPT-.YYYY.-"]
@@ -34,6 +35,9 @@ class ServiceAppointment(Document):
 		If the appointment came in from a public booking (no Customer record yet),
 		a Customer — and a Contact for the phone number — is created on the fly so
 		the booking → job → invoice flow is never blocked."""
+		from fsm.security.policy import require_manager_scope
+
+		require_manager_scope(self.company, self.territory)
 		if self.service_job:
 			frappe.throw(f"Already converted to {self.service_job}")
 
@@ -42,6 +46,7 @@ class ServiceAppointment(Document):
 		job = frappe.get_doc(
 			{
 				"doctype": "Service Job",
+				"company": self.company,
 				"customer": customer,
 				"contact": _primary_contact(customer),
 				"service_type": self.service_type,

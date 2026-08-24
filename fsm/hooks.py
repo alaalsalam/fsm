@@ -137,13 +137,27 @@ after_migrate = "fsm.setup.after_migrate"
 # -----------
 # Permissions evaluated in scripted ways
 
-# permission_query_conditions = {
-# 	"Event": "frappe.desk.doctype.event.event.get_permission_query_conditions",
-# }
-#
-# has_permission = {
-# 	"Event": "frappe.desk.doctype.event.event.has_permission",
-# }
+permission_query_conditions = {
+	"Service Job": "fsm.security.permissions.service_job_query",
+	"Service Appointment": "fsm.security.permissions.appointment_query",
+	"Service Return": "fsm.security.permissions.service_return_query",
+	"Service Job Message": "fsm.security.permissions.message_query",
+	"Service Feedback": "fsm.security.permissions.feedback_query",
+	"Service Time Log": "fsm.security.permissions.time_log_query",
+	"Customer Field Note": "fsm.security.permissions.field_note_query",
+	"Technician Location Log": "fsm.security.permissions.location_log_query",
+}
+
+has_permission = {
+	"Service Job": "fsm.security.permissions.service_job_permission",
+	"Service Appointment": "fsm.security.permissions.appointment_permission",
+	"Service Return": "fsm.security.permissions.job_child_permission",
+	"Service Job Message": "fsm.security.permissions.job_child_permission",
+	"Service Feedback": "fsm.security.permissions.job_child_permission",
+	"Service Time Log": "fsm.security.permissions.job_child_permission",
+	"Customer Field Note": "fsm.security.permissions.job_child_permission",
+	"Technician Location Log": "fsm.security.permissions.job_child_permission",
+}
 
 # Document Events
 # ---------------

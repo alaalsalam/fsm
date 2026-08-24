@@ -5,19 +5,16 @@ import frappe
 from frappe import _
 from frappe.utils import add_days, nowdate
 
+from fsm.security.policy import require_job_access, require_role
+from fsm.security.scopes import FSM_MANAGER, SYSTEM_MANAGER
+
 STAFF_ROLES = {"FSM Manager", "System Manager"}
 
 
 @frappe.whitelist()
 def submit_feedback(job: str, rating, comments: str | None = None, nps_score=None):
 	"""Record satisfaction for a job. Customers may only rate their own jobs."""
-	owner = frappe.db.get_value("Service Job", job, "customer")
-	if not (STAFF_ROLES & set(frappe.get_roles())):
-		from fsm.api import _current_customer
-
-		customer = _current_customer(optional=True)
-		if not customer or owner != customer:
-			raise frappe.PermissionError(_("This job is not on your account."))
+	job_doc = require_job_access(job, "read")
 
 	if frappe.db.exists("Service Feedback", {"service_job": job}):
 		frappe.throw(_("Feedback has already been submitted for this job."))
@@ -26,17 +23,19 @@ def submit_feedback(job: str, rating, comments: str | None = None, nps_score=Non
 		{
 			"doctype": "Service Feedback",
 			"service_job": job,
+			"customer": job_doc.customer,
 			"rating": int(rating),
 			"comments": comments,
 			"nps_score": int(nps_score) if nps_score not in (None, "") else None,
 		}
-	).insert(ignore_permissions=True)
+	).insert()
 	return {"name": doc.name}
 
 
 @frappe.whitelist()
 def get_feedback(job: str):
 	"""The feedback for a job, if any."""
+	require_job_access(job, "read")
 	return frappe.db.get_value(
 		"Service Feedback",
 		{"service_job": job},
@@ -48,8 +47,9 @@ def get_feedback(job: str):
 @frappe.whitelist()
 def get_csat_summary(days: int = 90):
 	"""Average rating and NPS over a recent window, for the dashboard."""
+	require_role(FSM_MANAGER, SYSTEM_MANAGER)
 	since = add_days(nowdate(), -int(days))
-	rows = frappe.get_all(
+	rows = frappe.get_list(
 		"Service Feedback", filters={"submitted_on": [">=", since]}, fields=["rating", "nps_score"]
 	)
 	if not rows:

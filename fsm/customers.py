@@ -5,10 +5,13 @@ import frappe
 from frappe import _
 from frappe.utils import nowdate
 
+from fsm.security.policy import require_customer_access, require_job_access
+
 
 @frappe.whitelist()
 def get_customer_profile(customer: str):
 	"""Customer details + service history + stats + field notes."""
+	require_customer_access(customer)
 	cust = frappe.db.get_value(
 		"Customer",
 		customer,
@@ -18,7 +21,7 @@ def get_customer_profile(customer: str):
 	if not cust:
 		frappe.throw(_("Customer not found."))
 
-	jobs = frappe.get_all(
+	jobs = frappe.get_list(
 		"Service Job",
 		filters={"customer": customer},
 		fields=[
@@ -32,7 +35,7 @@ def get_customer_profile(customer: str):
 			"primary_technician",
 		],
 		order_by="creation desc",
-		limit_page_length=50,
+		limit=50,
 	)
 	completed = [j for j in jobs if j.status == "Completed"]
 	last_dates = [j.completed_on for j in completed if j.completed_on]
@@ -54,6 +57,11 @@ def add_field_note(
 	visit_date: str | None = None,
 ):
 	"""Record a technician's field note against a customer (and optionally a job)."""
+	if not service_job:
+		frappe.throw(_("A Service Job is required for a field note."))
+	job_doc = require_job_access(service_job, "write")
+	if job_doc.customer != customer:
+		frappe.throw(_("The customer does not match the Service Job."), frappe.PermissionError)
 	doc = frappe.get_doc(
 		{
 			"doctype": "Customer Field Note",
@@ -63,13 +71,14 @@ def add_field_note(
 			"visit_date": visit_date or nowdate(),
 			"note": note,
 		}
-	).insert(ignore_permissions=True)
+	).insert()
 	return {"name": doc.name}
 
 
 @frappe.whitelist()
 def list_field_notes(customer: str):
-	return frappe.get_all(
+	require_customer_access(customer)
+	return frappe.get_list(
 		"Customer Field Note",
 		filters={"customer": customer},
 		fields=["name", "note", "service_job", "technician", "visit_date", "creation"],

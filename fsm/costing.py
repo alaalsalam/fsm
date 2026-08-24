@@ -5,6 +5,8 @@ import frappe
 from frappe import _
 from frappe.utils import now_datetime
 
+from fsm.security.policy import require_job_access, require_manager_scope, require_technician_assignment
+
 
 def sum_job_hours(job: str) -> float:
 	"""Total logged labour hours for a job."""
@@ -39,6 +41,7 @@ def start_timer(job: str, activity: str | None = None):
 	from fsm.tracking import _technician_for_user
 
 	technician = _technician_for_user()
+	require_technician_assignment(job)
 	existing = _open_log(job, technician)
 	if existing:
 		return {"name": existing, "already_running": True}
@@ -51,7 +54,7 @@ def start_timer(job: str, activity: str | None = None):
 			"from_time": now_datetime(),
 			"activity": activity,
 		}
-	).insert(ignore_permissions=True)
+	).insert()
 	return {"name": log.name, "already_running": False}
 
 
@@ -61,12 +64,13 @@ def stop_timer(job: str):
 	from fsm.tracking import _technician_for_user
 
 	technician = _technician_for_user()
+	require_technician_assignment(job)
 	name = _open_log(job, technician)
 	if not name:
 		frappe.throw(_("No running timer to stop on this job."))
 	log = frappe.get_doc("Service Time Log", name)
 	log.to_time = now_datetime()
-	log.save(ignore_permissions=True)
+	log.save()
 	return {"name": log.name, "hours": log.hours, "actual_hours": sum_job_hours(job)}
 
 
@@ -85,15 +89,20 @@ def estimate_job(service_type: str, technician: str | None = None):
 
 	Per-technician when a technician is given (their own pace), otherwise the team
 	average across everyone who has done this service type."""
+	from fsm.security.policy import resolve_manager_company
+
+	company = resolve_manager_company()
+	require_manager_scope(company)
 	filters = [
 		["status", "=", "Completed"],
 		["service_type", "=", service_type],
 		["actual_hours", ">", 0],
+		["company", "=", company],
 	]
 	if technician:
 		filters.append(["primary_technician", "=", technician])
 
-	rows = frappe.get_all("Service Job", filters=filters, fields=["actual_hours"])
+	rows = frappe.get_list("Service Job", filters=filters, fields=["actual_hours"], limit=1000)
 	if not rows:
 		return {"service_type": service_type, "sample_size": 0, "avg_hours": None}
 
@@ -109,7 +118,8 @@ def estimate_job(service_type: str, technician: str | None = None):
 @frappe.whitelist()
 def get_job_cost_summary(job: str):
 	"""Cost breakdown for a job (estimate vs actual), for the console costing panel."""
-	doc = frappe.get_doc("Service Job", job)
+	doc = require_job_access(job, "read", manager_only=True)
+	require_manager_scope(doc.company, doc.territory)
 	costs = compute_costs(doc)
 	return {
 		"estimated_hours": doc.estimated_hours,

@@ -6,12 +6,21 @@ import json
 import frappe
 from frappe import _
 
+from fsm.security.field_allowlists import INTEGRATION_JOB_ITEM_FIELDS
+from fsm.security.policy import (
+	bounded_int,
+	require_job_access,
+	require_role,
+	resolve_manager_company,
+	validate_allowed_fields,
+)
+from fsm.security.scopes import FSM_MANAGER, SYSTEM_MANAGER
+
 ADMIN_ROLES = {"FSM Manager", "System Manager"}
 
 
 def _require_admin():
-	if not (ADMIN_ROLES & set(frappe.get_roles())):
-		frappe.throw(_("Only FSM Managers can manage integrations."), frappe.PermissionError)
+	require_role(SYSTEM_MANAGER)
 
 
 @frappe.whitelist()
@@ -25,7 +34,7 @@ def generate_api_keys(user: str | None = None):
 	if not user_doc.api_key:
 		user_doc.api_key = frappe.generate_hash(length=15)
 	user_doc.api_secret = api_secret
-	user_doc.save(ignore_permissions=True)
+	user_doc.save()
 
 	return {
 		"user": user,
@@ -45,20 +54,25 @@ def create_job(
 	priority: str | None = None,
 	service_address: str | None = None,
 	items=None,
+	company: str | None = None,
 ):
 	"""Create a Service Job from an external system. Respects the caller's permissions."""
+	require_role(FSM_MANAGER, SYSTEM_MANAGER)
+	company = resolve_manager_company(company)
 	rows = json.loads(items) if isinstance(items, str) else (items or [])
+	for row in rows:
+		validate_allowed_fields(row, INTEGRATION_JOB_ITEM_FIELDS)
 	doc = frappe.get_doc(
 		{
 			"doctype": "Service Job",
+			"company": company,
 			"customer": customer,
 			"service_type": service_type,
 			"scheduled_date": scheduled_date,
 			"priority": priority,
 			"service_address": service_address,
 			"items": [
-				{"item_code": r["item_code"], "qty": r.get("qty", 1), "rate": r.get("rate", 0)}
-				for r in rows
+				{"item_code": r["item_code"], "qty": r.get("qty", 1), "rate": r.get("rate", 0)} for r in rows
 			],
 		}
 	)
@@ -69,6 +83,7 @@ def create_job(
 @frappe.whitelist()
 def get_job_status(job: str):
 	"""Current status of a job, for an external system to poll."""
+	require_job_access(job, "read", manager_only=True)
 	d = frappe.db.get_value(
 		"Service Job",
 		job,
@@ -83,12 +98,14 @@ def get_job_status(job: str):
 @frappe.whitelist()
 def list_jobs(status: str | None = None, customer: str | None = None, limit: int = 50):
 	"""List jobs (filterable), for external reporting/sync."""
-	filters = {}
+	require_role(FSM_MANAGER, SYSTEM_MANAGER)
+	company = resolve_manager_company()
+	filters = {"company": company}
 	if status:
 		filters["status"] = status
 	if customer:
 		filters["customer"] = customer
-	return frappe.get_all(
+	return frappe.get_list(
 		"Service Job",
 		filters=filters,
 		fields=[
@@ -101,7 +118,7 @@ def list_jobs(status: str | None = None, customer: str | None = None, limit: int
 			"total_amount",
 		],
 		order_by="creation desc",
-		limit_page_length=int(limit),
+		limit=bounded_int(limit, 1, 200),
 	)
 
 
@@ -133,7 +150,7 @@ def register_webhook(request_url: str, docevent: str = "on_update"):
 def list_webhooks():
 	"""FSM-related outbound webhooks."""
 	_require_admin()
-	return frappe.get_all(
+	return frappe.get_list(
 		"Webhook",
 		filters={"webhook_doctype": "Service Job"},
 		fields=["name", "webhook_docevent", "request_url", "enabled"],

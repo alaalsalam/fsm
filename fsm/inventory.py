@@ -4,6 +4,9 @@
 import frappe
 from frappe import _
 
+from fsm.security.policy import require_authenticated, require_company_scope, require_role
+from fsm.security.scopes import FSM_MANAGER, FSM_TECHNICIAN, SYSTEM_MANAGER, current_technician, user_roles
+
 
 @frappe.whitelist()
 def get_stock_levels(
@@ -20,8 +23,26 @@ def get_stock_levels(
 	- item: restrict to one item.
 	- low_only: when truthy, only return rows at or below their reorder point.
 	"""
+	user = require_authenticated()
+	roles = user_roles(user)
+	if FSM_TECHNICIAN in roles and not ({FSM_MANAGER, SYSTEM_MANAGER} & roles):
+		own_technician = current_technician(user)
+		if technician and technician != own_technician:
+			frappe.throw(_("You can only view your own van stock."), frappe.PermissionError)
+		technician = own_technician
 	if technician:
-		warehouse = frappe.db.get_value("Technician", technician, "warehouse") or warehouse
+		technician_values = frappe.db.get_value(
+			"Technician", technician, ["warehouse", "company"], as_dict=True
+		)
+		if not technician_values:
+			frappe.throw(_("Technician not found."))
+		warehouse = technician_values.warehouse or warehouse
+		if FSM_MANAGER in roles and SYSTEM_MANAGER not in roles:
+			require_company_scope(technician_values.company, user)
+	if not ({FSM_MANAGER, FSM_TECHNICIAN, SYSTEM_MANAGER} & roles):
+		frappe.throw(_("You are not permitted to view stock."), frappe.PermissionError)
+	if warehouse and FSM_MANAGER in roles and SYSTEM_MANAGER not in roles:
+		require_company_scope(frappe.db.get_value("Warehouse", warehouse, "company"), user)
 	warehouses = [warehouse] if warehouse else _fsm_warehouses()
 	if not warehouses:
 		return []
@@ -37,16 +58,31 @@ def get_stock_levels(
 		order_by="item_code asc",
 	)
 
+	item_codes = {row.item_code for row in bins}
+	item_names = {
+		row.name: row.item_name
+		for row in frappe.get_all(
+			"Item", filters={"name": ["in", sorted(item_codes)]}, fields=["name", "item_name"]
+		)
+	}
+	reorder_levels = {
+		(row.parent, row.warehouse): row.warehouse_reorder_level
+		for row in frappe.get_all(
+			"Item Reorder",
+			filters={"parent": ["in", sorted(item_codes)], "warehouse": ["in", warehouses]},
+			fields=["parent", "warehouse", "warehouse_reorder_level"],
+		)
+	}
 	rows = []
 	for b in bins:
-		reorder = _reorder_level(b.item_code, b.warehouse)
+		reorder = reorder_levels.get((b.item_code, b.warehouse))
 		low = _is_low(b.actual_qty, reorder)
 		if low_only and not low:
 			continue
 		rows.append(
 			{
 				"item_code": b.item_code,
-				"item_name": frappe.db.get_value("Item", b.item_code, "item_name"),
+				"item_name": item_names.get(b.item_code),
 				"warehouse": b.warehouse,
 				"actual_qty": b.actual_qty,
 				"reserved_qty": b.reserved_qty,
@@ -62,9 +98,12 @@ def get_stock_levels(
 def get_van_stock(technician: str | None = None):
 	"""Stock on the signed-in technician's van (or a given technician's)."""
 	if not technician:
-		from fsm.tracking import _technician_for_user
-
-		technician = _technician_for_user()
+		roles = user_roles()
+		if FSM_TECHNICIAN in roles and not ({FSM_MANAGER, SYSTEM_MANAGER} & roles):
+			technician = current_technician()
+		else:
+			require_role(FSM_MANAGER, SYSTEM_MANAGER)
+			frappe.throw(_("Select a technician."))
 	warehouse = frappe.db.get_value("Technician", technician, "warehouse")
 	if not warehouse:
 		return []
@@ -81,25 +120,23 @@ def low_stock_rows() -> list[dict]:
 
 def _fsm_warehouses() -> list[str]:
 	"""Warehouses field service cares about: every technician van + the default."""
+	roles = user_roles()
+	filters = {"warehouse": ["is", "set"]}
+	if FSM_MANAGER in roles and SYSTEM_MANAGER not in roles:
+		from fsm.security.scopes import allowed_companies
+
+		filters["company"] = ["in", sorted(allowed_companies() or set())]
+	elif FSM_TECHNICIAN in roles and SYSTEM_MANAGER not in roles:
+		filters["name"] = current_technician()
 	vans = frappe.get_all(
 		"Technician",
-		filters={"warehouse": ["is", "set"]},
+		filters=filters,
 		pluck="warehouse",
 	)
 	default = frappe.db.get_single_value("Service Settings", "default_warehouse")
-	if default:
+	if default and (SYSTEM_MANAGER in roles or default in vans):
 		vans.append(default)
 	return sorted({w for w in vans if w})
-
-
-def _reorder_level(item_code: str, warehouse: str) -> float | None:
-	"""The ERPNext reorder level for this item+warehouse, if configured."""
-	level = frappe.db.get_value(
-		"Item Reorder",
-		{"parent": item_code, "warehouse": warehouse},
-		"warehouse_reorder_level",
-	)
-	return level
 
 
 def _is_low(actual_qty: float, reorder_level: float | None) -> bool:

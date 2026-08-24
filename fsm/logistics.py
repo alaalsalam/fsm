@@ -7,6 +7,10 @@ import frappe
 from frappe import _
 from frappe.utils import nowdate
 
+from fsm.security.policy import require_job_access, validate_allowed_fields
+
+PART_FIELDS = {"item_code", "qty"}
+
 
 @frappe.whitelist()
 def request_parts(
@@ -25,6 +29,9 @@ def request_parts(
 	rows = json.loads(items) if isinstance(items, str) else items
 	if not rows:
 		frappe.throw(_("Add at least one item to request."))
+	job_doc = require_job_access(job, "write")
+	for row in rows:
+		validate_allowed_fields(row, PART_FIELDS)
 
 	target = warehouse or _job_warehouse(job)
 	if not target:
@@ -36,6 +43,7 @@ def request_parts(
 
 	sched = schedule_date or nowdate()
 	mr = frappe.new_doc("Material Request")
+	mr.company = job_doc.company
 	mr.material_request_type = material_request_type
 	mr.transaction_date = nowdate()
 	mr.schedule_date = sched
@@ -57,7 +65,8 @@ def request_parts(
 @frappe.whitelist()
 def get_job_logistics(job: str):
 	"""Parts requests and deliveries linked to a job, for the job timeline."""
-	material_requests = frappe.get_all(
+	require_job_access(job, "read")
+	material_requests = frappe.get_list(
 		"Material Request",
 		filters={"fsm_service_job": job},
 		fields=[
@@ -71,7 +80,7 @@ def get_job_logistics(job: str):
 		],
 		order_by="creation desc",
 	)
-	delivery_notes = frappe.get_all(
+	delivery_notes = frappe.get_list(
 		"Delivery Note",
 		filters={"fsm_service_job": job},
 		fields=["name", "status", "posting_date", "per_billed"],

@@ -8,6 +8,7 @@
  "field_order": [
   "subcontractor_name",
   "status",
+  "company",
   "column_break_main",
   "territory",
   "hourly_rate",
@@ -36,6 +37,16 @@
    "in_standard_filter": 1,
    "label": "Status",
    "options": "Active\nInactive"
+  },
+  {
+   "default": "company:Global Defaults:default_company",
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1,
+   "search_index": 1
   },
   {
    "fieldname": "column_break_main",

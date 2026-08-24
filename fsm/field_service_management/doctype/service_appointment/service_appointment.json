@@ -10,6 +10,7 @@
   "customer",
   "customer_name",
   "contact_phone",
+  "company",
   "column_break_head",
   "status",
   "service_type",
@@ -48,6 +49,16 @@
    "fieldtype": "Data",
    "label": "Contact Phone",
    "options": "Phone"
+  },
+  {
+   "default": "company:Global Defaults:default_company",
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1,
+   "search_index": 1
   },
   {
    "fieldname": "column_break_head",
@@ -150,6 +161,10 @@
    "read": 1,
    "role": "FSM Technician",
    "write": 1
+  },
+  {
+   "read": 1,
+   "role": "FSM Customer"
   }
  ],
  "row_format": "Dynamic",

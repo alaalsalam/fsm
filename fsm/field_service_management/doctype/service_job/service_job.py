@@ -21,6 +21,7 @@ class ServiceJob(Document):
 
 		address_display: DF.SmallText | None
 		checklist_template: DF.Link | None
+		company: DF.Link
 		completed_on: DF.Datetime | None
 		contact: DF.Link | None
 		customer: DF.Link
@@ -92,6 +93,9 @@ class ServiceJob(Document):
 	@frappe.whitelist()
 	def start_task(self, idx: int):
 		"""Begin a checklist step. Steps must be started in order."""
+		from fsm.security.policy import require_job_access
+
+		require_job_access(self, "write")
 		idx = int(idx)
 		self._guard_sequence(idx)
 		for t in self.tasks:
@@ -107,6 +111,9 @@ class ServiceJob(Document):
 	@frappe.whitelist()
 	def complete_task(self, idx: int, note: str | None = None):
 		"""Finish a checklist step (the earlier steps must be done first)."""
+		from fsm.security.policy import require_job_access
+
+		require_job_access(self, "write")
 		idx = int(idx)
 		self._guard_sequence(idx)
 		for t in self.tasks:
@@ -125,6 +132,9 @@ class ServiceJob(Document):
 	@frappe.whitelist()
 	def complete_job(self):
 		"""Fallback completion for jobs without a checklist."""
+		from fsm.security.policy import require_job_access
+
+		require_job_access(self, "write")
 		if self.tasks and any(t.status != "Done" for t in self.tasks):
 			frappe.throw("Finish the remaining checklist steps first.")
 		self.status = "Completed"
@@ -254,7 +264,7 @@ class ServiceJob(Document):
 		if not frappe.db.get_single_value("Service Settings", "auto_create_invoice"):
 			return
 		try:
-			make_invoice_from_job(self.name)
+			make_invoice_from_job(self.name, system_operation=True)
 		except Exception:
 			frappe.log_error(
 				title="FSM auto-invoice failed",
@@ -269,13 +279,17 @@ def _primary_customer_address(customer: str) -> str | None:
 	return get_default_address("Customer", customer)
 
 
-def make_invoice_from_job(job: str) -> str:
+def make_invoice_from_job(job: str, *, system_operation: bool = False) -> str:
 	"""Create (once) a draft Sales Invoice from a job's parts & services.
 
 	Shared by the console action (`fsm.api.create_invoice_from_job`) and the
 	auto-invoice-on-completion flow. Idempotent: returns the existing invoice
 	if the job already has one."""
 	doc = frappe.get_doc("Service Job", job)
+	if not system_operation:
+		from fsm.security.policy import require_job_access
+
+		require_job_access(doc, "write", manager_only=True)
 
 	if doc.sales_invoice:
 		return doc.sales_invoice
@@ -284,14 +298,9 @@ def make_invoice_from_job(job: str) -> str:
 	if not doc.items:
 		frappe.throw("This job has no parts or services to invoice.")
 
-	company = frappe.defaults.get_user_default("Company") or frappe.db.get_single_value(
-		"Global Defaults", "default_company"
-	)
-
 	invoice = frappe.new_doc("Sales Invoice")
 	invoice.customer = doc.customer
-	if company:
-		invoice.company = company
+	invoice.company = doc.company
 	invoice.po_no = doc.name
 	for row in doc.items:
 		invoice.append(
@@ -303,7 +312,10 @@ def make_invoice_from_job(job: str) -> str:
 				"uom": row.uom or None,
 			},
 		)
-	invoice.insert(ignore_permissions=True)
+	if system_operation:
+		invoice.insert(ignore_permissions=True)
+	else:
+		invoice.insert()
 
 	doc.db_set("sales_invoice", invoice.name)
 	return invoice.name

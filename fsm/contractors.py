@@ -3,11 +3,18 @@
 
 import frappe
 
+from fsm.security.policy import require_company_scope, require_role, resolve_manager_company
+from fsm.security.scopes import FSM_MANAGER, SYSTEM_MANAGER
+
 
 @frappe.whitelist()
 def list_subcontractors(status: str | None = None):
-	filters = {"status": status} if status else {}
-	return frappe.get_all(
+	require_role(FSM_MANAGER, SYSTEM_MANAGER)
+	company = resolve_manager_company()
+	filters = {"company": company}
+	if status:
+		filters["status"] = status
+	return frappe.get_list(
 		"Subcontractor",
 		filters=filters,
 		fields=["name", "subcontractor_name", "status", "territory", "hourly_rate", "phone", "email"],
@@ -18,16 +25,26 @@ def list_subcontractors(status: str | None = None):
 @frappe.whitelist()
 def get_subcontractor_work(subcontractor: str):
 	"""A subcontractor's workers, their jobs and a performance summary."""
-	technicians = frappe.get_all(
+	company = frappe.db.get_value("Subcontractor", subcontractor, "company")
+	require_company_scope(company)
+	tech_names = frappe.get_list(
 		"Technician",
-		filters={"subcontractor": subcontractor},
-		fields=["name", "technician_name", "status", "active"],
+		filters={"subcontractor": subcontractor, "company": company},
+		pluck="name",
 	)
-	tech_names = [t.name for t in technicians]
+	technicians = (
+		frappe.get_list(
+			"Technician",
+			filters={"name": ["in", tech_names]},
+			fields=["name", "technician_name", "status", "active"],
+		)
+		if tech_names
+		else []
+	)
 
 	jobs = []
 	if tech_names:
-		jobs = frappe.get_all(
+		jobs = frappe.get_list(
 			"Service Job",
 			filters={"primary_technician": ["in", tech_names]},
 			fields=[
@@ -40,7 +57,7 @@ def get_subcontractor_work(subcontractor: str):
 				"total_cost",
 			],
 			order_by="scheduled_date desc",
-			limit_page_length=50,
+			limit=50,
 		)
 
 	completed = [j for j in jobs if j.status == "Completed"]

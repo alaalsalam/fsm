@@ -4,6 +4,8 @@
 import frappe
 from frappe import _
 
+from fsm.security.policy import require_job_access
+
 STAFF_ROLES = {"FSM Manager", "FSM Technician", "System Manager"}
 
 
@@ -11,7 +13,7 @@ STAFF_ROLES = {"FSM Manager", "FSM Technician", "System Manager"}
 def get_messages(job: str):
 	"""The message thread for a job (oldest first). Customers see only their own."""
 	_assert_job_access(job)
-	return frappe.get_all(
+	return frappe.get_list(
 		"Service Job Message",
 		filters={"service_job": job},
 		fields=["name", "author_role", "author_name", "message", "creation"],
@@ -30,9 +32,9 @@ def post_message(job: str, message: str, author_role: str | None = None):
 			"doctype": "Service Job Message",
 			"service_job": job,
 			"message": message,
-			"author_role": author_role or _role_for_current_user(),
+			"author_role": _role_for_current_user(),
 		}
-	).insert(ignore_permissions=True)
+	).insert()
 	return {"name": doc.name, "creation": str(doc.creation)}
 
 
@@ -51,14 +53,7 @@ def post_system_message(job: str, message: str):
 
 def _assert_job_access(job: str):
 	"""Staff see every thread; a customer only threads for their own jobs."""
-	if STAFF_ROLES & set(frappe.get_roles()):
-		return
-	from fsm.api import _current_customer
-
-	customer = _current_customer(optional=True)
-	owner = frappe.db.get_value("Service Job", job, "customer")
-	if not customer or owner != customer:
-		raise frappe.PermissionError(_("This job is not on your account."))
+	require_job_access(job, "read")
 
 
 def _role_for_current_user() -> str:

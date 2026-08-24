@@ -6,6 +6,10 @@ import json
 import frappe
 from frappe import _
 
+from fsm.security.policy import require_authenticated, require_job_access, validate_allowed_fields
+
+RETURN_ITEM_FIELDS = {"item_code", "qty", "disposition", "note"}
+
 
 @frappe.whitelist()
 def create_return(service_job: str, items, warehouse: str | None = None, reason: str | None = None):
@@ -13,6 +17,9 @@ def create_return(service_job: str, items, warehouse: str | None = None, reason:
 	rows = json.loads(items) if isinstance(items, str) else items
 	if not rows:
 		frappe.throw(_("Add at least one item to return."))
+	require_job_access(service_job, "write")
+	for row in rows:
+		validate_allowed_fields(row, RETURN_ITEM_FIELDS)
 	doc = frappe.get_doc(
 		{
 			"doctype": "Service Return",
@@ -37,12 +44,13 @@ def create_return(service_job: str, items, warehouse: str | None = None, reason:
 
 @frappe.whitelist()
 def list_returns(status: str | None = None, job: str | None = None):
+	require_authenticated()
 	filters = {}
 	if status:
 		filters["status"] = status
 	if job:
 		filters["service_job"] = job
-	return frappe.get_all(
+	return frappe.get_list(
 		"Service Return",
 		filters=filters,
 		fields=["name", "service_job", "customer", "status", "return_date", "warehouse", "stock_entry"],
@@ -53,6 +61,7 @@ def list_returns(status: str | None = None, job: str | None = None):
 @frappe.whitelist()
 def get_return(name: str):
 	doc = frappe.get_doc("Service Return", name)
+	require_job_access(doc.service_job, "read")
 	return {
 		"name": doc.name,
 		"service_job": doc.service_job,
@@ -79,6 +88,7 @@ def get_return(name: str):
 def process_return(name: str, action: str):
 	"""Advance a return: action in (approve, receive, close)."""
 	doc = frappe.get_doc("Service Return", name)
+	require_job_access(doc.service_job, "write", manager_only=True)
 	handler = {"approve": doc.approve, "receive": doc.receive, "close": doc.close}.get(action)
 	if not handler:
 		frappe.throw(_("Unknown action {0}.").format(action))

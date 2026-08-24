@@ -42,6 +42,9 @@ class ServiceReturn(Document):
 
 	@frappe.whitelist()
 	def approve(self):
+		from fsm.security.policy import require_job_access
+
+		require_job_access(self.service_job, "write", manager_only=True)
 		self._guard_status(("Requested",), _("Only a requested return can be approved."))
 		self.status = "Approved"
 		self.save()
@@ -50,6 +53,9 @@ class ServiceReturn(Document):
 	@frappe.whitelist()
 	def receive(self):
 		"""Post the stock receipt for restock/refurbish items and mark the return received."""
+		from fsm.security.policy import require_job_access
+
+		require_job_access(self.service_job, "write", manager_only=True)
 		self._guard_status(("Approved",), _("Approve the return before receiving it."))
 		if not self.warehouse:
 			frappe.throw(_("Set a receiving warehouse before receiving the return."))
@@ -63,6 +69,9 @@ class ServiceReturn(Document):
 
 	@frappe.whitelist()
 	def close(self):
+		from fsm.security.policy import require_job_access
+
+		require_job_access(self.service_job, "write", manager_only=True)
 		self._guard_status(("Received",), _("Only a received return can be closed."))
 		self.status = "Closed"
 		self.save()
@@ -78,6 +87,7 @@ def _make_receipt(doc: "ServiceReturn", items) -> str:
 	se = frappe.new_doc("Stock Entry")
 	se.stock_entry_type = "Material Receipt"
 	se.posting_date = doc.return_date
+	se.company = frappe.db.get_value("Service Job", doc.service_job, "company")
 	for row in items:
 		se.append(
 			"items",

@@ -1,0 +1,117 @@
+import frappe
+
+from fsm.security.policy import require_job_access, require_manager_scope
+from fsm.security.scopes import (
+	FSM_CUSTOMER,
+	FSM_MANAGER,
+	FSM_TECHNICIAN,
+	SYSTEM_MANAGER,
+	allowed_companies,
+	allowed_territories,
+	current_customer,
+	current_technician,
+	sql_in_condition,
+	user_roles,
+)
+
+
+def service_job_query(user: str | None = None) -> str:
+	user = user or frappe.session.user
+	roles = user_roles(user)
+	if SYSTEM_MANAGER in roles:
+		return ""
+	if FSM_MANAGER in roles:
+		conditions = [sql_in_condition("`tabService Job`.`company`", allowed_companies(user) or set())]
+		territories = allowed_territories(user)
+		if territories is not None:
+			conditions.append(sql_in_condition("`tabService Job`.`territory`", territories))
+		return " and ".join(f"({condition})" for condition in conditions)
+	if FSM_TECHNICIAN in roles:
+		return f"`tabService Job`.`primary_technician` = {frappe.db.escape(current_technician(user, True) or '__none__')}"
+	if FSM_CUSTOMER in roles:
+		return f"`tabService Job`.`customer` = {frappe.db.escape(current_customer(user, True) or '__none__')}"
+	return "1=0"
+
+
+def service_job_permission(doc, user: str | None = None, permission_type: str | None = None):
+	try:
+		require_job_access(doc, permission_type or "read", user=user)
+	except frappe.AuthenticationError, frappe.PermissionError:
+		return False
+	return True
+
+
+def appointment_query(user: str | None = None) -> str:
+	user = user or frappe.session.user
+	roles = user_roles(user)
+	if SYSTEM_MANAGER in roles:
+		return ""
+	if FSM_MANAGER in roles:
+		conditions = [
+			sql_in_condition("`tabService Appointment`.`company`", allowed_companies(user) or set())
+		]
+		territories = allowed_territories(user)
+		if territories is not None:
+			conditions.append(sql_in_condition("`tabService Appointment`.`territory`", territories))
+		return " and ".join(f"({condition})" for condition in conditions)
+	if FSM_CUSTOMER in roles:
+		return f"`tabService Appointment`.`customer` = {frappe.db.escape(current_customer(user, True) or '__none__')}"
+	return "1=0"
+
+
+def appointment_permission(doc, user: str | None = None, permission_type: str | None = None):
+	user = user or frappe.session.user
+	roles = user_roles(user)
+	if SYSTEM_MANAGER in roles:
+		return True
+	if FSM_MANAGER in roles:
+		try:
+			require_manager_scope(doc.company, doc.territory, user)
+		except frappe.PermissionError:
+			return False
+		return True
+	if permission_type == "read" and FSM_CUSTOMER in roles:
+		return doc.customer == current_customer(user, True)
+	return False
+
+
+def job_child_query(doctype: str, job_field: str = "service_job", user: str | None = None) -> str:
+	job_scope = service_job_query(user)
+	return (
+		f"exists (select 1 from `tabService Job` where `tabService Job`.`name` = "
+		f"`tab{doctype}`.`{job_field}` and ({job_scope or '1=1'}))"
+	)
+
+
+def service_return_query(user: str | None = None) -> str:
+	return job_child_query("Service Return", user=user)
+
+
+def message_query(user: str | None = None) -> str:
+	return job_child_query("Service Job Message", user=user)
+
+
+def feedback_query(user: str | None = None) -> str:
+	return job_child_query("Service Feedback", user=user)
+
+
+def time_log_query(user: str | None = None) -> str:
+	return job_child_query("Service Time Log", user=user)
+
+
+def field_note_query(user: str | None = None) -> str:
+	return job_child_query("Customer Field Note", user=user)
+
+
+def location_log_query(user: str | None = None) -> str:
+	return job_child_query("Technician Location Log", user=user)
+
+
+def job_child_permission(doc, user: str | None = None, permission_type: str | None = None):
+	if not doc.service_job:
+		return False
+	try:
+		require_job_access(doc.service_job, permission_type or "read", user=user)
+	except frappe.AuthenticationError, frappe.PermissionError:
+		return False
+	return True

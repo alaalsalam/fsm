@@ -4,6 +4,9 @@
 import frappe
 from frappe.utils import add_days, get_datetime, nowdate, time_diff_in_hours
 
+from fsm.security.policy import bounded_int, require_role
+from fsm.security.scopes import FSM_MANAGER, SYSTEM_MANAGER
+
 
 def _since(days: int) -> str:
 	return add_days(nowdate(), -int(days))
@@ -12,8 +15,9 @@ def _since(days: int) -> str:
 @frappe.whitelist()
 def service_performance(days: int = 90):
 	"""Headline service KPIs over a recent window."""
+	require_role(FSM_MANAGER, SYSTEM_MANAGER)
 	since = _since(days)
-	jobs = frappe.get_all(
+	jobs = frappe.get_list(
 		"Service Job",
 		filters=[["creation", ">=", since]],
 		fields=[
@@ -31,9 +35,7 @@ def service_performance(days: int = 90):
 	total = len(jobs)
 	completed = [j for j in jobs if j.status == "Completed"]
 
-	mttr_vals = [
-		time_diff_in_hours(j.completed_on, j.creation) for j in completed if j.completed_on
-	]
+	mttr_vals = [time_diff_in_hours(j.completed_on, j.creation) for j in completed if j.completed_on]
 	mttr = round(sum(mttr_vals) / len(mttr_vals), 2) if mttr_vals else None
 
 	hour_vals = [j.actual_hours for j in completed if j.actual_hours]
@@ -49,7 +51,7 @@ def service_performance(days: int = 90):
 	punctuality = round(punctual_ok / punctual_base * 100) if punctual_base else None
 
 	returned = set(
-		frappe.get_all(
+		frappe.get_list(
 			"Service Return",
 			filters=[["service_job", "in", [j.name for j in completed] or [""]]],
 			pluck="service_job",
@@ -76,8 +78,9 @@ def service_performance(days: int = 90):
 @frappe.whitelist()
 def workorder_volume(days: int = 90):
 	"""Volume & mix of work orders: by status, by service type, and a daily trend."""
+	require_role(FSM_MANAGER, SYSTEM_MANAGER)
 	since = _since(days)
-	jobs = frappe.get_all(
+	jobs = frappe.get_list(
 		"Service Job",
 		filters=[["creation", ">=", since]],
 		fields=["status", "service_type", "creation"],
@@ -101,8 +104,9 @@ def workorder_volume(days: int = 90):
 @frappe.whitelist()
 def inventory_usage(days: int = 90, limit: int = 20):
 	"""Parts consumed on completed jobs in the window, ranked by quantity."""
+	require_role(FSM_MANAGER, SYSTEM_MANAGER)
 	since = _since(days)
-	job_names = frappe.get_all(
+	job_names = frappe.get_list(
 		"Service Job",
 		filters=[["status", "=", "Completed"], ["completed_on", ">=", since]],
 		pluck="name",
@@ -123,7 +127,7 @@ def inventory_usage(days: int = 90, limit: int = 20):
 		a["qty"] += r.qty or 0
 		a["amount"] += r.amount or 0
 
-	items = sorted(agg.values(), key=lambda x: x["qty"], reverse=True)[: int(limit)]
+	items = sorted(agg.values(), key=lambda x: x["qty"], reverse=True)[: bounded_int(limit, 1, 100)]
 	for it in items:
 		it["qty"] = round(it["qty"], 2)
 		it["amount"] = round(it["amount"], 2)
@@ -133,8 +137,9 @@ def inventory_usage(days: int = 90, limit: int = 20):
 @frappe.whitelist()
 def technician_utilization(days: int = 90):
 	"""Per-technician job count, hours, average pace and completion rate."""
+	require_role(FSM_MANAGER, SYSTEM_MANAGER)
 	since = _since(days)
-	jobs = frappe.get_all(
+	jobs = frappe.get_list(
 		"Service Job",
 		filters=[["creation", ">=", since], ["primary_technician", "is", "set"]],
 		fields=["primary_technician", "status", "actual_hours"],

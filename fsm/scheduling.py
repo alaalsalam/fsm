@@ -13,6 +13,13 @@ import frappe
 from frappe import _
 from frappe.utils import add_to_date, get_datetime
 
+from fsm.security.policy import (
+	bounded_int,
+	require_job_access,
+	require_manager_scope,
+	resolve_manager_company,
+)
+
 _SKILL_WEIGHT = 50
 _TERRITORY_WEIGHT = 30
 _AVAILABLE_WEIGHT = 20
@@ -26,7 +33,8 @@ def suggest_technicians(job: str, limit: int = 10):
 
 	Consumed by the console dispatch board to power "suggested technician" UX."""
 	doc = frappe.get_doc("Service Job", job)
-	candidates = _eligible_technicians()
+	require_job_access(doc, "read", manager_only=True)
+	candidates = _eligible_technicians(doc.company)
 	territories = _territory_ancestors(doc.territory)
 
 	ranked = []
@@ -46,13 +54,17 @@ def suggest_technicians(job: str, limit: int = 10):
 		)
 
 	ranked.sort(key=lambda r: r["score"], reverse=True)
-	return ranked[: int(limit)]
+	return ranked[: bounded_int(limit, 1, 50)]
 
 
 @frappe.whitelist()
 def assign_technician(job: str, technician: str):
 	"""Assign a technician to a job (with a conflict check) and return the job."""
 	doc = frappe.get_doc("Service Job", job)
+	require_job_access(doc, "write", manager_only=True)
+	technician_company = frappe.db.get_value("Technician", technician, "company")
+	if technician_company != doc.company:
+		frappe.throw(_("The technician and job must belong to the same company."), frappe.PermissionError)
 	if doc.scheduled_date and _has_conflict(technician, doc):
 		frappe.throw(
 			_("{0} already has a job booked at that time.").format(
@@ -69,11 +81,14 @@ def get_available_technicians(
 	territory: str | None = None,
 	service_type: str | None = None,
 	scheduled_date: str | None = None,
+	company: str | None = None,
 ):
 	"""Lightweight finder used when creating a job (no Service Job doc yet)."""
+	company = resolve_manager_company(company)
+	require_manager_scope(company, territory)
 	territories = _territory_ancestors(territory)
 	out = []
-	for tech in _eligible_technicians():
+	for tech in _eligible_technicians(company):
 		if scheduled_date and _busy_at(tech.name, scheduled_date):
 			continue
 		matches_territory = not tech.territory or tech.territory in territories
@@ -124,11 +139,11 @@ def score_technician(tech, job, territories: set[str]) -> tuple[int | None, list
 	return score, reasons
 
 
-def _eligible_technicians() -> list:
+def _eligible_technicians(company: str) -> list:
 	"""Active technicians who are not off duty, with the fields scoring needs."""
-	return frappe.get_all(
+	return frappe.get_list(
 		"Technician",
-		filters={"active": 1, "status": ["!=", "Off Duty"]},
+		filters={"active": 1, "status": ["!=", "Off Duty"], "company": company},
 		fields=[
 			"name",
 			"technician_name",
@@ -181,7 +196,7 @@ def _has_conflict(technician: str, job) -> bool:
 	start = get_datetime(job.scheduled_date)
 	end = get_datetime(job.scheduled_end) if job.scheduled_end else add_to_date(start, hours=1)
 
-	others = frappe.get_all(
+	others = frappe.get_list(
 		"Service Job",
 		filters={
 			"primary_technician": technician,

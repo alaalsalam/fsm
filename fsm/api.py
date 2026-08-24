@@ -3,13 +3,25 @@
 
 import frappe
 from frappe import _
+from frappe.core.doctype.user.user import is_signup_disabled
+from frappe.rate_limiter import rate_limit
+from frappe.utils import cint, validate_email_address
 
 from fsm.field_service_management.doctype.service_job.service_job import make_invoice_from_job
+from fsm.security.field_allowlists import CUSTOMER_REGISTRATION_FIELDS, GUEST_BOOKING_FIELDS
+from fsm.security.policy import (
+	bounded_int,
+	require_authenticated,
+	require_job_access,
+	validate_allowed_fields,
+)
+from fsm.security.scopes import current_customer
 
 
 @frappe.whitelist()
 def get_dispatch_jobs(status: str | None = None, technician: str | None = None, limit: int = 50):
 	"""Jobs for the console dispatch board / mobile job list (permission-aware)."""
+	require_authenticated()
 	filters: dict = {}
 	if status:
 		filters["status"] = status
@@ -32,105 +44,131 @@ def get_dispatch_jobs(status: str | None = None, technician: str | None = None, 
 			"promised_response_by",
 		],
 		order_by="scheduled_date asc",
-		limit_page_length=int(limit),
+		limit=bounded_int(limit, 1, 200),
 	)
 
 
 @frappe.whitelist()
 def get_dashboard_stats():
 	"""Headline metrics for the console dashboard."""
+	require_authenticated()
 	from frappe.utils import today
 
 	start, end = today() + " 00:00:00", today() + " 23:59:59"
 	open_statuses = ["Scheduled", "Assigned", "In Progress", "On Hold"]
 
-	completed_today = frappe.get_all(
+	jobs = frappe.get_list(
 		"Service Job",
-		filters={"status": "Completed", "completed_on": ["between", [start, end]]},
-		fields=["total_amount"],
+		filters={"status": ["in", [*open_statuses, "Completed"]]},
+		fields=["status", "completed_on", "total_amount", "sla_breached"],
+		limit=0,
 	)
+	completed_today = [
+		job
+		for job in jobs
+		if job.status == "Completed" and job.completed_on and start <= str(job.completed_on) <= end
+	]
 	revenue_today = sum((row.total_amount or 0) for row in completed_today)
 
 	return {
-		"open_jobs": frappe.db.count("Service Job", {"status": ["in", open_statuses]}),
-		"in_progress": frappe.db.count("Service Job", {"status": "In Progress"}),
+		"open_jobs": len([job for job in jobs if job.status in open_statuses]),
+		"in_progress": len([job for job in jobs if job.status == "In Progress"]),
 		"completed_today": len(completed_today),
 		"revenue_today": revenue_today,
-		"sla_breached": frappe.db.count("Service Job", {"sla_breached": 1, "status": ["in", open_statuses]}),
+		"sla_breached": len([job for job in jobs if job.sla_breached and job.status in open_statuses]),
 	}
 
 
 @frappe.whitelist()
 def create_invoice_from_job(job: str):
 	"""Generate a draft Sales Invoice from a job's parts & services and link it back."""
+	require_job_access(job, "write", manager_only=True)
 	return {"name": make_invoice_from_job(job)}
 
 
 @frappe.whitelist()
 def start_job_task(job: str, idx: int):
 	"""Begin a checklist step (sequential) and return the refreshed job."""
-	return frappe.get_doc("Service Job", job).start_task(idx)
+	return require_job_access(job, "write").start_task(idx)
 
 
 @frappe.whitelist()
 def complete_job_task(job: str, idx: int, note: str | None = None):
 	"""Finish a checklist step and return the refreshed job."""
-	return frappe.get_doc("Service Job", job).complete_task(idx, note)
+	return require_job_access(job, "write").complete_task(idx, note)
 
 
 @frappe.whitelist()
 def complete_job(job: str):
 	"""Complete a job that has no checklist; returns the refreshed job."""
-	return frappe.get_doc("Service Job", job).complete_job()
+	return require_job_access(job, "write").complete_job()
 
 
 @frappe.whitelist(allow_guest=True)
+@rate_limit(key="email", limit=5, seconds=60 * 60, methods="POST")
 def register_customer(full_name: str, email: str, password: str, phone: str | None = None):
 	"""Self-service customer signup from the portal.
 
 	Creates a Website User, a linked Customer, and a Contact that ties the two
 	together, then signs the new user in so the SPA can load their history."""
+	values = {"full_name": full_name, "email": email, "password": password, "phone": phone}
+	validate_allowed_fields(values, CUSTOMER_REGISTRATION_FIELDS)
 	full_name = (full_name or "").strip()
-	email = (email or "").strip().lower()
+	email = validate_email_address((email or "").strip().lower(), throw=True)
+	phone = (phone or "").strip() or None
 	if not (full_name and email and password):
 		frappe.throw(_("Name, email and password are required."))
+	if is_signup_disabled():
+		frappe.throw(_("Customer registration is disabled."), frappe.PermissionError)
 	if frappe.db.exists("User", email):
 		frappe.throw(_("An account with this email already exists. Please sign in."))
+	if frappe.db.exists("Contact Email", {"email_id": email}):
+		frappe.throw(_("A contact with this email already exists."))
 
-	first_name, _, last_name = full_name.partition(" ")
+	first_name, separator, last_name = full_name.partition(" ")
+	savepoint = f"fsm_register_{frappe.generate_hash(length=8)}"
+	frappe.db.savepoint(savepoint)
+	try:
+		user = frappe.get_doc(
+			{
+				"doctype": "User",
+				"email": email,
+				"first_name": first_name,
+				"last_name": last_name if separator else "",
+				"send_welcome_email": 0,
+				"user_type": "Website User",
+				"new_password": password,
+			}
+		).insert(ignore_permissions=True)
+		user.add_roles("FSM Customer")
 
-	user = frappe.get_doc(
-		{
-			"doctype": "User",
-			"email": email,
-			"first_name": first_name,
-			"last_name": last_name,
-			"send_welcome_email": 0,
-			"user_type": "Website User",
-			"new_password": password,
-		}
-	).insert(ignore_permissions=True)
-	user.add_roles("FSM Customer")
+		customer = frappe.get_doc(
+			{
+				"doctype": "Customer",
+				"customer_name": full_name,
+				"customer_type": "Individual",
+				"customer_group": _default_customer_group(),
+				"territory": _default_territory(),
+			}
+		).insert(ignore_permissions=True)
 
-	customer = frappe.get_doc(
-		{
-			"doctype": "Customer",
-			"customer_name": full_name,
-			"customer_type": "Individual",
-			"customer_group": _default_customer_group(),
-			"territory": _default_territory(),
-		}
-	).insert(ignore_permissions=True)
+		contact = frappe.get_doc(
+			{"doctype": "Contact", "first_name": first_name, "last_name": last_name if separator else ""}
+		)
+		contact.user = email
+		contact.append("email_ids", {"email_id": email, "is_primary": 1})
+		if phone:
+			contact.append("phone_nos", {"phone": phone, "is_primary_mobile_no": 1})
+		contact.append("links", {"link_doctype": "Customer", "link_name": customer.name})
+		contact.insert(ignore_permissions=True)
+	except Exception:
+		frappe.db.rollback(save_point=savepoint)
+		raise
+	else:
+		frappe.db.release_savepoint(savepoint)
 
-	contact = frappe.get_doc({"doctype": "Contact", "first_name": first_name, "last_name": last_name})
-	contact.user = email
-	contact.append("email_ids", {"email_id": email, "is_primary": 1})
-	if phone:
-		contact.append("phone_nos", {"phone": phone, "is_primary_mobile_no": 1})
-	contact.append("links", {"link_doctype": "Customer", "link_name": customer.name})
-	contact.insert(ignore_permissions=True)
-
-	frappe.local.login_manager.login_as(email)
+	if getattr(frappe.local, "login_manager", None):
+		frappe.local.login_manager.login_as(email)
 	return {"customer": customer.name, "user": email, "full_name": full_name}
 
 
@@ -153,7 +191,7 @@ def get_portal_session():
 def get_my_appointments():
 	"""Booking history for the signed-in customer."""
 	customer = _current_customer()
-	return frappe.get_all(
+	return frappe.get_list(
 		"Service Appointment",
 		filters={"customer": customer},
 		fields=[
@@ -172,7 +210,7 @@ def get_my_appointments():
 def get_my_jobs():
 	"""Job history for the signed-in customer."""
 	customer = _current_customer()
-	return frappe.get_all(
+	return frappe.get_list(
 		"Service Job",
 		filters={"customer": customer},
 		fields=[
@@ -227,6 +265,7 @@ def get_my_job(job: str):
 
 
 @frappe.whitelist(allow_guest=True)
+@rate_limit(limit=10, seconds=60 * 60, methods="POST")
 def book_appointment(
 	customer_name: str,
 	contact_phone: str,
@@ -239,9 +278,26 @@ def book_appointment(
 
 	Public (guest) bookings capture just a name + phone; a signed-in customer's
 	booking is linked straight to their Customer record."""
+	values = {
+		"customer_name": customer_name,
+		"contact_phone": contact_phone,
+		"service_address": service_address,
+		"service_type": service_type,
+		"preferred_date": preferred_date,
+		"notes": notes,
+	}
+	validate_allowed_fields(values, GUEST_BOOKING_FIELDS)
+	customer_name = (customer_name or "").strip()
+	contact_phone = (contact_phone or "").strip()
+	if not customer_name or not contact_phone:
+		frappe.throw(_("Customer name and contact phone are required."))
+	company = frappe.db.get_single_value("Global Defaults", "default_company")
+	if not company:
+		frappe.throw(_("A default company must be configured before accepting bookings."))
 	appointment = frappe.get_doc(
 		{
 			"doctype": "Service Appointment",
+			"company": company,
 			"customer": _current_customer(optional=True),
 			"customer_name": customer_name,
 			"contact_phone": contact_phone,
@@ -258,27 +314,7 @@ def book_appointment(
 
 def _current_customer(optional: bool = False) -> str | None:
 	"""Resolve the Customer linked to the signed-in user (via their Contact)."""
-	user = frappe.session.user
-	if not user or user == "Guest":
-		if optional:
-			return None
-		raise frappe.AuthenticationError(_("Please sign in to continue."))
-
-	contact = frappe.db.get_value("Contact", {"user": user})
-
-	if contact:
-		customer = frappe.db.get_value(
-			"Dynamic Link",
-			{"parent": contact, "parenttype": "Contact", "link_doctype": "Customer"},
-			"link_name",
-		)
-		print(customer)
-		if customer:
-			return customer
-
-	if optional:
-		return None
-	raise frappe.ValidationError(_("No customer profile is linked to your account."))
+	return current_customer(optional=optional)
 
 
 def _default_customer_group() -> str:

@@ -12,6 +12,7 @@
   "user",
   "worker_type",
   "subcontractor",
+  "company",
   "section_break_contact",
   "phone",
   "territory",
@@ -71,6 +72,16 @@
    "fieldtype": "Link",
    "label": "Subcontractor",
    "options": "Subcontractor"
+  },
+  {
+   "default": "company:Global Defaults:default_company",
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1,
+   "search_index": 1
   },
   {
    "fieldname": "section_break_contact",

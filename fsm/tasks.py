@@ -28,8 +28,6 @@ def flag_sla_breaches():
 		frappe.db.set_value("Service Job", name, "sla_breached", 1, update_modified=False)
 		on_service_job_update(frappe.get_doc("Service Job", name))
 
-	if breached:
-		frappe.db.commit()
 	return breached
 
 
@@ -65,7 +63,6 @@ def notify_low_stock():
 			}
 		).insert(ignore_permissions=True)
 
-	frappe.db.commit()
 	return rows
 
 

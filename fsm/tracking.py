@@ -6,6 +6,12 @@ from frappe import _
 from frappe.utils import now_datetime
 
 from fsm.scheduling import _haversine_km, has_coords
+from fsm.security.policy import (
+	bounded_int,
+	require_job_access,
+	require_manager_scope,
+	require_technician_assignment,
+)
 
 
 @frappe.whitelist()
@@ -14,6 +20,8 @@ def update_location(latitude: float, longitude: float, accuracy: float | None = 
 	mobile app). The Technician's last-known location is updated via the log's
 	`after_insert` hook."""
 	technician = _technician_for_user()
+	if job:
+		require_technician_assignment(job)
 	frappe.get_doc(
 		{
 			"doctype": "Technician Location Log",
@@ -56,13 +64,15 @@ def clock_out():
 def nearest_technicians(job: str, limit: int = 5):
 	"""Active technicians ranked by distance from the job site. Requires the job to
 	have geocoded coordinates and technicians to have reported a location."""
-	j_lat, j_lng = frappe.db.get_value("Service Job", job, ["service_latitude", "service_longitude"])
+	job_doc = require_job_access(job, "read", manager_only=True)
+	require_manager_scope(job_doc.company, job_doc.territory)
+	j_lat, j_lng = job_doc.service_latitude, job_doc.service_longitude
 	if not has_coords(j_lat, j_lng):
 		frappe.throw(_("This job has no coordinates yet, so distance can't be calculated."))
 
-	rows = frappe.get_all(
+	rows = frappe.get_list(
 		"Technician",
-		filters={"active": 1, "status": ["!=", "Off Duty"]},
+		filters={"active": 1, "status": ["!=", "Off Duty"], "company": job_doc.company},
 		fields=[
 			"name",
 			"technician_name",
@@ -88,7 +98,7 @@ def nearest_technicians(job: str, limit: int = 5):
 			}
 		)
 	out.sort(key=lambda r: r["distance_km"])
-	return out[: int(limit)]
+	return out[: bounded_int(limit, 1, 50)]
 
 
 def _technician_for_user(user: str | None = None) -> str:
