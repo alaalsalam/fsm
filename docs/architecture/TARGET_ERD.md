@@ -1,15 +1,15 @@
 # ARCH-001 Target ERD
 
-Status: **Proposed — approval required before schema changes**
+Status: **Accepted target architecture — schema changes require a separately authorized phase**
 
-The target uses `Service Job` as the sole operational aggregate. Request and Visit are distinct lifecycle records, not competing work orders. ERPNext owns commercial, stock, asset, and accounting records. Names marked **Proposed** are conceptual until the ADR set is approved; this document does not authorize creating them.
+The target uses `Service Job` as the sole operational aggregate. Request and Visit are distinct lifecycle records, not competing work orders. ERPNext owns commercial, stock, asset, and accounting records. Conceptual names below are accepted design targets; this document does not authorize creating their schema.
 
 ```mermaid
 erDiagram
     CUSTOMER ||--o{ SERVICE_REQUEST : raises
     CONTACT ||--o{ SERVICE_REQUEST : contacts
     ADDRESS ||--o{ SERVICE_REQUEST : locates
-    SERVICE_REQUEST o|--|| SERVICE_JOB : converts_to
+    SERVICE_REQUEST ||--o{ SERVICE_JOB : results_in
 
     CUSTOMER ||--o{ SERVICE_JOB : receives_service
     SERVICE_JOB ||--|{ JOB_EQUIPMENT : covers
@@ -43,7 +43,7 @@ erDiagram
 
 | Entity | Physical target | Owner | Cardinality / invariant |
 |---|---|---|---|
-| Service Request | Controlled evolution/rename of current Service Appointment, not a parallel duplicate | FSM Intake | Zero or one canonical Job; immutable conversion link |
+| Service Request | Controlled evolution/rename of current Service Appointment, not a parallel duplicate | FSM Intake | Zero or more Jobs; every Job retains one immutable Request origin |
 | Service Job | Existing DocType | FSM Operations | Canonical aggregate root and correlation key |
 | Job Equipment | **Proposed child table** | FSM Operations | One or more equipment rows per Job; links ERPNext Item/Serial No/Asset |
 | Service Visit | **Proposed supporting record** | FSM Work Execution | Zero or more visits per Job; never bills or owns inventory |
@@ -52,7 +52,7 @@ erDiagram
 | Time Log | Existing Service Time Log, target link to Visit and Job | FSM Work Execution | Append-oriented; technician may not delete posted evidence |
 | Location Event | Existing Technician Location Log | FSM Workforce | Append-only, retention-controlled, actor/device stamped |
 | Maintenance Plan | **Proposed only after ERPNext overlap review** | FSM Maintenance | Recurrence definition, not an execution document |
-| Maintenance Occurrence | **Proposed deterministic occurrence ledger** | FSM Maintenance | Unique `(plan, due_at)`; generates at most one request/job |
+| Maintenance Occurrence | **Target deterministic occurrence ledger** | FSM Maintenance | Unique `(plan, plan_revision, due_at_utc)`; generates at most one request/job |
 | Customer/Contact/Address | ERPNext native | ERPNext Selling | Never duplicated in FSM |
 | Item/Serial No/Asset | ERPNext native | ERPNext Stock/Assets | Equipment source of truth |
 | Commercial and stock documents | ERPNext native | ERPNext | Linked from Job; state is projected, never mirrored as authoritative FSM state |

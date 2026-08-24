@@ -1,6 +1,6 @@
 # ADR-002: SwiftService is a functional reference only
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-08-24
 
 ## Context

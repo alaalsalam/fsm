@@ -1,6 +1,6 @@
 # ARCH-006 Screen Merge Matrix
 
-Status: **Proposed**
+Status: **Accepted merge/ownership constraint — no redesign authorized by GATE-001**
 
 No new screen is approved unless it has one domain owner, one primary aggregate, shared API contracts, and shared design tokens/components.
 

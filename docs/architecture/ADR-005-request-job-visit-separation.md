@@ -1,6 +1,6 @@
 # ADR-005: Separate Request, Job, and Visit responsibilities
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-08-24
 
 ## Context
@@ -13,7 +13,7 @@ Intake, the service commitment, and physical attendance have different cardinali
 - **Service Job** owns the service commitment and overall operational outcome.
 - **Service Visit** owns one attendance attempt, crew, check-in/out, execution evidence, and outcome.
 
-A Request converts to at most one Job. A Job has zero or more Visits. A Visit cannot invoice, post stock, or close a different Job. The current `Service Appointment` must evolve through a controlled rename/migration or be explicitly adopted as Request; a duplicate Request DocType may not coexist.
+The fixed cardinalities are `Service Request 1:N Service Job`, `Service Job 1:N Service Visit`, and `Service Job 1:N Job Equipment`. A Request may be fulfilled by multiple Jobs when triage produces separate commitments; each Job has one Request origin and zero or more Visits and equipment rows. A Visit cannot invoice, post stock, or close a different Job. The current `Service Appointment` must evolve through a controlled rename/migration or be explicitly adopted as Request; a duplicate Request DocType may not coexist.
 
 ## Consequences
 

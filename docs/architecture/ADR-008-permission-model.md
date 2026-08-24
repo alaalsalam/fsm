@@ -1,32 +1,32 @@
 # ADR-008: Command authorization and least privilege
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-08-24
 
 ## Context
 
-Current metadata roles do not express assigned-job/customer scope, several APIs use unrestricted queries, and many writes bypass permissions.
+DocType role metadata alone cannot express assigned-job, customer, company, and territory scope. The security gate found unrestricted reads and HTTP-reachable permission bypasses that required one enforceable backend policy.
 
 ## Decision
 
-Use layered authorization:
+Authorization is default-deny and implemented in `fsm.security`:
 
-1. Frappe authentication establishes actor identity.
-2. Role policy authorizes the command class.
-3. `frappe.has_permission(..., throw=True)` enforces DocType/document permission.
-4. Domain scope asserts customer ownership, technician assignment, territory, or integration grant.
-5. State guard validates the transition.
-6. A narrowly scoped internal bypass is allowed only after steps 1–5 and is auditable.
+1. `require_authenticated` establishes a non-Guest actor unless the endpoint is explicitly public.
+2. `require_role` authorizes the command class; System Manager elevation is explicit, never inferred from UI visibility.
+3. permission query hooks and `has_permission` hooks apply row scope to Service Job, Appointment, Return, Message, Feedback, Time Log, Field Note, and Location Log.
+4. `require_company_scope`, `require_manager_scope`, `require_customer_ownership`, and `require_technician_assignment` assert root-resource scope before reads, writes, or transitions.
+5. `require_doc_read`/`require_doc_write`, field allowlists, bounded limits, and controller state guards constrain documents, payloads, and transitions.
+6. `ignore_permissions=True` is permitted only for an enumerated guest bootstrap, authorized internal root operation, setup hook, or scheduler operation recorded in `IGNORE_PERMISSIONS_REGISTER.md`.
 
-Technicians see/modify assigned active work and append execution evidence; they cannot edit commercial truth or delete posted evidence. Customers see only their own requests/jobs/visits/messages/feedback. Managers see the operational organization. Integration credentials receive explicit scopes. Guest booking/registration is rate-limited and idempotent.
+Technicians can read and mutate only their assigned Jobs and append authorized execution evidence. Customers can read only their own appointments, Jobs, messages, and feedback. FSM Managers are restricted by Company User Permission and optional territory scope. System Managers retain explicit global administration. Guest registration and booking have fixed payloads and rate limits; role and user type cannot be supplied by callers.
 
 ## Consequences
 
-- `get_all` is forbidden for user-scoped reads unless an explicit privileged guard precedes it.
-- Permission tests include positive and negative cases for every public/whitelisted command.
-- Bypass calls without a documented guard fail review/CI.
+- `get_all` is forbidden for user-scoped reads unless root IDs are already scoped or a documented system/administrative guard precedes it.
+- Negative tests cover company, technician, customer, Guest, dashboard, registration rollback, and direct child-document bypass.
+- Bypass calls without a documented root guard fail review.
 - Location and financial fields receive field-level response shaping.
 
 ## Approval gate
 
-The critical findings in `PERMISSION_AUDIT.md` and automated negative tests must close before external/mobile feature work.
+Satisfied by GATE-001 backend security tests and the API/data/ignore-permissions matrices. Future APIs must update those matrices and add positive and negative tests in the same commit.

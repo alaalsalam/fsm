@@ -1,6 +1,6 @@
 # ADR-010: Arabic-first RTL and shared localization
 
-- Status: Proposed
+- Status: Accepted as mandatory cross-cutting rule
 - Date: 2026-08-24
 
 ## Context

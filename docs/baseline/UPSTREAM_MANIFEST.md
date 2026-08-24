@@ -8,6 +8,7 @@
 | SwiftService | `https://github.com/alaalsalam/swiftservice.git` | `develop` | `520d933e755cea36a450a7fc6ab9686d9b74f3fb` | Functional reference only; no code copying |
 | Frappe | Local v16 checkout | `version-16` | `567c05b6b7b736b52f08c372a620bd19cba168d1` | Framework engine |
 | ERPNext | Local v16 checkout | `version-16` | `054b20a2ae1bdea44694cca72d17412945171cab` | Sales, stock, invoicing, and collection source of truth |
+| Frappe Payments | `https://github.com/frappe/payments.git` | `develop` | `86fefa9faf8ad825fe6f08c4753acfe44817900b` | Official owner of `Payment Gateway`; ERPNext v16 test/dev dependency |
 
 ## Derived project commits
 
@@ -32,5 +33,5 @@ SwiftService was cloned to `/tmp/swiftservice-reference.ivm9la`, outside the ben
 ## Version caveats
 
 - The local Frappe and ERPNext checkouts have no configured `origin` remote, so their recorded commit SHAs—not a remote URL—are the reproducibility anchor.
-- The designated execution site is `digit16.trilogy-erp.com` in the v16 development bench. Its installed apps are `frappe`, `erpnext`, `ksa_compliance`, `crm`, and `fsm`. The disposable clean-install site was deleted after validation.
+- The designated execution site is `digit16.trilogy-erp.com` in the v16 development bench. Its installed apps are `frappe`, `erpnext`, `ksa_compliance`, `crm`, `fsm`, and official `payments`. The clean GATE test site is removed after final evidence collection.
 - The source manifest declares Node 20 support, while the frozen frontend dependencies require Node 22.12 or later.

@@ -1,5 +1,7 @@
 # BASE-005 Permission Audit
 
+> Historical baseline findings. GATE-001 dispositions and remaining approved exceptions are authoritative in `docs/security/API_AUTHORIZATION_MATRIX.md`, `IGNORE_PERMISSIONS_REGISTER.md`, and `DATA_SCOPE_MATRIX.md`.
+
 ## Verdict
 
 **Fail — feature development is blocked.** The metadata permission model is simple and understandable, but server-side enforcement is inconsistent. At least 18 application paths use `ignore_permissions=True`; only a subset has a preceding explicit identity/ownership/admin guard. Several sensitive read endpoints use `frappe.get_all`, which bypasses user permission filtering.

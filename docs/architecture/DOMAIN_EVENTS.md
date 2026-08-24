@@ -1,6 +1,6 @@
 # ARCH-003 Domain Events
 
-Status: **Proposed contract catalogue**
+Status: **Accepted target contract catalogue — durable event implementation is not part of GATE-001**
 
 ## Event envelope
 

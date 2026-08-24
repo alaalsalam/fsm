@@ -1,6 +1,6 @@
 # ADR-007: Deterministic maintenance occurrence engine
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-08-24
 
 ## Context
@@ -11,12 +11,12 @@ Recurring maintenance must survive scheduler retries, timezone/DST boundaries, p
 
 If the ERPNext overlap review confirms a domain gap, separate recurrence definition from execution:
 
-- Maintenance Plan owns rule, timezone, start/end, equipment, service template, and generation lead time.
-- Maintenance Occurrence is a unique ledger row for `(plan, due_at)` with Pending/Generated/Skipped/Superseded/Failed state.
-- Generation uses an idempotency key and creates at most one Request or Job according to policy.
+- Maintenance Plan owns rule, IANA timezone, start/end, equipment, service template, generation lead time, and an immutable revision number.
+- Maintenance Occurrence is a unique ledger row for `(plan, plan_revision, due_at_utc)` with Pending/Generated/Skipped/Superseded/Failed state; the local due time and UTC offset are retained for audit.
+- Generation uses the occurrence identity as an idempotency key and creates at most one Request or Job according to policy, including after retries or concurrent scheduler workers.
 - Occurrence never becomes the execution record; its generated Service Job remains canonical.
 
-Plan edits do not rewrite completed/generated occurrences. Future pending occurrences are superseded and recalculated with audit history.
+Plan edits create a new plan revision and do not rewrite completed/generated occurrences. Future pending occurrences from the old revision are superseded and recalculated with audit history. DST gaps and folds are resolved by an explicit policy attached to the plan timezone.
 
 ## Consequences
 

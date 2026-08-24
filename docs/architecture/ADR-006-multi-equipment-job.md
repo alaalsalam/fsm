@@ -1,6 +1,6 @@
 # ADR-006: A Service Job supports multiple equipment items
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-08-24
 
 ## Context
@@ -9,7 +9,7 @@ A single customer visit may service several units. One-Job-per-unit fragments sc
 
 ## Decision
 
-Introduce, only after approval, a Job Equipment child relation under Service Job. Each row links ERPNext Item and optionally Serial No and Asset, records the requested service/outcome, and may reference equipment-scoped checklist results. ERPNext remains equipment master and warranty source.
+The target model requires a Job Equipment child relation under Service Job; multi-equipment support is mandatory and may not be replaced by one Job per unit. Each row links ERPNext Item and optionally Serial No and Asset, records the requested service/outcome, and may reference equipment-scoped checklist results. ERPNext remains equipment master and warranty source. Schema implementation remains blocked until the next phase is separately authorized.
 
 At least one row is required for equipment-centric Jobs; non-equipment services may explicitly opt out by Job type. Duplicate Serial No rows in one active Job are rejected unless the service policy permits distinct operations.
 

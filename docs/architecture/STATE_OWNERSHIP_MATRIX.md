@@ -1,10 +1,10 @@
 # ARCH-002 State Ownership Matrix
 
-Status: **Proposed**
+Status: **Accepted target contract — implementation requires a separately authorized phase**
 
 Only the owner may author a state. Other domains consume projections or react to events; they do not copy the state into a competing authoritative field.
 
-| Aggregate/document | Proposed states | State owner | Permitted command actors | Projection consumers |
+| Aggregate/document | Target states | State owner | Permitted command actors | Projection consumers |
 |---|---|---|---|---|
 | Service Request | New, Triaged, Accepted, Rejected, Converted, Cancelled | FSM Intake | Customer creates; Manager triages/converts | Portal, Console, Job creation |
 | Service Job | Draft, Planned, Assigned, En Route, In Progress, On Hold, Completed, Cancelled | FSM Operations | Manager plans/assigns/holds/cancels; assigned crew starts/completes within guards | Console, Mobile, Portal, Analytics |

@@ -1,6 +1,6 @@
 # ADR-009: Offline mobile uses a command queue and server reconciliation
 
-- Status: Proposed
+- Status: Accepted as target architecture
 - Date: 2026-08-24
 
 ## Context
