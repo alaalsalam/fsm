@@ -6,6 +6,10 @@ import { fileURLToPath, URL } from "node:url";
 // Standalone Capacitor app — bundled into dist/ and packaged into native shells.
 export default defineConfig({
 	plugins: [vue(), tailwindcss()],
+	test: {
+		environment: "jsdom",
+		clearMocks: true,
+	},
 	resolve: {
 		alias: {
 			"@": fileURLToPath(new URL("./src", import.meta.url)),

@@ -26,15 +26,27 @@ const router = createRouter({
 	routes,
 });
 
+export function portalGuardDecision(
+	requiresAuth: boolean,
+	isAuthEntry: boolean,
+	isAuthenticated: boolean,
+	fullPath: string,
+) {
+	if (requiresAuth && !isAuthenticated) {
+		return { name: "login", query: { redirect: fullPath } };
+	}
+	if (isAuthEntry && isAuthenticated) return { name: "account" };
+	return true;
+}
+
 router.beforeEach(async (to) => {
 	await loadSession();
-	if (to.meta.auth && !session.session.authenticated) {
-		return { name: "login", query: { redirect: to.fullPath } };
-	}
-	if ((to.name === "login" || to.name === "signup") && session.session.authenticated) {
-		return { name: "account" };
-	}
-	return true;
+	return portalGuardDecision(
+		Boolean(to.meta.auth),
+		to.name === "login" || to.name === "signup",
+		session.session.authenticated,
+		to.fullPath,
+	);
 });
 
 export default router;

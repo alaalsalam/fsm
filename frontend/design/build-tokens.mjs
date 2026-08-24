@@ -11,6 +11,7 @@
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { format } from "prettier";
 
 const root = dirname(fileURLToPath(import.meta.url));
 const tokens = JSON.parse(readFileSync(resolve(root, "tokens.json"), "utf8"));
@@ -327,7 +328,7 @@ html.kl-theme-light {
 `;
 }
 
-function buildTs() {
+async function buildTs() {
 	const flat = {
 		brand: {
 			50: get("color.brand.50"),
@@ -369,11 +370,17 @@ function buildTs() {
 		),
 		touchMin: raw(tokens.touchTarget.min),
 	};
-	return (
+	const source =
 		"// KodLyft FSM design tokens — generated from tokens.json. Do not edit by hand.\n" +
 		`export const tokens = ${JSON.stringify(flat, null, "\t")} as const;\n` +
-		"export type Tokens = typeof tokens;\n"
-	);
+		"export type Tokens = typeof tokens;\n";
+	return format(source, {
+		parser: "typescript",
+		printWidth: 100,
+		useTabs: true,
+		tabWidth: 4,
+		trailingComma: "all",
+	});
 }
 
 mkdirSync(resolve(root, "css"), { recursive: true });
@@ -382,7 +389,7 @@ writeFileSync(resolve(root, "css/kodlyft-tokens.css"), buildWebCss());
 writeFileSync(resolve(root, "css/ionic-variables.css"), buildIonicCss());
 writeFileSync(resolve(root, "css/tailwind-theme.css"), buildTailwindTheme());
 writeFileSync(resolve(root, "css/command.css"), buildCommandCss());
-writeFileSync(resolve(root, "src/tokens.ts"), buildTs());
+writeFileSync(resolve(root, "src/tokens.ts"), await buildTs());
 console.log(
 	"✓ tokens built: css/{kodlyft-tokens,ionic-variables,tailwind-theme,command}.css, src/tokens.ts",
 );

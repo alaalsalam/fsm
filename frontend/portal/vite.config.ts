@@ -6,6 +6,10 @@ import path from "node:path";
 export default defineConfig({
 	base: "/",
 	plugins: [vue(), tailwindcss()],
+	test: {
+		environment: "jsdom",
+		clearMocks: true,
+	},
 	resolve: {
 		alias: {
 			"@": path.resolve(__dirname, "src"),

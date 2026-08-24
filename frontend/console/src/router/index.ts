@@ -68,16 +68,28 @@ const router = createRouter({
 	routes,
 });
 
+export function authGuardDecision(
+	isPublic: boolean,
+	isLogin: boolean,
+	isAuthenticated: boolean,
+	fullPath: string,
+) {
+	if (!isPublic && !isAuthenticated) {
+		return { name: "login", query: { redirect: fullPath } };
+	}
+	if (isLogin && isAuthenticated) return { path: "/" };
+	return true;
+}
+
 router.beforeEach(async (to) => {
 	const store = useAuthStore();
 	if (!store.ready) await store.load();
-	if (!to.meta.public && !store.isAuthenticated) {
-		return { name: "login", query: { redirect: to.fullPath } };
-	}
-	if (to.name === "login" && store.isAuthenticated) {
-		return { path: "/" };
-	}
-	return true;
+	return authGuardDecision(
+		Boolean(to.meta.public),
+		to.name === "login",
+		store.isAuthenticated,
+		to.fullPath,
+	);
 });
 
 export default router;

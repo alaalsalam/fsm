@@ -63,6 +63,8 @@ frontend/mobile/dist/
 frontend/mobile/android/
 frontend/mobile/ios/
 frontend/design/dist/
+frontend/test-results/
+frontend/playwright-report/
 
 # ESLint / tooling caches
 .eslintcache
