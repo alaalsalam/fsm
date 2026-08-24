@@ -88,6 +88,8 @@ curl -I http://127.0.0.1:8017/book
 | Typecheck | PASS | All six workspaces completed `tsc`/`vue-tsc --noEmit` |
 | ESLint | PASS | `eslint .` exit 0 |
 | Format check | FAIL | Generated `design/src/tokens.ts` is not Prettier-clean after token generation |
+| Ruff lint | FAIL | `F823` in `fsm/api.py:96`: local `_` is referenced before assignment |
+| Ruff format | FAIL | `fsm/analytics.py` and `fsm/integrations.py` would be reformatted |
 | Backend tests | BLOCKED | Pre-test dependency traversal ended with `frappe.exceptions.DoesNotExistError: DocType Payment Gateway not found` |
 | SwiftService contamination | PASS | Reference checkout was under `/tmp/swiftservice-reference.ivm9la`; no SwiftService files exist in FSM |
 
@@ -109,6 +111,8 @@ curl -I http://127.0.0.1:8017/book
 | BL-012 | Medium | Scheduler methods call `frappe.db.commit()` directly. | Remove application-level transaction commits in a later authorized hardening phase. |
 | BL-013 | Medium | Mobile offline behavior is not implemented: no durable queue, conflict policy, sync cursor, or encrypted local operational store. | Follow ADR-009 before claiming offline support. |
 | BL-014 | Medium | UI is English-first and lacks an audited RTL/localization implementation. | Follow ADR-010 and add RTL visual/interaction tests. |
+| BL-015 | Critical | `register_customer` assigns `first_name, _, last_name`, which shadows the imported translation function `_`; validation and duplicate-account error paths can raise `UnboundLocalError`/`TypeError`. Ruff reports F823 at line 96. | Rename the throwaway local and add guest registration negative-path tests in an authorized hardening phase. |
+| BL-016 | Low | Ruff format check reports `fsm/analytics.py` and `fsm/integrations.py` as unformatted. | Apply deterministic formatting in a separate code-quality commit. |
 
 ## Acceptance status
 
