@@ -1,0 +1,35 @@
+# ARCH-006 Screen Merge Matrix
+
+Status: **Proposed**
+
+No new screen is approved unless it has one domain owner, one primary aggregate, shared API contracts, and shared design tokens/components.
+
+| Capability/screen | Current KodLyft surface | SwiftService reference | Target action | Domain owner | Authoritative data |
+|---|---|---|---|---|---|
+| Dispatch board | Console `/` | `/dispatch` | Keep current; merge crew/visit filters after Visit approval | FSM Dispatch | Service Job/Visit |
+| Job list | Console `/jobs`; Mobile `/jobs` | Service request generic list | Keep; share list query contract and filters | FSM Operations | Service Job |
+| Job create/detail | Console `/jobs/new`, `/jobs/:name`; Mobile detail | Generic request/detail forms | Keep task-specific current screens; add Request/Visit/equipment sections | FSM Operations | Service Job |
+| Intake booking | Portal `/` | Service request form | Keep Portal; evolve Service Appointment to approved Request model | FSM Intake | Service Request |
+| Customer account/history | Portal `/account` | None | Keep | FSM Customer Experience | Scoped Request/Job projections |
+| Customer tracking | Portal `/track/:job` | GPS panel/live ETA | Keep; merge ETA concept with privacy filter | FSM Customer Experience | Visit tracking projection |
+| Inventory | Console `/inventory` | Van inventory/spares | Keep projection only; route actions to ERPNext | ERPNext Stock | Warehouse/Bin/MR/Stock Entry |
+| Returns | Console `/returns` | RMA/replacement | Keep; merge operational outcomes, not duplicate stock docs | FSM Returns | Service Return + ERPNext Stock |
+| Partners | Console `/subcontractors` | Engineer profiles | Keep current; no separate Swift engineer identity | FSM Workforce | Technician/Subcontractor/User |
+| Analytics | Console `/analytics` | Dashboard/reports | Keep and merge only validated KPI definitions | FSM Analytics | FSM events + ERPNext ledgers |
+| Integrations | Console `/integrations` | Settings | Keep admin-only; move secret actions behind guards | Platform Integration | Frappe Integration records |
+| Account/login | All surfaces | Shared console session | Keep Frappe identity; share auth contract | Frappe Identity | User/session |
+| Visit execution | Mobile job detail | Engineer Visit/GPS panels | Add only after ADR approval, within Mobile job flow—not a second app | FSM Work Execution | Service Visit |
+| Maintenance plan | None | PM visit/AMC pages | Proposed future Console section after ADR-007 | FSM Maintenance | Plan/Occurrence |
+| Workshop repair | None | Repair Order | Merge into Job type/detail sections; no separate work-order screen | FSM Operations | Service Job |
+| Billing/estimate/payment | Job detail links | Service Billing/Estimate | Link/open ERPNext native screens or scoped projections | ERPNext Selling/Accounts | Quotation/Invoice/Payment |
+| Data import | None | `/data-import` | Use native Frappe Data Import; no FSM clone | Frappe Platform | Data Import |
+| Knowledge base | None | `/help` | Use platform knowledge/help after separate decision | Platform Knowledge | Frappe knowledge content |
+
+## Shared surface contract
+
+- `frontend/design/tokens.json` remains the only visual-token source.
+- `frontend/ui` holds shared presentational components with RTL states.
+- `frontend/api` owns versioned transport and domain types; surface wrappers must converge on generated/shared commands and queries.
+- Console may expose organization-wide views only to authorized roles.
+- Portal may expose only the authenticated customer scope or explicitly public booking data.
+- Mobile may expose only assigned work plus approved lookup data, with offline commands governed by ADR-009.
