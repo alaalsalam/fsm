@@ -8,8 +8,8 @@ No new screen is approved unless it has one domain owner, one primary aggregate,
 |---|---|---|---|---|---|
 | Dispatch board | Console `/` | `/dispatch` | Keep current; merge crew/visit filters after Visit approval | FSM Dispatch | Service Job/Visit |
 | Job list | Console `/jobs`; Mobile `/jobs` | Service request generic list | Keep; share list query contract and filters | FSM Operations | Service Job |
-| Job create/detail | Console `/jobs/new`, `/jobs/:name`; Mobile detail | Generic request/detail forms | Keep task-specific current screens; add Request/Visit/equipment sections | FSM Operations | Service Job |
-| Intake booking | Portal `/` | Service request form | Keep Portal; evolve Service Appointment to approved Request model | FSM Intake | Service Request |
+| Job create/detail | Console `/jobs/new`, `/jobs/:name`; Mobile detail | Generic request/detail forms | Keep task-specific screens; CORE Request/Visit sections implemented; equipment remains later | FSM Operations | Service Job |
+| Intake booking | Portal `/` | Service request form | Keep Portal; Service Request model implemented | FSM Intake | Service Request |
 | Customer account/history | Portal `/account` | None | Keep | FSM Customer Experience | Scoped Request/Job projections |
 | Customer tracking | Portal `/track/:job` | GPS panel/live ETA | Keep; merge ETA concept with privacy filter | FSM Customer Experience | Visit tracking projection |
 | Inventory | Console `/inventory` | Van inventory/spares | Keep projection only; route actions to ERPNext | ERPNext Stock | Warehouse/Bin/MR/Stock Entry |
@@ -18,7 +18,7 @@ No new screen is approved unless it has one domain owner, one primary aggregate,
 | Analytics | Console `/analytics` | Dashboard/reports | Keep and merge only validated KPI definitions | FSM Analytics | FSM events + ERPNext ledgers |
 | Integrations | Console `/integrations` | Settings | Keep admin-only; move secret actions behind guards | Platform Integration | Frappe Integration records |
 | Account/login | All surfaces | Shared console session | Keep Frappe identity; share auth contract | Frappe Identity | User/session |
-| Visit execution | Mobile job detail | Engineer Visit/GPS panels | Add only after ADR approval, within Mobile job flow—not a second app | FSM Work Execution | Service Visit |
+| Visit execution | Mobile job detail | Engineer Visit/GPS panels | CORE baseline implemented within Mobile job flow—not a second app | FSM Work Execution | Service Visit |
 | Maintenance plan | None | PM visit/AMC pages | Proposed future Console section after ADR-007 | FSM Maintenance | Plan/Occurrence |
 | Workshop repair | None | Repair Order | Merge into Job type/detail sections; no separate work-order screen | FSM Operations | Service Job |
 | Billing/estimate/payment | Job detail links | Service Billing/Estimate | Link/open ERPNext native screens or scoped projections | ERPNext Selling/Accounts | Quotation/Invoice/Payment |

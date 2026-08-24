@@ -1,6 +1,6 @@
 # ADR-005: Separate Request, Job, and Visit responsibilities
 
-- Status: Accepted
+- Status: Accepted and implemented for the CORE slice
 - Date: 2026-08-24
 
 ## Context
@@ -13,7 +13,7 @@ Intake, the service commitment, and physical attendance have different cardinali
 - **Service Job** owns the service commitment and overall operational outcome.
 - **Service Visit** owns one attendance attempt, crew, check-in/out, execution evidence, and outcome.
 
-The fixed cardinalities are `Service Request 1:N Service Job`, `Service Job 1:N Service Visit`, and `Service Job 1:N Job Equipment`. A Request may be fulfilled by multiple Jobs when triage produces separate commitments; each Job has one Request origin and zero or more Visits and equipment rows. A Visit cannot invoice, post stock, or close a different Job. The current `Service Appointment` must evolve through a controlled rename/migration or be explicitly adopted as Request; a duplicate Request DocType may not coexist.
+The implemented CORE cardinalities are `Service Request 1:N Service Job` and `Service Job 1:N Service Visit`; the future Job Equipment relation remains design-only. A Request may be fulfilled by multiple Jobs when triage produces separate commitments; each Job retains its Request origin and has zero or more Visits. A Visit cannot invoice, post stock, or close a Job. `Service Appointment` was migrated in place to Service Request; a duplicate runtime DocType does not coexist.
 
 ## Consequences
 
@@ -21,6 +21,6 @@ The fixed cardinalities are `Service Request 1:N Service Job`, `Service Job 1:N 
 - Customer booking status is not confused with Job execution state.
 - Job completion is guarded by required Visit outcomes.
 
-## Approval gate
+## Implementation record
 
-Approve the physical migration choice for `Service Appointment` before creating any Request/Visit schema.
+The guarded rename patch, Request/Job/Visit command service, append-only Event Log, and authorization tests were delivered and verified by CORE-CLOSEOUT.

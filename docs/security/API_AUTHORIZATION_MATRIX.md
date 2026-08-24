@@ -1,6 +1,6 @@
 # API authorization matrix
 
-Date: 2026-08-24. Inventory source: Python whitelist decorators at the GATE-001 revision. Total: **58/58 classified** (51 module APIs and 7 document methods). Default is deny; frontend visibility is never an authorization control.
+Date: 2026-08-24. Inventory source: Python whitelist decorators at the CORE closeout revision. Total: **85/85 current endpoints classified**. The original 58-row GATE-001 table remains below as an audit baseline; two removed document RPCs and all 29 CORE additions are reconciled in the CORE delta. Default is deny; frontend visibility is never an authorization control.
 
 Legend: access `G` = explicit Guest, `A` = authenticated. Scope columns use `C` = Company User Permission, `T` = Service Territory, `O` = current Customer ownership, `A` = assigned Technician, `—` = not applicable. Read/bypass values are `No`, `Scoped` (root IDs or warehouses were authorized first), or the named documented exception. Tests: `AUTH`, `COMP`, `CUST`, `TECH`, `GUEST`, `FIELDS`, `STATE`, `AGG`, `RATE`, `ROLLBACK`, `CHILD`, `E2E`.
 
@@ -11,13 +11,13 @@ Legend: access `G` = explicit Guest, `A` = authenticated. Scope columns use `C` 
 | 3 | `fsm.api.create_invoice_from_job` | A; Manager → draft invoice | Service Job | FSM Manager/System Manager | C | T | — | — | `job` | `require_job_access(write, manager_only)` | No | No for HTTP path | Medium: accounting command | AUTH,COMP,FIELDS |
 | 4 | `fsm.api.start_job_task` | A; assigned Technician/Manager → transition task | Service Job | Technician/Manager/System Manager | C | T | — | A | `job, idx` | `require_job_access(write)` + state guard | No | Conditional system auto-invoice only | Low | TECH,COMP,STATE |
 | 5 | `fsm.api.complete_job_task` | A; assigned Technician/Manager → transition task | Service Job | Technician/Manager/System Manager | C | T | — | A | `job, idx, note` | `require_job_access(write)` + sequence guard | No | Conditional system auto-invoice only | Low | TECH,COMP,STATE,FIELDS |
-| 6 | `fsm.api.complete_job` | A; assigned Technician/Manager → complete | Service Job | Technician/Manager/System Manager | C | T | — | A | `job` | `require_job_access(write)` + checklist guard | No | Conditional system auto-invoice only | Medium: invoice side effect | TECH,COMP,STATE |
+| 6 | `fsm.api.complete_job` | A; assigned Technician/Manager → canonical completion command | Service Job | Technician/Manager/System Manager | C | T | — | A | `job` | forwards to `service_operations.commands.complete_job`; CompletionPolicy | No | Conditional system auto-invoice only | Medium: invoice side effect | TECH,COMP,STATE |
 | 7 | `fsm.api.register_customer` | G; Guest → create fixed Website User/Customer/Contact | registration aggregate | Guest | — | — | self | — | `full_name,email,password,phone` only | allowlist + validation + fixed role/type + rate limit | No | Approved guest bootstrap | Medium: public identity creation | GUEST,FIELDS,RATE,ROLLBACK,CUST |
 | 8 | `fsm.api.get_portal_session` | G; Guest/auth user → session projection | User/Contact | Guest | — | — | O | — | none | explicit Guest branch + `current_customer(optional)` | No | No | Low | GUEST,CUST,E2E |
-| 9 | `fsm.api.get_my_appointments` | A; Customer → own appointments | Service Appointment | FSM Customer | C* | T* | O | — | none | `current_customer` + appointment query hook | No | No | Low | AUTH,CUST |
+| 9 | `fsm.api.get_my_appointments` | A; Customer → own Requests | Service Request | FSM Customer | C* | T* | O | — | none | deprecated alias to `get_my_requests` | No | No | Low; removal requires client window | AUTH,CUST |
 | 10 | `fsm.api.get_my_jobs` | A; Customer → own Jobs | Service Job | FSM Customer | C* | T* | O | — | none | `current_customer` + Job query hook | No | No | Low | AUTH,CUST |
 | 11 | `fsm.api.get_my_job` | A; Customer → own Job detail | Service Job | FSM Customer | C* | T* | O | — | `job` | explicit owner comparison | No | No | Low | CUST,FIELDS |
-| 12 | `fsm.api.book_appointment` | G; Guest/Customer → booking | Service Appointment | Guest | default | — | optional O | — | fixed booking allowlist | allowlist + required fields + fixed company + rate limit | No | Approved guest booking insert | Medium: public write/abuse | GUEST,FIELDS,RATE |
+| 12 | `fsm.api.book_appointment` | G; Guest/Customer → Request intake | Service Request | Guest | default | — | optional O | — | same fixed allowlist as `request_service` | deprecated alias; public intake guard + rate limit | No | Approved Request insert | Medium: public write/abuse | GUEST,FIELDS,RATE |
 | 13 | `fsm.scheduling.suggest_technicians` | A; Manager → ranked candidates | Service Job | FSM Manager/System Manager | C | T | — | — | `job, limit≤50` | `require_job_access(read, manager_only)` | Scoped child skills | No | Low | AUTH,COMP,AGG |
 | 14 | `fsm.scheduling.assign_technician` | A; Manager → assignment | Service Job | FSM Manager/System Manager | C | T | — | — | `job, technician` | `require_job_access(write, manager_only)` + same-company guard | Scoped child skills | No | Low | COMP,STATE,FIELDS |
 | 15 | `fsm.scheduling.get_available_technicians` | A; Manager → workforce search | Company | FSM Manager/System Manager | C | T | — | — | `territory,service_type,scheduled_date,company` | `resolve_manager_company` + `require_manager_scope` | Scoped child skills | No | Low | COMP,AUTH,FIELDS |
@@ -59,10 +59,44 @@ Legend: access `G` = explicit Guest, `A` = authenticated. Scope columns use `C` 
 | 51 | `fsm.integrations.list_webhooks` | A; administrator → Webhook list | Webhook | System Manager | — | — | — | — | none | `_require_admin` | No | No | Medium: integration metadata | AUTH |
 | 52 | `ServiceJob.start_task` | A document RPC; assigned actor → task transition | Service Job | Technician/Manager/System Manager | C | T | — | A | `idx` | `require_job_access(write)` + sequence guard | No | Conditional system auto-invoice only | Low | TECH,COMP,STATE |
 | 53 | `ServiceJob.complete_task` | A document RPC; assigned actor → task transition | Service Job | Technician/Manager/System Manager | C | T | — | A | `idx,note` | `require_job_access(write)` + sequence guard | No | Conditional system auto-invoice only | Low | TECH,COMP,STATE |
-| 54 | `ServiceJob.complete_job` | A document RPC; assigned actor → completion | Service Job | Technician/Manager/System Manager | C | T | — | A | none | `require_job_access(write)` + checklist guard | No | Conditional system auto-invoice only | Medium: invoice side effect | TECH,COMP,STATE |
-| 55 | `ServiceAppointment.create_service_job` | A document RPC; Manager → conversion | Service Appointment | FSM Manager/System Manager | C | T | — | — | document name only | `require_manager_scope` + one-time conversion guard | No | Authorized aggregate creation/customer bootstrap | Medium: creates ERP/FSM records | COMP,STATE,CHILD |
+| 54 | `ServiceJob.complete_job` | **Removed in CORE**; replaced by canonical command | Service Job | — | — | — | — | — | — | no longer whitelisted | No | No | Closed duplicate lifecycle path | STATE |
+| 55 | `ServiceAppointment.create_service_job` | **Removed in CORE** with Appointment controller | Service Appointment | — | — | — | — | — | — | replaced by Request command/RPC | No | No | Closed duplicate concept | STATE |
 | 56 | `ServiceReturn.approve` | A document RPC; Manager → approve | Service Return→Job | FSM Manager/System Manager | C | T | — | — | document name only | `require_job_access(write, manager_only)` + state guard | No | No | Low | COMP,STATE |
 | 57 | `ServiceReturn.receive` | A document RPC; Manager → receive/post stock | Service Return→Job | FSM Manager/System Manager | C | T | — | — | document name only | `require_job_access(write, manager_only)` + state guard | No | Authorized Stock Entry receipt | High: submitted stock document | COMP,STATE |
 | 58 | `ServiceReturn.close` | A document RPC; Manager → close | Service Return→Job | FSM Manager/System Manager | C | T | — | — | document name only | `require_job_access(write, manager_only)` + state guard | No | No | Low | COMP,STATE |
 
-`T*`, `C*`, `O*`, and `A*` mean the scope is inherited from the authorized Job/customer/technician relation rather than accepted as a free input. Any new whitelist decorator must add a row here and positive/negative coverage in the same commit.
+## CORE endpoint delta (29 additions)
+
+| Endpoint | Access and accepted input | Root guard/scope | Bypass decision |
+|---|---|---|---|
+| `fsm.api.get_my_requests` | A Customer; no input | `current_customer`; explicit Customer filter plus Request query hook | none |
+| `fsm.api.request_service` | G; fixed `customer_name,contact_phone,service_address,service_type,preferred_date,notes` | POST rate limit, required fields, fixed default company, linked current Customer only | approved narrow Request insert |
+| `open_request` | A scoped Manager; `request,source,correlation_id` | `_request_access(manager_only)` company/territory then transition map | event insert only |
+| `triage_request` | same | same | event insert only |
+| `cancel_request` | same | same | event insert only |
+| `close_request` | same | same | event insert only |
+| `create_job_from_request` | A scoped Manager; `request,idempotency_key,source` | Request scope/status; key 1–128; unique operation key | approved Job + event inserts after guard |
+| `plan_job` | A scoped Manager; `job,source,correlation_id` | `require_job_access(write, manager_only)` + transition map | event insert only |
+| `schedule_job` | A scoped Manager; plus start/end | same; valid time window | event insert only |
+| `dispatch_job` | A scoped Manager; optional technician | same; active same-company Technician | event insert only |
+| `start_job` | A assigned Technician/scoped Manager | `require_job_access(write)` + transition map | event insert only |
+| `hold_job` | same; fixed reason allowlist | same | event insert only |
+| `resume_job` | same | same; prior state allowlist | event insert only |
+| `cancel_job` | A scoped Manager | manager-only Job access | event insert only |
+| `complete_job` | A assigned Technician/scoped Manager | Job access + CompletionPolicy + active Visit rejection | event insert only |
+| `create_visit` | A scoped Manager; Job/window/technician | manager Job scope; active Job; active same-company Technician | approved Visit + event inserts after guard |
+| `dispatch_visit` | A scoped Manager | parent Job scope + technician present | event insert only |
+| `start_travel` | A exact assigned Technician/scoped Manager | parent Job access + exact Visit assignment | event insert only |
+| `check_in_visit` | same; coordinates/accuracy | same + coordinate validation | event insert only |
+| `start_visit_work` | same | same + transition map | event insert only |
+| `check_out_visit` | same; coordinates/accuracy | same + coordinate validation | event insert only |
+| `complete_visit` | same | same + transition map | event insert only |
+| `cancel_visit` | same | same + transition map | event insert only |
+| `list_service_requests` | A; `status,limit≤200` | authenticated + Request permission query hook | none |
+| `get_service_request` | A; `request` | Manager scope or Customer ownership; linked Jobs use permission query hook | none |
+| `get_job_visits` | A; `job` | `require_job_access(read)` + Visit permission hook | none |
+| `get_service_visit` | A; `visit` | parent Job read guard | none |
+| `get_service_timeline` | A; fixed reference type/name | corresponding Request/Job/Visit read guard | none |
+| `ServiceRequest.create_service_job` | A document RPC; optional idempotency key | forwards to manager-scoped canonical conversion command | same approved Job/event inserts |
+
+The command names above are under `fsm.service_operations.commands`; read projections are under `fsm.service_operations.api`. `T*`, `C*`, `O*`, and `A*` mean scope inherited from the authorized root relation. Positive/negative CORE coverage is in `fsm.tests.test_service_operations`.

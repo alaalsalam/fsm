@@ -5,7 +5,10 @@ This matrix covers user-facing lists/aggregations plus all remaining production 
 | Data/read path | Query form | Scope applied before/inside query | Fields/output control | Leakage decision |
 |---|---|---|---|---|
 | Dispatch list and dashboard | `get_list(Service Job)` | permission query hook maps Manager→company, Technician→assignment, Customer→ownership | explicit fields; bounded list; KPI derived only from visible rows | Closed |
-| Portal Jobs/Appointments | `get_list` | current Customer filter plus DocType query hook | explicit portal projections | Closed |
+| Portal Requests/Jobs | `get_list` | current Customer filter plus Request/Job query hooks | explicit portal projections | Closed |
+| Console Request list/detail | `get_list(Service Request/Service Job)` | Manager company/territory query hooks; Customer path requires ownership | bounded explicit fields | Closed |
+| Job Visit list/detail | `get_list/get_doc(Service Visit)` | parent Job read/write authorization plus exact technician assignment for execution | explicit Visit projection | Closed |
+| Service timeline | `get_list(Service Event Log)` | Request/Job/Visit root authorized before correlation filter | fixed audit fields; max 500 | Closed |
 | Messages/feedback/returns/notes | `get_list` | root Job authorized; child query hook uses visible Job existence | explicit child fields | Closed |
 | Customer profile/history | `get_list(Service Job)` | `require_customer_access` first, then visible Job query | required profile/history fields only | Closed |
 | Scheduling candidates | `get_list(Technician)` | authorized Job company or resolved manager company | explicit scoring fields | Closed |
@@ -28,3 +31,5 @@ This matrix covers user-facing lists/aggregations plus all remaining production 
 | Daily manager recipient resolution | `get_all(Has Role)` | system-only scheduler; fixed FSM Manager role then enabled check | user IDs only | Approved system read |
 
 `get_all` is retained only for child tables/system metadata where Frappe User Permissions do not supply a useful root check, and every retained user-reachable occurrence is constrained by authorized root IDs or warehouses.
+
+CORE adds no unscoped `get_all`. Request→Job and Job→Visit reads remain permission-aware `get_list` calls. The sole Visit projection write targets its already-authorized parent Job; no Visit→Request mutation exists.

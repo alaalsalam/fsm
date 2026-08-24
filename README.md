@@ -39,7 +39,7 @@ KodLyft runs as one Frappe app with three frontends that share **one design lang
 
 ```
                 ┌──────────────────────── Frappe + ERPNext ────────────────────────┐
-                │  Native FSM doctypes (Job, Appointment, Technician, Contract …)    │
+                │  Native FSM doctypes (Request, Job, Visit, Technician, Contract …) │
                 │  reusing ERPNext masters (Customer, Item, Quotation, Invoice …)    │
                 └───────────────▲───────────────▲───────────────▲───────────────────┘
                                 │ REST / realtime │               │
