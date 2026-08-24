@@ -73,25 +73,64 @@ Service Job / Service Visit — reusing ERPNext + existing FSM masters, no dupli
 | Test module byte-compiles | ✅ OK |
 | AST parse of engine/api/controller | ✅ OK |
 
-## Gate status — **TEAMS-GATE: IMPLEMENTED · PENDING PLATFORM MIGRATE + TEST**
+## Gate status — **TEAMS-GATE: FAIL (cycle 1) → remediated, PENDING cycle-2 test run**
 
-The implementation is complete and statically valid. It **cannot be self-certified PASS** because
-closing the gate requires:
-
-1. **`bench migrate`** on `digit16.trilogy-erp.com` — to create the 3 new DocTypes and the new
-   Service Job / Service Visit / Technician fields. Migration is a **platform-managed operation**
-   this agent is not permitted to run (BildFast pipeline reserves it).
-2. **`bench --site digit16.trilogy-erp.com run-tests --app fsm --module fsm.tests`** — to execute the
-   18 new team tests plus the 39-test regression baseline against the migrated schema.
+Cycle 1 failed on a test-only ImportError (details below). Remediated test-side; awaiting a clean
+test-environment run to certify. No implementation/schema change in the remediation.
 
 ### ⚠ Deployment ordering (important)
 `get_dispatch_jobs` now selects `assigned_service_team` and `team_leader`. Until migrate lands, those
 columns do not exist, so the console dispatch board (which calls `get_dispatch_jobs`) will error.
-**Migrate must run before/with this deploy** — this is the normal FSM backend→pipeline flow, flagged
-here so the migrate is not skipped.
+**Migrate must run before/with this deploy** — this is the normal FSM backend→pipeline flow.
 
-### Required manager / platform action
-Run migrate, then the test suite. If all 57 tests (39 + 18) pass → **TEAMS-GATE: PASS**, proceed to
-Phase 2 (Service Contracts / AMC). If any fail → report here and fix within Phase 1 only.
+---
 
-No production site touched. No `ignore_permissions` added on user-driven writes. No ERPNext duplication.
+## Manager gate cycle 1 — TEAMS-GATE: FAIL (2026-08-24)
+
+The two schema migrations completed (exit 0). Certification then **failed**:
+
+1. The proposed `--module fsm.tests` command discovered **zero tests** — it targets the `fsm.tests`
+   *package*, which owns no tests directly. **Rejected as evidence; never used again below.**
+2. Full discovery `run-tests --app fsm` failed before running: `test_service_teams.py:6` imported
+   `get_dispatch_jobs` from `fsm.scheduling`, raising `ImportError` → `TestRunnerError`.
+
+### Root cause
+API-ownership mistake **in the test only**: `get_dispatch_jobs` is owned by `fsm.api` (where
+`test_security` also imports it); only `suggest_teams` / `assign_team` live in `fsm.scheduling`.
+The implementation was correct — no endpoint was misplaced or duplicated.
+
+### Remediation (Phase 1, test-only — no schema change)
+- Fixed the import: `get_dispatch_jobs` ← `fsm.api`; `suggest_teams, assign_team` ← `fsm.scheduling`.
+- Removed unused `add_to_date`, `now_datetime` imports.
+- Fixed a test-isolation defect surfaced once the import resolved: `TestServiceTeamAuthorization`
+  reuses SecurityFixture's fixed-name technicians, so a team from one method leaked into the next and
+  the overlapping-membership guard (correctly) rejected it. Added `_remove_stale_teams()` cleanup in
+  `setUp`, mirroring SecurityFixture's own `_remove_stale_fixtures` pattern.
+
+### Verification performed
+| Check | Result |
+|---|---|
+| `py_compile` test + impl | ✅ |
+| Real-context import (`bench console`) | ✅ `IMPORT_OK True True True` |
+| Endpoint NOT duplicated in scheduling | ✅ `SCHEDULING_HAS suggest=True assign=True get_dispatch=False` |
+
+### Test execution is environment-gated (not a code defect)
+Running the suite on the populated dev site `digit16.trilogy-erp.com` fails in ERPNext's
+`BootStrapTestData()` (`erpnext/tests/utils.py`) with `DuplicateEntryError('Price List',
+'Standard Buying')` — it assumes a fresh test DB. **The existing baseline module
+`fsm.tests.test_service_operations` fails identically**, confirming this is a pre-existing
+environmental condition, not Phase 1 code. Certification must run on the clean test environment the
+baseline uses (dedicated test site), not the live dev site.
+
+### Required manager commands for gate cycle 2
+- **Second migration:** NOT required — the remediation touched only `fsm/tests/test_service_teams.py`;
+  no DocType/field/schema change since cycle-1 migrate.
+- **Full test discovery (correct command):**
+  `bench --site <clean-test-site> run-tests --app fsm`
+  (discovers all `test_*.py`: 39 baseline + 18 team = 57). Optionally scope to the new module with
+  `--module fsm.tests.test_service_teams`. **Do not use `--module fsm.tests`** (zero tests).
+
+If all 57 pass → **TEAMS-GATE: PASS**, proceed to Phase 2 (Service Contracts / AMC). Otherwise fix
+within Phase 1 only.
+
+No production site touched. No `ignore_permissions` on user-driven writes. No ERPNext duplication.
