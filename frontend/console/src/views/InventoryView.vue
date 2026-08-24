@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from "vue";
 import { PageHeader, EmptyState } from "@kodlyft/ui";
 import { getStockLevels, type StockRow } from "@/lib/fsm";
+import { t } from "@/lib/i18n";
 
 const rows = ref<StockRow[]>([]);
 const loading = ref(true);
@@ -29,7 +30,7 @@ async function load() {
 	try {
 		rows.value = await getStockLevels();
 	} catch {
-		error.value = "Couldn't load stock levels.";
+		error.value = t("تعذّر تحميل مستويات المخزون.", "Couldn't load stock levels.");
 	} finally {
 		loading.value = false;
 	}
@@ -40,13 +41,17 @@ onMounted(load);
 
 <template>
 	<div>
-		<PageHeader eyebrow="Parts" title="Inventory" subtitle="Van & warehouse stock levels">
+		<PageHeader
+			:eyebrow="t('القطع', 'Parts')"
+			:title="t('المخزون', 'Inventory')"
+			:subtitle="t('مستويات مخزون الشاحنات والمستودعات', 'Van & warehouse stock levels')"
+		>
 			<template #actions>
 				<label
 					class="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-border bg-bg px-3.5 py-2 text-sm font-medium text-fg"
 				>
 					<input v-model="lowOnly" type="checkbox" class="accent-brand" />
-					Low stock only
+					{{ t("المخزون المنخفض فقط", "Low stock only") }}
 					<span
 						v-if="lowCount"
 						class="rounded-full bg-danger/15 px-2 py-0.5 font-mono text-xs text-danger tabular-nums"
@@ -59,7 +64,7 @@ onMounted(load);
 					class="inline-flex items-center gap-2 rounded-xl border border-border bg-bg px-3.5 py-2 text-sm font-medium text-fg hover:bg-surface"
 					@click="load"
 				>
-					Refresh
+					{{ t("تحديث", "Refresh") }}
 				</button>
 			</template>
 		</PageHeader>
@@ -81,11 +86,17 @@ onMounted(load);
 
 		<EmptyState
 			v-else-if="visible.length === 0"
-			title="No stock to show"
+			:title="t('لا يوجد مخزون للعرض', 'No stock to show')"
 			:description="
 				lowOnly
-					? 'Nothing is below its reorder level right now.'
-					: 'Set a Van Warehouse on technicians (or a default warehouse in Service Settings) to track stock here.'
+					? t(
+							'لا شيء أقل من مستوى إعادة الطلب حالياً.',
+							'Nothing is below its reorder level right now.',
+						)
+					: t(
+							'عيّن مستودع شاحنة للفنيين (أو مستودعاً افتراضياً في إعدادات الخدمة) لتتبع المخزون هنا.',
+							'Set a Van Warehouse on technicians (or a default warehouse in Service Settings) to track stock here.',
+						)
 			"
 		/>
 
@@ -102,11 +113,19 @@ onMounted(load);
 					<table class="w-full min-w-md text-left text-sm">
 						<thead class="border-b border-border text-fg-muted">
 							<tr>
-								<th class="px-4 py-2 font-medium">Item</th>
-								<th class="px-4 py-2 text-right font-medium">On hand</th>
-								<th class="px-4 py-2 text-right font-medium">Reserved</th>
-								<th class="px-4 py-2 text-right font-medium">Projected</th>
-								<th class="px-4 py-2 text-right font-medium">Reorder</th>
+								<th class="px-4 py-2 font-medium">{{ t("الصنف", "Item") }}</th>
+								<th class="px-4 py-2 text-right font-medium">
+									{{ t("المتوفر", "On hand") }}
+								</th>
+								<th class="px-4 py-2 text-right font-medium">
+									{{ t("المحجوز", "Reserved") }}
+								</th>
+								<th class="px-4 py-2 text-right font-medium">
+									{{ t("المتوقع", "Projected") }}
+								</th>
+								<th class="px-4 py-2 text-right font-medium">
+									{{ t("حد إعادة الطلب", "Reorder") }}
+								</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -122,7 +141,7 @@ onMounted(load);
 										v-if="r.low"
 										class="ml-2 rounded-full bg-danger/15 px-2 py-0.5 text-xs font-medium text-danger"
 									>
-										Low
+										{{ t("منخفض", "Low") }}
 									</span>
 								</td>
 								<td

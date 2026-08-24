@@ -4,6 +4,7 @@ import { useRouter } from "vue-router";
 import { PageHeader, Spinner, EmptyState } from "@kodlyft/ui";
 import type { CustomerSiteSummary } from "@kodlyft/api";
 import { installedBase } from "@/lib/fsm";
+import { t, lang } from "@/lib/i18n";
 
 const router = useRouter();
 const rows = ref<CustomerSiteSummary[]>([]);
@@ -26,7 +27,7 @@ onMounted(async () => {
 	try {
 		rows.value = await installedBase.listSites({ limit: 200 });
 	} catch {
-		error.value = "Couldn't load customer sites.";
+		error.value = t("تعذّر تحميل مواقع العملاء.", "Couldn't load customer sites.");
 	} finally {
 		loading.value = false;
 	}
@@ -36,26 +37,31 @@ onMounted(async () => {
 <template>
 	<div>
 		<PageHeader
-			eyebrow="Customers & Equipment"
-			title="Customer Sites"
-			:subtitle="`${filtered.length} service locations`"
+			:eyebrow="t('العملاء والمعدات', 'Customers & Equipment')"
+			:title="t('مواقع العملاء', 'Customer Sites')"
+			:subtitle="t(`${filtered.length} موقع خدمة`, `${filtered.length} service locations`)"
 		/>
 		<div class="mb-4 flex flex-wrap gap-3">
 			<input
 				v-model="search"
-				aria-label="Search sites"
+				:aria-label="t('بحث في المواقع', 'Search sites')"
 				type="search"
-				placeholder="Search site, code, customer or city"
+				:placeholder="
+					t(
+						'ابحث بالموقع أو الرمز أو العميل أو المدينة',
+						'Search site, code, customer or city',
+					)
+				"
 				class="min-w-64 flex-1 rounded-xl border border-border bg-bg px-3.5 py-2.5"
 			/>
 			<select
 				v-model="status"
-				aria-label="Site status"
+				:aria-label="t('حالة الموقع', 'Site status')"
 				class="rounded-xl border border-border bg-bg px-3.5 py-2.5"
 			>
-				<option value="">All statuses</option>
-				<option>Active</option>
-				<option>Inactive</option>
+				<option value="">{{ t("كل الحالات", "All statuses") }}</option>
+				<option value="Active">{{ t("نشط", "Active") }}</option>
+				<option value="Inactive">{{ t("غير نشط", "Inactive") }}</option>
 			</select>
 		</div>
 		<div v-if="loading" class="flex justify-center py-16"><Spinner :size="28" /></div>
@@ -67,17 +73,25 @@ onMounted(async () => {
 		</p>
 		<EmptyState
 			v-else-if="!filtered.length"
-			title="No customer sites"
-			description="Create a service site through the managed site command."
+			:title="t('لا توجد مواقع', 'No customer sites')"
+			:description="
+				t(
+					'أنشئ موقع خدمة عبر أمر الموقع المُدار.',
+					'Create a service site through the managed site command.',
+				)
+			"
 		/>
 		<div v-else class="overflow-hidden rounded-2xl border border-border bg-bg shadow-card">
-			<table class="w-full text-left text-sm">
+			<table
+				class="w-full text-sm"
+				:class="{ 'text-right': lang === 'ar', 'text-left': lang !== 'ar' }"
+			>
 				<thead class="border-b border-border text-fg-muted">
 					<tr>
-						<th class="px-4 py-3">Site</th>
-						<th class="px-4 py-3">Customer</th>
-						<th class="px-4 py-3">City</th>
-						<th class="px-4 py-3">Status</th>
+						<th class="px-4 py-3">{{ t("الموقع", "Site") }}</th>
+						<th class="px-4 py-3">{{ t("العميل", "Customer") }}</th>
+						<th class="px-4 py-3">{{ t("المدينة", "City") }}</th>
+						<th class="px-4 py-3">{{ t("الحالة", "Status") }}</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -101,7 +115,11 @@ onMounted(async () => {
 										? 'bg-success/15 text-success'
 										: 'bg-white/10 text-fg-muted'
 								"
-								>{{ row.status }}</span
+								>{{
+									row.status === "Active"
+										? t("نشط", "Active")
+										: t("غير نشط", "Inactive")
+								}}</span
 							>
 						</td>
 					</tr>

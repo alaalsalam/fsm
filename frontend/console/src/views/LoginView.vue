@@ -3,6 +3,7 @@ import { ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import { Spinner } from "@kodlyft/ui";
+import { t } from "@/lib/i18n";
 
 const store = useAuthStore();
 const router = useRouter();
@@ -21,7 +22,7 @@ async function submit() {
 		const redirect = (route.query.redirect as string) || "/";
 		router.push(redirect);
 	} catch {
-		error.value = "Incorrect email or password.";
+		error.value = t("بريد إلكتروني أو كلمة مرور غير صحيحة.", "Incorrect email or password.");
 	} finally {
 		busy.value = false;
 	}
@@ -50,14 +51,22 @@ async function submit() {
 				</span>
 				<div class="leading-tight">
 					<p class="text-lg font-bold text-cmd-fg">KodLyft</p>
-					<p class="text-xs text-cmd-fg-muted">Field service console</p>
+					<p class="text-xs text-cmd-fg-muted">
+						{{ t("وحدة تحكم الخدمة الميدانية", "Field service console") }}
+					</p>
 				</div>
 			</div>
 
-			<h1 class="mb-1 text-xl font-bold text-cmd-fg">Welcome back</h1>
-			<p class="mb-6 text-sm text-cmd-fg-muted">Sign in to your dispatch console.</p>
+			<h1 class="mb-1 text-xl font-bold text-cmd-fg">
+				{{ t("أهلاً بعودتك", "Welcome back") }}
+			</h1>
+			<p class="mb-6 text-sm text-cmd-fg-muted">
+				{{ t("تسجيل الدخول إلى وحدة تحكم التوزيع.", "Sign in to your dispatch console.") }}
+			</p>
 
-			<label class="mb-1.5 block text-sm font-medium text-cmd-fg" for="usr">Email</label>
+			<label class="mb-1.5 block text-sm font-medium text-cmd-fg" for="usr">{{
+				t("البريد الإلكتروني", "Email")
+			}}</label>
 			<input
 				id="usr"
 				v-model="usr"
@@ -67,7 +76,9 @@ async function submit() {
 				class="mb-4 w-full rounded-xl border border-cmd-border bg-white/5 px-3.5 py-2.5 text-base text-cmd-fg placeholder:text-cmd-fg-muted focus-visible:outline-none focus-visible:[box-shadow:var(--kl-elevation-focus)]"
 			/>
 
-			<label class="mb-1.5 block text-sm font-medium text-cmd-fg" for="pwd">Password</label>
+			<label class="mb-1.5 block text-sm font-medium text-cmd-fg" for="pwd">{{
+				t("كلمة المرور", "Password")
+			}}</label>
 			<input
 				id="pwd"
 				v-model="pwd"
@@ -85,7 +96,7 @@ async function submit() {
 				class="kl-grad-brand flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-base font-semibold text-white shadow-e2 transition-[filter] duration-200 hover:brightness-110 focus-visible:outline-none focus-visible:[box-shadow:var(--kl-elevation-focus)] disabled:opacity-60"
 			>
 				<Spinner v-if="busy" :size="18" />
-				{{ busy ? "Signing in…" : "Sign in" }}
+				{{ busy ? t("جارٍ تسجيل الدخول…", "Signing in…") : t("تسجيل الدخول", "Sign in") }}
 			</button>
 		</form>
 	</div>

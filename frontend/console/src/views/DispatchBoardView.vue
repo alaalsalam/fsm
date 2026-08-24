@@ -11,6 +11,7 @@ import {
 	type CsatSummary,
 } from "@/lib/fsm";
 import { realtime, SERVICE_JOB_EVENT, TECHNICIAN_EVENT } from "@/lib/realtime";
+import { t, lang } from "@/lib/i18n";
 
 const router = useRouter();
 
@@ -34,25 +35,27 @@ function scheduleReload() {
 
 const unsubscribers: Array<() => void> = [];
 
-const COLUMNS: { status: JobStatus; label: string; dot: string }[] = [
-	{ status: "Scheduled", label: "Scheduled", dot: "bg-warning" },
-	{ status: "Dispatched", label: "Dispatched", dot: "bg-info" },
-	{ status: "In Progress", label: "In progress", dot: "bg-brand" },
-	{ status: "On Hold", label: "On hold", dot: "bg-fg-muted" },
-];
+const COLUMNS = computed<{ status: JobStatus; label: string; dot: string }[]>(() => [
+	{ status: "Scheduled", label: t("مجدول", "Scheduled"), dot: "bg-warning" },
+	{ status: "Dispatched", label: t("تم التوزيع", "Dispatched"), dot: "bg-info" },
+	{ status: "In Progress", label: t("قيد التنفيذ", "In progress"), dot: "bg-brand" },
+	{ status: "On Hold", label: t("في الانتظار", "On hold"), dot: "bg-fg-muted" },
+]);
 
 const board = computed(() =>
-	COLUMNS.map((col) => ({
+	COLUMNS.value.map((col) => ({
 		...col,
 		jobs: jobs.value.filter((j) => j.status === col.status),
 	})),
 );
 
-const today = new Date().toLocaleDateString(undefined, {
-	weekday: "long",
-	month: "short",
-	day: "numeric",
-});
+const today = computed(() =>
+	new Date().toLocaleDateString(lang.value === "ar" ? "ar-SA" : "en-US", {
+		weekday: "long",
+		month: "short",
+		day: "numeric",
+	}),
+);
 
 const currency = (n: number) =>
 	new Intl.NumberFormat(undefined, { style: "currency", currency: "USD" }).format(n);
@@ -67,7 +70,10 @@ async function load() {
 			getCsatSummary().catch(() => null),
 		]);
 	} catch {
-		error.value = "Couldn't load the dispatch board. Check your connection and try again.";
+		error.value = t(
+			"تعذّر تحميل لوحة التوزيع. تحقق من اتصالك وحاول مرة أخرى.",
+			"Couldn't load the dispatch board. Check your connection and try again.",
+		);
 	} finally {
 		loading.value = false;
 	}
@@ -97,15 +103,19 @@ onBeforeUnmount(() => {
 
 <template>
 	<div>
-		<PageHeader eyebrow="Today" title="Dispatch board" :subtitle="today">
+		<PageHeader
+			:eyebrow="t('اليوم', 'Today')"
+			:title="t('لوحة التوزيع', 'Dispatch board')"
+			:subtitle="today"
+		>
 			<template #actions>
 				<span
 					v-if="live"
 					class="inline-flex items-center gap-1.5 rounded-full border border-border bg-bg px-2.5 py-1 text-xs font-medium text-fg-muted"
-					title="Live updates are on"
+					:title="t('التحديثات المباشرة مفعّلة', 'Live updates are on')"
 				>
 					<span class="size-2 animate-pulse rounded-full bg-success" aria-hidden="true" />
-					Live
+					{{ t("مباشر", "Live") }}
 				</span>
 				<button
 					type="button"
@@ -126,7 +136,7 @@ onBeforeUnmount(() => {
 						<path d="M21 12a9 9 0 1 1-2.64-6.36" />
 						<path d="M21 4v5h-5" />
 					</svg>
-					Refresh
+					{{ t("تحديث", "Refresh") }}
 				</button>
 				<button
 					type="button"
@@ -145,13 +155,17 @@ onBeforeUnmount(() => {
 					>
 						<path d="M12 5v14M5 12h14" />
 					</svg>
-					New job
+					{{ t("أمر عمل جديد", "New job") }}
 				</button>
 			</template>
 		</PageHeader>
 
 		<div class="mb-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-5">
-			<KpiCard label="Open jobs" :value="stats?.open_jobs ?? '—'" tone="brand">
+			<KpiCard
+				:label="t('أوامر العمل المفتوحة', 'Open jobs')"
+				:value="stats?.open_jobs ?? '—'"
+				tone="brand"
+			>
 				<template #icon>
 					<svg
 						viewBox="0 0 24 24"
@@ -169,7 +183,11 @@ onBeforeUnmount(() => {
 					</svg>
 				</template>
 			</KpiCard>
-			<KpiCard label="In progress" :value="stats?.in_progress ?? '—'" tone="warning">
+			<KpiCard
+				:label="t('قيد التنفيذ', 'In progress')"
+				:value="stats?.in_progress ?? '—'"
+				tone="warning"
+			>
 				<template #icon>
 					<svg
 						viewBox="0 0 24 24"
@@ -186,7 +204,11 @@ onBeforeUnmount(() => {
 					</svg>
 				</template>
 			</KpiCard>
-			<KpiCard label="Completed today" :value="stats?.completed_today ?? '—'" tone="success">
+			<KpiCard
+				:label="t('مكتملة اليوم', 'Completed today')"
+				:value="stats?.completed_today ?? '—'"
+				tone="success"
+			>
 				<template #icon>
 					<svg
 						viewBox="0 0 24 24"
@@ -203,7 +225,7 @@ onBeforeUnmount(() => {
 				</template>
 			</KpiCard>
 			<KpiCard
-				label="Revenue today"
+				:label="t('إيراد اليوم', 'Revenue today')"
 				:value="stats ? currency(stats.revenue_today) : '—'"
 				tone="success"
 			>
@@ -223,7 +245,7 @@ onBeforeUnmount(() => {
 				</template>
 			</KpiCard>
 			<KpiCard
-				label="Satisfaction"
+				:label="t('الرضا', 'Satisfaction')"
 				:value="csat?.avg_rating != null ? `${csat.avg_rating}★` : '—'"
 				tone="brand"
 			>
@@ -267,8 +289,16 @@ onBeforeUnmount(() => {
 			</svg>
 			<span>
 				<strong class="font-semibold">{{ slaBreaches }}</strong>
-				{{ slaBreaches === 1 ? "job has" : "jobs have" }} breached their response SLA —
-				assign a technician now.
+				{{
+					t(
+						slaBreaches === 1
+							? "أمر عمل تجاوز حد الاستجابة — قم بتعيين فني الآن."
+							: "أوامر عمل تجاوزت حد الاستجابة — قم بتعيين فني الآن.",
+						slaBreaches === 1
+							? "job has breached their response SLA — assign a technician now."
+							: "jobs have breached their response SLA — assign a technician now.",
+					)
+				}}
 			</span>
 		</div>
 
@@ -292,8 +322,13 @@ onBeforeUnmount(() => {
 
 		<EmptyState
 			v-else-if="jobs.length === 0"
-			title="No active jobs"
-			description="Scheduled and in-progress jobs will appear on the board here."
+			:title="t('لا توجد أوامر عمل نشطة', 'No active jobs')"
+			:description="
+				t(
+					'ستظهر أوامر العمل المجدولة وقيد التنفيذ على اللوحة هنا.',
+					'Scheduled and in-progress jobs will appear on the board here.',
+				)
+			"
 		>
 			<template #icon>
 				<svg
@@ -316,7 +351,7 @@ onBeforeUnmount(() => {
 					class="kl-grad-brand inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-white shadow-e2 transition-[filter] hover:brightness-110"
 					@click="router.push({ name: 'job-new' })"
 				>
-					Create the first job
+					{{ t("إنشاء أول أمر عمل", "Create the first job") }}
 				</button>
 			</template>
 		</EmptyState>
@@ -344,7 +379,7 @@ onBeforeUnmount(() => {
 						v-if="col.jobs.length === 0"
 						class="rounded-xl border border-dashed border-border px-3 py-8 text-center text-xs text-fg-muted"
 					>
-						Nothing here
+						{{ t("لا يوجد شيء هنا", "Nothing here") }}
 					</p>
 				</div>
 			</section>

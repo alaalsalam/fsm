@@ -3,6 +3,8 @@ import { onMounted, ref } from "vue";
 import { RouterLink, useRouter } from "vue-router";
 import { Spinner, StatusPill } from "@kodlyft/ui";
 import { createJobFromRequest, getServiceRequest, type ServiceRequestDoc } from "@/lib/fsm";
+import { t } from "@/lib/i18n";
+
 const props = defineProps<{ name: string }>();
 const router = useRouter();
 const request = ref<ServiceRequestDoc>();
@@ -42,10 +44,12 @@ async function convert() {
 				:disabled="busy"
 				@click="convert"
 			>
-				Create Service Job
+				{{ t("إنشاء أمر خدمة", "Create Service Job") }}
 			</button>
 			<section class="mt-8">
-				<h2 class="text-lg font-bold text-cmd-fg">Linked Service Jobs</h2>
+				<h2 class="text-lg font-bold text-cmd-fg">
+					{{ t("أوامر الخدمة المرتبطة", "Linked Service Jobs") }}
+				</h2>
 				<div class="mt-3 space-y-2">
 					<RouterLink
 						v-for="job in request.service_jobs"
@@ -56,7 +60,7 @@ async function convert() {
 						><StatusPill :status="job.status"
 					/></RouterLink>
 					<p v-if="!request.service_jobs.length" class="text-sm text-cmd-fg-muted">
-						No jobs yet.
+						{{ t("لا توجد أوامر عمل حتى الآن.", "No jobs yet.") }}
 					</p>
 				</div>
 			</section></template

@@ -7,6 +7,7 @@ import {
 	type SubcontractorRow,
 	type SubcontractorWork,
 } from "@/lib/fsm";
+import { t } from "@/lib/i18n";
 
 const rows = ref<SubcontractorRow[]>([]);
 const loading = ref(true);
@@ -25,7 +26,7 @@ async function load() {
 	try {
 		rows.value = await listSubcontractors();
 	} catch {
-		error.value = "Couldn't load subcontractors.";
+		error.value = t("تعذّر تحميل المقاولين من الباطن.", "Couldn't load subcontractors.");
 	} finally {
 		loading.value = false;
 	}
@@ -50,9 +51,11 @@ onMounted(load);
 <template>
 	<div>
 		<PageHeader
-			eyebrow="Workforce"
-			title="Subcontractors"
-			subtitle="External firms and their field workers"
+			:eyebrow="t('القوى العاملة', 'Workforce')"
+			:title="t('المقاولون من الباطن', 'Subcontractors')"
+			:subtitle="
+				t('الشركات الخارجية وعمالها الميدانيين', 'External firms and their field workers')
+			"
 		/>
 
 		<p
@@ -72,8 +75,13 @@ onMounted(load);
 
 		<EmptyState
 			v-else-if="rows.length === 0"
-			title="No subcontractors yet"
-			description="Add a Subcontractor, then create Technicians with worker type ‘Contractor’ linked to it."
+			:title="t('لا يوجد مقاولون من الباطن حتى الآن', 'No subcontractors yet')"
+			:description="
+				t(
+					'أضف مقاولاً من الباطن، ثم أنشئ فنيين من نوع العامل «مقاول» مرتبطين به.',
+					'Add a Subcontractor, then create Technicians with worker type Contractor linked to it.',
+				)
+			"
 		/>
 
 		<div v-else class="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -100,12 +108,18 @@ onMounted(load);
 									: 'bg-fg-muted/15 text-fg-muted'
 							"
 						>
-							{{ s.status }}
+							{{
+								s.status === "Active"
+									? t("نشط", "Active")
+									: t("غير نشط", "Inactive")
+							}}
 						</span>
 					</div>
 					<p class="mt-0.5 text-xs text-fg-muted">
-						{{ s.territory || "Any territory" }}
-						<span v-if="s.hourly_rate"> · {{ currency(s.hourly_rate) }}/hr</span>
+						{{ s.territory || t("أي منطقة", "Any territory") }}
+						<span v-if="s.hourly_rate">
+							· {{ currency(s.hourly_rate) }}/{{ t("ساعة", "hr") }}</span
+						>
 					</p>
 				</button>
 			</div>
@@ -125,25 +139,25 @@ onMounted(load);
 						class="grid grid-cols-2 gap-px overflow-hidden rounded-xl bg-border sm:grid-cols-4"
 					>
 						<div class="bg-bg px-3 py-2.5">
-							<p class="text-xs text-fg-muted">Workers</p>
+							<p class="text-xs text-fg-muted">{{ t("العمال", "Workers") }}</p>
 							<p class="font-mono text-lg tabular-nums">
 								{{ work.summary.technicians }}
 							</p>
 						</div>
 						<div class="bg-bg px-3 py-2.5">
-							<p class="text-xs text-fg-muted">Jobs</p>
+							<p class="text-xs text-fg-muted">{{ t("أوامر العمل", "Jobs") }}</p>
 							<p class="font-mono text-lg tabular-nums">
 								{{ work.summary.completed_jobs }}/{{ work.summary.total_jobs }}
 							</p>
 						</div>
 						<div class="bg-bg px-3 py-2.5">
-							<p class="text-xs text-fg-muted">Hours</p>
+							<p class="text-xs text-fg-muted">{{ t("الساعات", "Hours") }}</p>
 							<p class="font-mono text-lg tabular-nums">
 								{{ work.summary.total_hours }}
 							</p>
 						</div>
 						<div class="bg-bg px-3 py-2.5">
-							<p class="text-xs text-fg-muted">Cost</p>
+							<p class="text-xs text-fg-muted">{{ t("التكلفة", "Cost") }}</p>
 							<p class="font-mono text-lg tabular-nums text-brand">
 								{{ currency(work.summary.total_cost) }}
 							</p>
@@ -151,15 +165,25 @@ onMounted(load);
 					</div>
 
 					<div>
-						<h3 class="mb-2 text-sm font-bold text-fg">Recent jobs</h3>
+						<h3 class="mb-2 text-sm font-bold text-fg">
+							{{ t("أحدث أوامر العمل", "Recent jobs") }}
+						</h3>
 						<div v-if="work.jobs.length" class="overflow-x-auto">
 							<table class="w-full text-left text-sm">
 								<thead class="border-b border-border text-fg-muted">
 									<tr>
-										<th class="py-2 pr-3 font-medium">Job</th>
-										<th class="py-2 pr-3 font-medium">Customer</th>
-										<th class="py-2 pr-3 font-medium">Status</th>
-										<th class="py-2 text-right font-medium">Cost</th>
+										<th class="py-2 pr-3 font-medium">
+											{{ t("أمر العمل", "Job") }}
+										</th>
+										<th class="py-2 pr-3 font-medium">
+											{{ t("العميل", "Customer") }}
+										</th>
+										<th class="py-2 pr-3 font-medium">
+											{{ t("الحالة", "Status") }}
+										</th>
+										<th class="py-2 text-right font-medium">
+											{{ t("التكلفة", "Cost") }}
+										</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -178,13 +202,20 @@ onMounted(load);
 								</tbody>
 							</table>
 						</div>
-						<p v-else class="text-sm text-fg-muted">No jobs assigned yet.</p>
+						<p v-else class="text-sm text-fg-muted">
+							{{ t("لم تُسنَد أوامر عمل بعد.", "No jobs assigned yet.") }}
+						</p>
 					</div>
 				</div>
 				<EmptyState
 					v-else
-					title="Select a subcontractor"
-					description="Pick a firm on the left to see its workers, jobs and performance."
+					:title="t('اختر مقاولاً من الباطن', 'Select a subcontractor')"
+					:description="
+						t(
+							'اختر شركة من اليسار لعرض عمالها وأوامر عملها وأدائها.',
+							'Pick a firm on the left to see its workers, jobs and performance.',
+						)
+					"
 				/>
 			</div>
 		</div>

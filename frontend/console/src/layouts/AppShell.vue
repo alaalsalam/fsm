@@ -3,24 +3,40 @@ import { computed } from "vue";
 import { RouterView, RouterLink, useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import { theme, toggleTheme } from "@/lib/theme";
+import { lang, toggleLang, t } from "@/lib/i18n";
 
 const store = useAuthStore();
 const router = useRouter();
 
-const nav = [
-	{ name: "dispatch", label: "Dispatch", to: "/", exact: true },
-	{ name: "requests", label: "Requests", to: "/requests", exact: false },
-	{ name: "jobs", label: "Jobs", to: "/jobs", exact: false },
-	{ name: "equipment", label: "Equipment", to: "/equipment", exact: false },
-	{ name: "sites", label: "Sites", to: "/sites", exact: false },
-	{ name: "equipment-locations", label: "Locations", to: "/equipment-locations", exact: false },
-	{ name: "inventory", label: "Inventory", to: "/inventory", exact: false },
-	{ name: "returns", label: "Returns", to: "/returns", exact: false },
-	{ name: "subcontractors", label: "Partners", to: "/subcontractors", exact: false },
-	{ name: "analytics", label: "Analytics", to: "/analytics", exact: false },
-	{ name: "integrations", label: "Integrations", to: "/integrations", exact: false },
-	{ name: "account", label: "Account", to: "/account", exact: false },
-];
+const nav = computed(() => [
+	{ name: "dispatch", label: t("لوحة التوزيع", "Dispatch"), to: "/", exact: true },
+	{ name: "requests", label: t("الطلبات", "Requests"), to: "/requests", exact: false },
+	{ name: "jobs", label: t("أوامر العمل", "Jobs"), to: "/jobs", exact: false },
+	{ name: "equipment", label: t("المعدات", "Equipment"), to: "/equipment", exact: false },
+	{ name: "sites", label: t("المواقع", "Sites"), to: "/sites", exact: false },
+	{
+		name: "equipment-locations",
+		label: t("المواضع", "Locations"),
+		to: "/equipment-locations",
+		exact: false,
+	},
+	{ name: "inventory", label: t("المخزون", "Inventory"), to: "/inventory", exact: false },
+	{ name: "returns", label: t("المرتجعات", "Returns"), to: "/returns", exact: false },
+	{
+		name: "subcontractors",
+		label: t("الشركاء", "Partners"),
+		to: "/subcontractors",
+		exact: false,
+	},
+	{ name: "analytics", label: t("التحليلات", "Analytics"), to: "/analytics", exact: false },
+	{
+		name: "integrations",
+		label: t("التكاملات", "Integrations"),
+		to: "/integrations",
+		exact: false,
+	},
+	{ name: "account", label: t("الحساب", "Account"), to: "/account", exact: false },
+]);
 
 const displayName = computed(() => store.user?.full_name ?? store.user?.name ?? "");
 const initials = computed(() =>
@@ -61,7 +77,9 @@ async function signOut() {
 					</span>
 					<div class="leading-tight">
 						<p class="text-base font-bold tracking-tight text-cmd-fg">KodLyft</p>
-						<p class="text-xs text-cmd-fg-muted">Field service</p>
+						<p class="text-xs text-cmd-fg-muted">
+							{{ t("خدمة ميدانية", "Field service") }}
+						</p>
 					</div>
 				</div>
 
@@ -131,6 +149,30 @@ async function signOut() {
 				</nav>
 
 				<div class="mt-auto space-y-2">
+					<!-- Language toggle -->
+					<button
+						type="button"
+						class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-cmd-fg-muted transition-colors hover:bg-white/5 hover:text-cmd-fg"
+						:aria-label="lang === 'ar' ? 'Switch to English' : 'التبديل إلى العربية'"
+						@click="toggleLang"
+					>
+						<svg
+							viewBox="0 0 24 24"
+							class="size-5 shrink-0"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="1.8"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							aria-hidden="true"
+						>
+							<circle cx="12" cy="12" r="9" />
+							<path d="M3 12h18M12 3c-2.5 4-2.5 14 0 18M12 3c2.5 4 2.5 14 0 18" />
+						</svg>
+						<span>{{ lang === "ar" ? "English" : "العربية" }}</span>
+					</button>
+
+					<!-- Theme toggle -->
 					<button
 						type="button"
 						class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-cmd-fg-muted transition-colors hover:bg-white/5 hover:text-cmd-fg"
@@ -156,7 +198,11 @@ async function signOut() {
 								<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />
 							</template>
 						</svg>
-						<span>{{ theme === "dark" ? "Light mode" : "Dark mode" }}</span>
+						<span>{{
+							theme === "dark"
+								? t("الوضع الفاتح", "Light mode")
+								: t("الوضع الداكن", "Dark mode")
+						}}</span>
 					</button>
 
 					<RouterLink
@@ -172,7 +218,9 @@ async function signOut() {
 							<p class="truncate text-sm font-medium text-cmd-fg">
 								{{ displayName }}
 							</p>
-							<p class="truncate text-xs text-cmd-fg-muted">View account</p>
+							<p class="truncate text-xs text-cmd-fg-muted">
+								{{ t("عرض الحساب", "View account") }}
+							</p>
 						</div>
 					</RouterLink>
 				</div>
@@ -201,6 +249,14 @@ async function signOut() {
 					<span class="text-base font-bold text-cmd-fg">KodLyft</span>
 				</div>
 				<div class="flex items-center gap-2">
+					<button
+						type="button"
+						class="flex size-9 items-center justify-center rounded-full bg-white/5 text-xs font-bold text-cmd-fg"
+						:aria-label="lang === 'ar' ? 'Switch to English' : 'التبديل إلى العربية'"
+						@click="toggleLang"
+					>
+						{{ lang === "ar" ? "EN" : "ع" }}
+					</button>
 					<button
 						type="button"
 						class="flex size-9 items-center justify-center rounded-full bg-white/5 text-cmd-fg"

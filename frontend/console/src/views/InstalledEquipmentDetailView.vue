@@ -3,6 +3,8 @@ import { onMounted, ref } from "vue";
 import { PageHeader, Spinner } from "@kodlyft/ui";
 import type { EquipmentHistoryEvent, InstalledEquipmentDetail } from "@kodlyft/api";
 import { installedBase } from "@/lib/fsm";
+import { t } from "@/lib/i18n";
+
 const props = defineProps<{ name: string }>();
 const equipment = ref<InstalledEquipmentDetail>();
 const history = ref<EquipmentHistoryEvent[]>([]);
@@ -15,7 +17,7 @@ onMounted(async () => {
 			installedBase.getHistory(props.name),
 		]);
 	} catch {
-		error.value = "Couldn't load this equipment record.";
+		error.value = t("تعذّر تحميل سجل المعدة هذا.", "Couldn't load this equipment record.");
 	} finally {
 		loading.value = false;
 	}
@@ -25,7 +27,7 @@ const printQr = () => window.print();
 <template>
 	<div>
 		<PageHeader
-			eyebrow="Installed Equipment"
+			:eyebrow="t('المعدات المركّبة', 'Installed Equipment')"
 			:title="equipment?.equipment_id || name"
 			:subtitle="
 				equipment
@@ -39,53 +41,64 @@ const printQr = () => window.print();
 			<div class="grid gap-4 lg:grid-cols-3">
 				<section class="kl-glass rounded-2xl p-5 lg:col-span-2">
 					<div class="flex justify-between">
-						<h2 class="font-bold">Overview</h2>
+						<h2 class="font-bold">{{ t("نظرة عامة", "Overview") }}</h2>
 						<span class="rounded-full bg-brand/15 px-3 py-1 text-sm text-brand">{{
 							equipment.status
 						}}</span>
 					</div>
 					<dl class="mt-4 grid gap-4 sm:grid-cols-2">
 						<div>
-							<dt class="text-xs text-fg-muted">Site / location</dt>
+							<dt class="text-xs text-fg-muted">
+								{{ t("الموقع / الموضع", "Site / location") }}
+							</dt>
 							<dd>
 								{{ equipment.customer_site || "—" }} ·
-								{{ equipment.equipment_location || "Main site" }}
+								{{
+									equipment.equipment_location || t("الموقع الرئيسي", "Main site")
+								}}
 							</dd>
 						</div>
 						<div>
-							<dt class="text-xs text-fg-muted">Product</dt>
+							<dt class="text-xs text-fg-muted">{{ t("المنتج", "Product") }}</dt>
 							<dd>
-								{{ equipment.item_code }} · {{ equipment.serial_no || "No serial" }}
+								{{ equipment.item_code }} ·
+								{{ equipment.serial_no || t("لا رقم تسلسلي", "No serial") }}
 							</dd>
 						</div>
 						<div>
-							<dt class="text-xs text-fg-muted">Sales source</dt>
+							<dt class="text-xs text-fg-muted">
+								{{ t("مصدر المبيعات", "Sales source") }}
+							</dt>
 							<dd>
 								{{ equipment.delivery_note || equipment.source }} ·
 								{{ equipment.sales_order || "—" }}
 							</dd>
 						</div>
 						<div>
-							<dt class="text-xs text-fg-muted">Warranty</dt>
+							<dt class="text-xs text-fg-muted">{{ t("الضمان", "Warranty") }}</dt>
 							<dd>
 								{{ equipment.warranty_status }} ·
 								{{ equipment.warranty_end_date || "—" }}
 							</dd>
 						</div>
 						<div>
-							<dt class="text-xs text-fg-muted">Technical</dt>
+							<dt class="text-xs text-fg-muted">
+								{{ t("المواصفات التقنية", "Technical") }}
+							</dt>
 							<dd>
 								{{ equipment.manufacturer || "—" }} {{ equipment.model_no || "" }}
 							</dd>
 						</div>
 						<div>
-							<dt class="text-xs text-fg-muted">Last service</dt>
+							<dt class="text-xs text-fg-muted">
+								{{ t("آخر خدمة", "Last service") }}
+							</dt>
 							<dd>{{ equipment.last_service_date || "—" }}</dd>
 						</div>
 					</dl>
 				</section>
 				<section class="kl-glass rounded-2xl p-5 text-center">
-					<h2 class="font-bold">Service QR</h2>
+					<h2 class="font-bold">{{ t("رمز QR للخدمة", "Service QR") }}</h2>
 					<div
 						class="mx-auto mt-4 flex aspect-square max-w-40 items-center justify-center rounded-xl border-2 border-dashed border-brand bg-white p-3 font-mono text-sm text-black"
 					>
@@ -96,14 +109,14 @@ const printQr = () => window.print();
 						class="mt-3 rounded-lg border border-border px-4 py-2 text-sm"
 						@click="printQr"
 					>
-						Print QR
+						{{ t("طباعة رمز QR", "Print QR") }}
 					</button>
 				</section>
 			</div>
 			<section class="kl-glass rounded-2xl p-5">
-				<h2 class="font-bold">Service history</h2>
+				<h2 class="font-bold">{{ t("سجل الخدمة", "Service history") }}</h2>
 				<p v-if="!history.length" class="mt-3 text-sm text-fg-muted">
-					No history events yet.
+					{{ t("لا توجد أحداث في السجل حتى الآن.", "No history events yet.") }}
 				</p>
 				<ol v-else class="mt-4 space-y-3">
 					<li

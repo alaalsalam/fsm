@@ -12,6 +12,7 @@ import {
 	type JobStatus,
 } from "@kodlyft/ui";
 import { getDispatchJobs } from "@/lib/fsm";
+import { t } from "@/lib/i18n";
 
 const router = useRouter();
 
@@ -31,6 +32,17 @@ const STATUSES: JobStatus[] = [
 	"Cancelled",
 	"Overdue",
 ];
+
+const STATUS_LABEL_AR: Record<string, string> = {
+	Draft: "مسودة",
+	Scheduled: "مجدول",
+	Dispatched: "تم التوزيع",
+	"In Progress": "قيد التنفيذ",
+	"On Hold": "في الانتظار",
+	Completed: "مكتمل",
+	Cancelled: "ملغي",
+	Overdue: "متأخر",
+};
 
 const filtered = computed(() =>
 	jobs.value.filter((j) => {
@@ -54,7 +66,7 @@ async function load() {
 	try {
 		jobs.value = await getDispatchJobs({ limit: 200 });
 	} catch {
-		error.value = "Couldn't load jobs.";
+		error.value = t("تعذّر تحميل أوامر العمل.", "Couldn't load jobs.");
 	} finally {
 		loading.value = false;
 	}
@@ -70,24 +82,26 @@ onMounted(load);
 <template>
 	<div>
 		<PageHeader
-			eyebrow="All work"
-			title="Jobs"
-			:subtitle="`${filtered.length} of ${jobs.length}`"
+			:eyebrow="t('كل الأعمال', 'All work')"
+			:title="t('أوامر العمل', 'Jobs')"
+			:subtitle="`${filtered.length} ${t('من', 'of')} ${jobs.length}`"
 		/>
 
 		<div class="mb-4 flex flex-wrap gap-3">
 			<input
 				v-model="search"
 				type="search"
-				placeholder="Search customer or job no."
+				:placeholder="t('ابحث بالعميل أو رقم أمر العمل', 'Search customer or job no.')"
 				class="min-w-56 flex-1 rounded-xl border border-border bg-bg px-3.5 py-2.5 text-base backdrop-blur-xl focus-visible:outline-none focus-visible:[box-shadow:var(--kl-elevation-focus)]"
 			/>
 			<select
 				v-model="statusFilter"
 				class="rounded-xl border border-border bg-bg px-3.5 py-2.5 text-base backdrop-blur-xl focus-visible:outline-none focus-visible:[box-shadow:var(--kl-elevation-focus)]"
 			>
-				<option value="">All statuses</option>
-				<option v-for="s in STATUSES" :key="s" :value="s">{{ STATUS_LABEL[s] }}</option>
+				<option value="">{{ t("كل الحالات", "All statuses") }}</option>
+				<option v-for="s in STATUSES" :key="s" :value="s">
+					{{ t(STATUS_LABEL_AR[s] || STATUS_LABEL[s], STATUS_LABEL[s]) }}
+				</option>
 			</select>
 		</div>
 
@@ -100,8 +114,10 @@ onMounted(load);
 		</div>
 		<EmptyState
 			v-else-if="filtered.length === 0"
-			title="No matching jobs"
-			description="Try adjusting your search or status filter."
+			:title="t('لا توجد أوامر عمل مطابقة', 'No matching jobs')"
+			:description="
+				t('حاول تعديل بحثك أو فلتر الحالة.', 'Try adjusting your search or status filter.')
+			"
 		/>
 
 		<template v-else>
@@ -117,11 +133,13 @@ onMounted(load);
 				<table class="w-full text-left text-sm">
 					<thead class="border-b border-border text-fg-muted">
 						<tr>
-							<th class="px-4 py-3 font-medium">Job</th>
-							<th class="px-4 py-3 font-medium">Customer</th>
-							<th class="px-4 py-3 font-medium">Technician</th>
-							<th class="px-4 py-3 font-medium">Status</th>
-							<th class="px-4 py-3 text-right font-medium">Total</th>
+							<th class="px-4 py-3 font-medium">{{ t("أمر العمل", "Job") }}</th>
+							<th class="px-4 py-3 font-medium">{{ t("العميل", "Customer") }}</th>
+							<th class="px-4 py-3 font-medium">{{ t("الفني", "Technician") }}</th>
+							<th class="px-4 py-3 font-medium">{{ t("الحالة", "Status") }}</th>
+							<th class="px-4 py-3 text-right font-medium">
+								{{ t("الإجمالي", "Total") }}
+							</th>
 						</tr>
 					</thead>
 					<tbody>
