@@ -16,7 +16,8 @@ from fsm.api import (
 	get_portal_session,
 	register_customer,
 )
-from fsm.messaging import get_messages
+from fsm.feedback import get_feedback, submit_feedback
+from fsm.messaging import get_messages, post_message
 from fsm.security.policy import require_job_access
 
 
@@ -174,6 +175,9 @@ class TestDataIsolation(SecurityFixture):
 		self.assertEqual([row.name for row in get_my_jobs()], [self.job_a])
 		self.assertEqual([row.name for row in get_my_appointments()], [self.appointment_a])
 		self.assertEqual(get_my_job(self.job_a)["name"], self.job_a)
+		self.assertTrue(post_message(self.job_a, "customer-owned message")["name"])
+		self.assertTrue(submit_feedback(self.job_a, 5, "customer-owned feedback")["name"])
+		self.assertEqual(get_feedback(self.job_a).rating, 5)
 		with self.assertRaises(frappe.PermissionError):
 			get_my_job(self.job_b)
 		with self.assertRaises(frappe.PermissionError):

@@ -111,7 +111,18 @@ def job_child_permission(doc, user: str | None = None, permission_type: str | No
 	if not doc.service_job:
 		return False
 	try:
-		require_job_access(doc.service_job, permission_type or "read", user=user)
+		root_permission = "read" if permission_type in (None, "read", "create") else "write"
+		job = require_job_access(doc.service_job, root_permission, user=user)
 	except frappe.AuthenticationError, frappe.PermissionError:
+		return False
+	if getattr(doc, "customer", None) and doc.customer != job.customer:
+		return False
+	roles = user_roles(user)
+	if (
+		permission_type in ("create", "write")
+		and FSM_TECHNICIAN in roles
+		and getattr(doc, "technician", None)
+		and doc.technician != current_technician(user, True)
+	):
 		return False
 	return True
