@@ -1,7 +1,8 @@
-import { createClient } from "@kodlyft/api";
+import { createClient, InstalledBaseApi } from "@kodlyft/api";
 import type { JobStatus } from "@kodlyft/ui";
 
 export const client = createClient({ baseUrl: "" });
+export const installedBase = new InstalledBaseApi(client);
 
 export interface BookingPayload {
 	customer_name: string;

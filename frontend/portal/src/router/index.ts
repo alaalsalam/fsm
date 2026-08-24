@@ -12,6 +12,25 @@ const routes: RouteRecordRaw[] = [
 		meta: { auth: true },
 	},
 	{
+		path: "/my-sites",
+		name: "my-sites",
+		component: () => import("@/views/MySitesView.vue"),
+		meta: { auth: true },
+	},
+	{
+		path: "/my-equipment",
+		name: "my-equipment",
+		component: () => import("@/views/MyEquipmentView.vue"),
+		meta: { auth: true },
+	},
+	{
+		path: "/my-equipment/:name",
+		name: "my-equipment-detail",
+		component: () => import("@/views/MyEquipmentDetailView.vue"),
+		props: true,
+		meta: { auth: true },
+	},
+	{
 		path: "/track/:job",
 		name: "track",
 		component: () => import("@/views/TrackView.vue"),

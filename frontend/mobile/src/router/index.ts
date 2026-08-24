@@ -10,6 +10,17 @@ const routes: RouteRecordRaw[] = [
 		component: () => import("@/views/JobDetailView.vue"),
 		props: true,
 	},
+	{
+		path: "/equipment",
+		name: "equipment-lookup",
+		component: () => import("@/views/EquipmentLookupView.vue"),
+	},
+	{
+		path: "/equipment/:id",
+		name: "equipment-summary",
+		component: () => import("@/views/EquipmentSummaryView.vue"),
+		props: true,
+	},
 ];
 
 export default createRouter({

@@ -70,6 +70,16 @@ async function handleSignOut() {
 					</button>
 					<template v-if="session.session.authenticated">
 						<RouterLink
+							to="/my-sites"
+							class="rounded-lg px-2 py-1.5 font-medium text-cmd-fg-muted transition-colors hover:text-cmd-fg"
+							>Sites</RouterLink
+						>
+						<RouterLink
+							to="/my-equipment"
+							class="rounded-lg px-2 py-1.5 font-medium text-cmd-fg-muted transition-colors hover:text-cmd-fg"
+							>Equipment</RouterLink
+						>
+						<RouterLink
 							to="/account"
 							class="rounded-lg px-3 py-1.5 font-medium text-cmd-fg-muted transition-colors hover:text-cmd-fg"
 							active-class="text-cmd-fg"

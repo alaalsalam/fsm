@@ -74,6 +74,9 @@ async function refresh(event: RefresherCustomEvent) {
 		<IonHeader class="ion-no-border">
 			<IonToolbar>
 				<IonTitle>My jobs</IonTitle>
+				<RouterLink to="/equipment" slot="end" class="mr-4 text-sm font-semibold text-brand"
+					>Equipment</RouterLink
+				>
 			</IonToolbar>
 		</IonHeader>
 		<IonContent :fullscreen="true">

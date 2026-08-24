@@ -1,5 +1,8 @@
 import { client } from "./api";
+import { InstalledBaseApi } from "@kodlyft/api";
 import type { JobSummary, JobStatus } from "@kodlyft/ui";
+
+export const installedBase = new InstalledBaseApi(client);
 
 interface DispatchRow {
 	name: string;

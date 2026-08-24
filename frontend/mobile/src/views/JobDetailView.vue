@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from "vue";
+import type { JobEquipmentRow } from "@kodlyft/api";
 import {
 	IonPage,
 	IonHeader,
@@ -18,6 +19,7 @@ import {
 	getJob,
 	getJobVisits,
 	runVisitCommand,
+	installedBase,
 	type MobileJob,
 	type MobileVisit,
 } from "@/lib/fsm";
@@ -31,6 +33,7 @@ const lastHours = ref<number | null>(null);
 const timerError = ref("");
 const job = ref<MobileJob>();
 const visits = ref<MobileVisit[]>([]);
+const equipment = ref<JobEquipmentRow[]>([]);
 const loading = ref(true);
 const actionBusy = ref(false);
 const actionError = ref("");
@@ -75,7 +78,11 @@ async function toggleTimer() {
 
 onMounted(async () => {
 	try {
-		[job.value, visits.value] = await Promise.all([getJob(props.id), getJobVisits(props.id)]);
+		[job.value, visits.value, equipment.value] = await Promise.all([
+			getJob(props.id),
+			getJobVisits(props.id),
+			installedBase.getJobEquipment(props.id),
+		]);
 	} catch {
 		actionError.value = "Couldn't load this job from the server.";
 	} finally {
@@ -166,6 +173,32 @@ async function addPhoto() {
 							</button>
 						</div>
 					</div>
+				</section>
+				<section>
+					<h2 class="mb-2 text-lg font-bold">Linked equipment</h2>
+					<p
+						v-if="!equipment.length"
+						class="rounded-lg border border-dashed border-border p-4 text-sm text-fg-muted"
+					>
+						No installed equipment linked to this job.
+					</p>
+					<RouterLink
+						v-for="row in equipment"
+						:key="row.installed_equipment"
+						:to="`/equipment/${row.installed_equipment}`"
+						class="mb-2 block rounded-lg border border-border bg-bg p-4"
+					>
+						<div class="flex items-center justify-between gap-3">
+							<div>
+								<p class="font-mono font-semibold">{{ row.installed_equipment }}</p>
+								<p class="text-sm text-fg-muted">
+									{{ row.item_code
+									}}<span v-if="row.serial_no"> · {{ row.serial_no }}</span>
+								</p>
+							</div>
+							<span class="text-xs text-brand">{{ row.equipment_status }}</span>
+						</div>
+					</RouterLink>
 				</section>
 				<section class="rounded-lg border border-border bg-bg p-4">
 					<div class="flex items-center justify-between">

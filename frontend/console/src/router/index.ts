@@ -19,6 +19,33 @@ const routes: RouteRecordRaw[] = [
 			},
 			{ path: "/jobs", name: "jobs", component: () => import("@/views/JobsView.vue") },
 			{
+				path: "/sites",
+				name: "sites",
+				component: () => import("@/views/CustomerSitesView.vue"),
+			},
+			{
+				path: "/sites/:name",
+				name: "site-detail",
+				component: () => import("@/views/CustomerSiteDetailView.vue"),
+				props: true,
+			},
+			{
+				path: "/equipment",
+				name: "equipment",
+				component: () => import("@/views/InstalledEquipmentView.vue"),
+			},
+			{
+				path: "/equipment/:name",
+				name: "equipment-detail",
+				component: () => import("@/views/InstalledEquipmentDetailView.vue"),
+				props: true,
+			},
+			{
+				path: "/equipment-locations",
+				name: "equipment-locations",
+				component: () => import("@/views/EquipmentLocationsView.vue"),
+			},
+			{
 				path: "/requests",
 				name: "requests",
 				component: () => import("@/views/RequestsView.vue"),
