@@ -35,11 +35,13 @@ def get_dispatch_jobs(status: str | None = None, technician: str | None = None, 
 			"name",
 			"customer_name",
 			"status",
+			"phase",
 			"priority",
 			"scheduled_date",
 			"primary_technician",
 			"total_amount",
 			"address_display",
+			"service_request",
 			"sla_breached",
 			"promised_response_by",
 		],
@@ -55,7 +57,7 @@ def get_dashboard_stats():
 	from frappe.utils import today
 
 	start, end = today() + " 00:00:00", today() + " 23:59:59"
-	open_statuses = ["Scheduled", "Assigned", "In Progress", "On Hold"]
+	open_statuses = ["Planned", "Scheduled", "Dispatched", "In Progress", "On Hold"]
 
 	jobs = frappe.get_list(
 		"Service Job",
@@ -100,8 +102,10 @@ def complete_job_task(job: str, idx: int, note: str | None = None):
 
 @frappe.whitelist()
 def complete_job(job: str):
-	"""Complete a job that has no checklist; returns the refreshed job."""
-	return require_job_access(job, "write").complete_job()
+	"""Compatibility alias; lifecycle ownership remains in the command service."""
+	from fsm.service_operations.commands import complete_job as command
+
+	return command(job)
 
 
 @frappe.whitelist(allow_guest=True)
@@ -188,22 +192,28 @@ def get_portal_session():
 
 
 @frappe.whitelist()
-def get_my_appointments():
-	"""Booking history for the signed-in customer."""
+def get_my_requests():
+	"""Service request history for the signed-in customer."""
 	customer = _current_customer()
 	return frappe.get_list(
-		"Service Appointment",
+		"Service Request",
 		filters={"customer": customer},
 		fields=[
 			"name",
 			"status",
 			"service_type",
-			"preferred_date",
-			"service_job",
+			"subject",
+			"preferred_start",
 			"creation",
 		],
 		order_by="creation desc",
 	)
+
+
+@frappe.whitelist()
+def get_my_appointments():
+	"""Deprecated compatibility alias for clients upgrading to get_my_requests."""
+	return get_my_requests()
 
 
 @frappe.whitelist()
@@ -216,6 +226,7 @@ def get_my_jobs():
 		fields=[
 			"name",
 			"status",
+			"phase",
 			"priority",
 			"service_type",
 			"scheduled_date",
@@ -224,6 +235,7 @@ def get_my_jobs():
 			"total_amount",
 			"sales_invoice",
 			"address_display",
+			"service_request",
 		],
 		order_by="creation desc",
 	)
@@ -241,6 +253,8 @@ def get_my_job(job: str):
 	return {
 		"name": doc.name,
 		"status": doc.status,
+		"phase": doc.phase,
+		"service_request": doc.service_request,
 		"priority": doc.priority,
 		"service_type": doc.service_type,
 		"scheduled_date": doc.scheduled_date,
@@ -261,12 +275,17 @@ def get_my_job(job: str):
 			}
 			for i in doc.items
 		],
+		"visits": frappe.get_list(
+			"Service Visit", filters={"service_job": doc.name},
+			fields=["name", "visit_number", "status", "scheduled_start", "primary_technician"],
+			order_by="visit_number asc",
+		),
 	}
 
 
 @frappe.whitelist(allow_guest=True)
 @rate_limit(limit=10, seconds=60 * 60, methods="POST")
-def book_appointment(
+def request_service(
 	customer_name: str,
 	contact_phone: str,
 	service_address: str | None = None,
@@ -274,7 +293,7 @@ def book_appointment(
 	preferred_date: str | None = None,
 	notes: str | None = None,
 ):
-	"""Create an open Service Appointment.
+	"""Create a scoped Service Request intake record.
 
 	Public (guest) bookings capture just a name + phone; a signed-in customer's
 	booking is linked straight to their Customer record."""
@@ -294,22 +313,35 @@ def book_appointment(
 	company = frappe.db.get_single_value("Global Defaults", "default_company")
 	if not company:
 		frappe.throw(_("A default company must be configured before accepting bookings."))
-	appointment = frappe.get_doc(
+	request = frappe.get_doc(
 		{
-			"doctype": "Service Appointment",
+			"doctype": "Service Request",
 			"company": company,
 			"customer": _current_customer(optional=True),
-			"customer_name": customer_name,
-			"contact_phone": contact_phone,
+			"subject": service_type or _("Service request from {0}").format(customer_name),
+			"phone": contact_phone,
 			"service_address": service_address,
 			"service_type": service_type,
-			"preferred_date": preferred_date,
-			"notes": notes,
+			"preferred_start": preferred_date,
+			"description": notes,
+			"source": "Portal",
 			"status": "Open",
 		}
-	).insert(ignore_permissions=True)
+	)
+	request.flags.fsm_command = True
+	request.insert(ignore_permissions=True)
 
-	return {"name": appointment.name}
+	from fsm.service_operations.events import append_event
+
+	append_event("request.opened", request, to_status="Open", source="Portal")
+	return {"name": request.name}
+
+
+@frappe.whitelist(allow_guest=True)
+@rate_limit(limit=10, seconds=60 * 60, methods="POST")
+def book_appointment(**kwargs):
+	"""Deprecated request_service alias retained for rolling client upgrades."""
+	return request_service(**kwargs)
 
 
 def _current_customer(optional: bool = False) -> str | None:

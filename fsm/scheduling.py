@@ -201,7 +201,7 @@ def _has_conflict(technician: str, job) -> bool:
 		filters={
 			"primary_technician": technician,
 			"name": ["!=", job.name or ""],
-			"status": ["in", ["Scheduled", "Assigned", "In Progress"]],
+			"status": ["in", ["Scheduled", "Dispatched", "In Progress"]],
 			"scheduled_date": ["is", "set"],
 		},
 		fields=["scheduled_date", "scheduled_end"],

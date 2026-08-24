@@ -89,7 +89,7 @@ def workorder_volume(days: int = 90):
 	by_service_type = _count_by(jobs, lambda j: j.service_type or "Unspecified")
 	by_day = _count_by(jobs, lambda j: str(get_datetime(j.creation).date()))
 
-	open_statuses = {"Draft", "Scheduled", "Assigned", "In Progress", "On Hold"}
+	open_statuses = {"Draft", "Planned", "Scheduled", "Dispatched", "In Progress", "On Hold"}
 	return {
 		"window_days": int(days),
 		"total": len(jobs),

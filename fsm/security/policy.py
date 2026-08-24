@@ -125,6 +125,9 @@ def require_doc_read(doctype: str, name: str, user: str | None = None):
 	doc = frappe.get_doc(doctype, name)
 	if doctype == "Service Job":
 		return require_job_access(doc, "read", user=user)
+	if doctype == "Service Visit":
+		require_job_access(doc.service_job, "read", user=user)
+		return doc
 	frappe.has_permission(doctype, "read", doc=doc, user=user, throw=True)
 	return doc
 
@@ -134,6 +137,9 @@ def require_doc_write(doctype: str, name: str, user: str | None = None):
 	doc = frappe.get_doc(doctype, name)
 	if doctype == "Service Job":
 		return require_job_access(doc, "write", user=user)
+	if doctype == "Service Visit":
+		require_job_access(doc.service_job, "write", user=user)
+		return doc
 	frappe.has_permission(doctype, "write", doc=doc, user=user, throw=True)
 	return doc
 

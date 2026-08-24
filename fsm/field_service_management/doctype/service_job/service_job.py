@@ -43,20 +43,24 @@ class ServiceJob(Document):
 		service_type: DF.Data | None
 		sla_breached: DF.Check
 		status: DF.Literal[
-			"Draft", "Scheduled", "Assigned", "In Progress", "On Hold", "Completed", "Cancelled"
+			"Draft", "Planned", "Scheduled", "Dispatched", "In Progress", "On Hold", "Completed", "Cancelled"
 		]
 		tasks: DF.Table[ServiceJobTask]
 		territory: DF.Link | None
 		total_amount: DF.Currency
 	# end: auto-generated types
 
+	def before_insert(self):
+		if self.status not in (None, "", "Draft") and not self.flags.fsm_command:
+			frappe.throw(_("Service Jobs must enter the lifecycle in Draft through an application command."))
+
 	def validate(self):
+		self.guard_lifecycle_changes()
 		self.apply_settings_defaults()
 		self.apply_checklist_template()
 		self.set_address_display()
 		self.calculate_totals()
 		self.normalize_tasks()
-		self.sync_status()
 		self.set_completion_timestamp()
 		self.track_sla()
 		self.calculate_costs()
@@ -75,7 +79,7 @@ class ServiceJob(Document):
 		self.notify_reschedule()
 
 	def notify_reschedule(self):
-		"""Post a System message to the job thread when the appointment time moves, so
+		"""Post a System message to the job thread when the service schedule moves, so
 		the customer sees it on the portal (FSM feature #11)."""
 		before = self.get_doc_before_save()
 		if not before or not self.scheduled_date:
@@ -87,7 +91,7 @@ class ServiceJob(Document):
 		from fsm.messaging import post_system_message
 
 		post_system_message(
-			self.name, _("Appointment rescheduled to {0}.").format(format_datetime(self.scheduled_date))
+			self.name, _("Service schedule changed to {0}.").format(format_datetime(self.scheduled_date))
 		)
 
 	@frappe.whitelist()
@@ -129,17 +133,12 @@ class ServiceJob(Document):
 		self.save()
 		return self.as_dict()
 
-	@frappe.whitelist()
-	def complete_job(self):
-		"""Fallback completion for jobs without a checklist."""
-		from fsm.security.policy import require_job_access
-
-		require_job_access(self, "write")
-		if self.tasks and any(t.status != "Done" for t in self.tasks):
-			frappe.throw("Finish the remaining checklist steps first.")
-		self.status = "Completed"
-		self.save()
-		return self.as_dict()
+	def guard_lifecycle_changes(self):
+		before = self.get_doc_before_save()
+		if not before or self.flags.fsm_command:
+			return
+		if before.status != self.status or before.phase != self.phase:
+			frappe.throw(_("Service Job lifecycle can only change through a command API."))
 
 	def _guard_sequence(self, idx: int):
 		for t in self.tasks:
@@ -203,27 +202,6 @@ class ServiceJob(Document):
 				t.started_on = None
 				t.completed_on = None
 
-	def sync_status(self):
-		"""Derive job status from checklist progress (the status field is not edited
-		by hand). Falls back to schedule/assignment when no step has started.
-
-		On Hold and Cancelled are operator states and are left untouched."""
-		if self.status in ("On Hold", "Cancelled"):
-			return
-
-		if self.tasks:
-			if all(t.status == "Done" for t in self.tasks):
-				self.status = "Completed"
-				return
-			if any(t.status in ("In Progress", "Done") for t in self.tasks):
-				self.status = "In Progress"
-				return
-
-		if self.primary_technician and self.status in ("Draft", "Scheduled"):
-			self.status = "Assigned"
-		elif self.scheduled_date and self.status == "Draft":
-			self.status = "Scheduled"
-
 	def set_completion_timestamp(self):
 		if self.status == "Completed" and not self.completed_on:
 			self.completed_on = now_datetime()
@@ -233,7 +211,7 @@ class ServiceJob(Document):
 	def track_sla(self):
 		"""Stamp the first response and flag SLA breaches against promised_response_by.
 		A 'response' is the job leaving the Draft/Scheduled backlog (Assigned onward)."""
-		responded_statuses = ("Assigned", "In Progress", "On Hold", "Completed")
+		responded_statuses = ("Dispatched", "In Progress", "On Hold", "Completed")
 		if not self.responded_on and self.status in responded_statuses:
 			self.responded_on = now_datetime()
 

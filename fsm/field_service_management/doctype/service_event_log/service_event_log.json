@@ -1,0 +1,14 @@
+{
+ "actions":[],"autoname":"field:event_id","creation":"2026-08-24 00:00:00","doctype":"DocType","engine":"InnoDB",
+ "field_order":["event_id","event_type","reference_doctype","reference_name","service_request","service_job","service_visit","actor_section","actor","actor_type","transition_section","from_status","to_status","from_phase","to_phase","event_section","event_time","source","correlation_id","metadata_json"],
+ "fields":[
+  {"fieldname":"event_id","fieldtype":"Data","label":"Event ID","read_only":1,"reqd":1,"unique":1},{"fieldname":"event_type","fieldtype":"Data","in_list_view":1,"label":"Event Type","read_only":1,"reqd":1},{"fieldname":"reference_doctype","fieldtype":"Link","label":"Reference DocType","options":"DocType","read_only":1,"reqd":1},{"fieldname":"reference_name","fieldtype":"Dynamic Link","in_list_view":1,"label":"Reference Name","options":"reference_doctype","read_only":1,"reqd":1},
+  {"fieldname":"service_request","fieldtype":"Link","label":"Service Request","options":"Service Request","read_only":1},{"fieldname":"service_job","fieldtype":"Link","label":"Service Job","options":"Service Job","read_only":1},{"fieldname":"service_visit","fieldtype":"Link","label":"Service Visit","options":"Service Visit","read_only":1},
+  {"fieldname":"actor_section","fieldtype":"Section Break","label":"Actor"},{"fieldname":"actor","fieldtype":"Link","label":"Actor","options":"User","read_only":1},{"fieldname":"actor_type","fieldtype":"Data","label":"Actor Type","read_only":1},
+  {"fieldname":"transition_section","fieldtype":"Section Break","label":"Transition"},{"fieldname":"from_status","fieldtype":"Data","label":"From Status","read_only":1},{"fieldname":"to_status","fieldtype":"Data","label":"To Status","read_only":1},{"fieldname":"from_phase","fieldtype":"Data","label":"From Phase","read_only":1},{"fieldname":"to_phase","fieldtype":"Data","label":"To Phase","read_only":1},
+  {"fieldname":"event_section","fieldtype":"Section Break","label":"Event"},{"fieldname":"event_time","fieldtype":"Datetime","in_list_view":1,"label":"Event Time","read_only":1,"reqd":1},{"fieldname":"source","fieldtype":"Select","label":"Source","options":"Console\nPortal\nMobile\nScheduler\nAPI\nSystem","read_only":1,"reqd":1},{"fieldname":"correlation_id","fieldtype":"Data","label":"Correlation ID","read_only":1,"search_index":1},{"fieldname":"metadata_json","fieldtype":"Code","label":"Metadata JSON","options":"JSON","read_only":1}
+ ],
+ "modified":"2026-08-24 00:00:00","modified_by":"Administrator","module":"Field Service Management","name":"Service Event Log","owner":"Administrator",
+ "permissions":[{"read":1,"report":1,"role":"System Manager"},{"read":1,"report":1,"role":"FSM Manager"},{"read":1,"role":"FSM Technician"},{"read":1,"role":"FSM Customer"}],
+ "search_fields":"event_type,reference_name,correlation_id","sort_field":"event_time","sort_order":"DESC","states":[],"track_changes":0
+}

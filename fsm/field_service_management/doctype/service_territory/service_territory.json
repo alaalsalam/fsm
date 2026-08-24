@@ -59,7 +59,7 @@
   },
   {
    "group": "Service",
-   "link_doctype": "Service Appointment",
+   "link_doctype": "Service Request",
    "link_fieldname": "territory"
   },
   {

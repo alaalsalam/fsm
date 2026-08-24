@@ -139,7 +139,9 @@ after_migrate = "fsm.setup.after_migrate"
 
 permission_query_conditions = {
 	"Service Job": "fsm.security.permissions.service_job_query",
-	"Service Appointment": "fsm.security.permissions.appointment_query",
+	"Service Request": "fsm.security.permissions.service_request_query",
+	"Service Visit": "fsm.security.permissions.service_visit_query",
+	"Service Event Log": "fsm.security.permissions.event_log_query",
 	"Service Return": "fsm.security.permissions.service_return_query",
 	"Service Job Message": "fsm.security.permissions.message_query",
 	"Service Feedback": "fsm.security.permissions.feedback_query",
@@ -150,7 +152,9 @@ permission_query_conditions = {
 
 has_permission = {
 	"Service Job": "fsm.security.permissions.service_job_permission",
-	"Service Appointment": "fsm.security.permissions.appointment_permission",
+	"Service Request": "fsm.security.permissions.service_request_permission",
+	"Service Visit": "fsm.security.permissions.service_visit_permission",
+	"Service Event Log": "fsm.security.permissions.event_log_permission",
 	"Service Return": "fsm.security.permissions.job_child_permission",
 	"Service Job Message": "fsm.security.permissions.job_child_permission",
 	"Service Feedback": "fsm.security.permissions.job_child_permission",

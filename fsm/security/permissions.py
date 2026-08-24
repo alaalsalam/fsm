@@ -41,25 +41,25 @@ def service_job_permission(doc, user: str | None = None, permission_type: str | 
 	return True
 
 
-def appointment_query(user: str | None = None) -> str:
+def service_request_query(user: str | None = None) -> str:
 	user = user or frappe.session.user
 	roles = user_roles(user)
 	if SYSTEM_MANAGER in roles:
 		return ""
 	if FSM_MANAGER in roles:
 		conditions = [
-			sql_in_condition("`tabService Appointment`.`company`", allowed_companies(user) or set())
+			sql_in_condition("`tabService Request`.`company`", allowed_companies(user) or set())
 		]
 		territories = allowed_territories(user)
 		if territories is not None:
-			conditions.append(sql_in_condition("`tabService Appointment`.`territory`", territories))
+			conditions.append(sql_in_condition("`tabService Request`.`territory`", territories))
 		return " and ".join(f"({condition})" for condition in conditions)
 	if FSM_CUSTOMER in roles:
-		return f"`tabService Appointment`.`customer` = {frappe.db.escape(current_customer(user, True) or '__none__')}"
+		return f"`tabService Request`.`customer` = {frappe.db.escape(current_customer(user, True) or '__none__')}"
 	return "1=0"
 
 
-def appointment_permission(doc, user: str | None = None, permission_type: str | None = None):
+def service_request_permission(doc, user: str | None = None, permission_type: str | None = None):
 	user = user or frappe.session.user
 	roles = user_roles(user)
 	if SYSTEM_MANAGER in roles:
@@ -72,6 +72,45 @@ def appointment_permission(doc, user: str | None = None, permission_type: str | 
 		return True
 	if permission_type == "read" and FSM_CUSTOMER in roles:
 		return doc.customer == current_customer(user, True)
+	return False
+
+
+def service_visit_query(user: str | None = None) -> str:
+	return job_child_query("Service Visit", user=user)
+
+
+def service_visit_permission(doc, user: str | None = None, permission_type: str | None = None):
+	return job_child_permission(doc, user, permission_type)
+
+
+def event_log_query(user: str | None = None) -> str:
+	user = user or frappe.session.user
+	roles = user_roles(user)
+	if SYSTEM_MANAGER in roles:
+		return ""
+	job_scope = service_job_query(user)
+	request_scope = service_request_query(user)
+	return (
+		f"((`tabService Event Log`.`service_job` is not null and exists (select 1 from `tabService Job` "
+		f"where `tabService Job`.`name` = `tabService Event Log`.`service_job` and ({job_scope or '1=1'}))) "
+		f"or (`tabService Event Log`.`service_request` is not null and exists (select 1 from `tabService Request` "
+		f"where `tabService Request`.`name` = `tabService Event Log`.`service_request` and ({request_scope or '1=1'}))))"
+	)
+
+
+def event_log_permission(doc, user: str | None = None, permission_type: str | None = None):
+	if permission_type not in (None, "read"):
+		return False
+	if doc.service_job:
+		try:
+			require_job_access(doc.service_job, "read", user=user)
+		except (frappe.AuthenticationError, frappe.PermissionError):
+			return False
+		return True
+	if doc.service_request:
+		return service_request_permission(
+			frappe.get_doc("Service Request", doc.service_request), user, "read"
+		)
 	return False
 
 
