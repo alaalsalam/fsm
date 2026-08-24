@@ -1,6 +1,6 @@
 # `ignore_permissions` register
 
-Date: 2026-08-24. Search patterns include `ignore_permissions=True`, spaced assignment, and `save/insert/delete(ignore_permissions=True)`. Result: **all 32 occurrences classified**; 15 runtime/setup occurrences and 17 test/assertion occurrences. There is no generic bypass helper.
+Date: 2026-08-24. Search patterns include `ignore_permissions=True`, spaced assignment, and `save/insert/delete(ignore_permissions=True)`. Current result: **all 46 occurrences classified**. The CORE register below remains valid; IB adds four runtime command/system occurrences and ten test-fixture occurrences. There is no generic bypass helper.
 
 | Location | Operation | Reachability and guard | Classification | Decision |
 |---|---|---|---|---|
@@ -19,6 +19,10 @@ Date: 2026-08-24. Search patterns include `ignore_permissions=True`, spaced assi
 | `service_operations/commands.py:223` | create Service Visit | HTTP; manager parent Job scope, active Job, valid schedule, active same-company Technician | Internal operation after explicit authorization | Approved child aggregate creation. |
 | `service_operations/events.py:48` | append Service Event Log | callable only from command/projection code; controller requires internal flag | Internal system operation after explicit authorization | Approved append-only audit write. |
 | `service_return.py:102` | create Stock Entry receipt | document RPC; manager root Job scope, Approved state, warehouse, fixed dispositions | Internal system operation after explicit authorization | Approved; submitted ERPNext stock operation. |
+| `installed_base/commands.py` site insert | create Customer Site | HTTP; fixed field allowlist and Manager company/territory scope first | Internal operation after explicit authorization | Approved canonical command. |
+| `installed_base/commands.py` location insert | create Equipment Location | HTTP; fixed field allowlist and exact Site write scope first | Internal operation after explicit authorization | Approved canonical command. |
+| `installed_base/commands.py` equipment insert | manual Installed Equipment | HTTP; fixed field allowlist and Manager company scope first; controller validates ERPNext links | Internal operation after explicit authorization | Approved canonical command. |
+| `installed_base/provisioning.py` equipment insert | provision from Delivery Note | ERPNext submit hook or retry after Manager company scope; eligible Item policy and exact row identity | Internal system operation after explicit authorization | Approved idempotent projection with unique key. |
 | `fsm/tests/test_security.py:86` | create test User | test runner as Administrator | Approved documented exception | Test fixture only. |
 | `fsm/tests/test_security.py:102` | create test Customer | test runner as Administrator | Approved documented exception | Test fixture only. |
 | `fsm/tests/test_security.py:109` | create Company User Permission | test runner as Administrator | Approved documented exception | Test fixture only. |
@@ -33,3 +37,5 @@ Date: 2026-08-24. Search patterns include `ignore_permissions=True`, spaced assi
 Every future HTTP-reachable bypass must name its root authorization function in this register. A bypass that merely checks authentication, trusts a submitted `customer/company/technician`, or follows a frontend-hidden button is rejected.
 
 The nine additional test occurrences are confined to `fsm/tests/test_service_operations.py`: fixture roots plus explicit negative attempts to forge initial state or modify/delete Event Log. They are not imported by runtime code.
+
+The ten IB test occurrences are confined to `fsm/tests/test_installed_base.py` and build ERPNext Customer/Item/Serial/Delivery fixtures or direct negative assertions. They are never imported by runtime code.

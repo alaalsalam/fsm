@@ -4,7 +4,7 @@ Status: **CORE operational audit implemented**.
 
 ## Implemented envelope
 
-`Service Event Log` stores `event_id`, `event_type`, reference DocType/name, Request/Job/Visit correlations, actor and actor type, from/to status and phase, server event time, source, correlation ID, and minimal JSON metadata. Records are inserted internally in the command transaction and cannot normally be created, edited, or deleted through document APIs.
+`Service Event Log` stores `event_id`, `event_type`, reference DocType/name, Request/Job/Visit/Installed Equipment correlations, actor and actor type, from/to status and phase, server event time, source, correlation ID, and minimal JSON metadata. Records are inserted internally in the command transaction and cannot normally be created, edited, or deleted through document APIs.
 
 ## Implemented catalogue
 
@@ -13,8 +13,9 @@ Status: **CORE operational audit implemented**.
 | Request | `request.opened`, `request.triaged`, `request.converted`, `request.closed`, `request.cancelled` |
 | Job | `job.created.from_request`, `job.planned`, `job.scheduled`, `job.dispatched`, `job.started`, `job.started.from_visit`, `job.held`, `job.resumed`, `job.cancelled`, `job.completed`, `job.phase.changed` |
 | Visit | `visit.created`, `visit.dispatched`, `visit.travel.started`, `visit.checked_in`, `visit.work.started`, `visit.checked_out`, `visit.completed`, `visit.cancelled` |
+| Installed Equipment | `EquipmentProvisioned`, `InstallationConfirmed`, `EquipmentActivated`, `EquipmentMoved`, `EquipmentReturned`, `EquipmentDeactivated`, `EquipmentLinkedToJob`, `EquipmentStatusChanged`, `DeliveryCancelled` |
 
-Rejected commands write no lifecycle fact. Read access to timelines is authorized against the referenced Request, Job, or Visit root.
+Rejected commands write no lifecycle fact. Read access to timelines is authorized against the referenced Request, Job, Visit or Installed Equipment root. Equipment History is a projection over these events and linked Job events; no duplicate history table exists.
 
 ## Not claimed by CORE
 

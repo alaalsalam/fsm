@@ -1,6 +1,6 @@
 # API authorization matrix
 
-Date: 2026-08-24. Inventory source: Python whitelist decorators at the CORE closeout revision. Total: **85/85 current endpoints classified**. The original 58-row GATE-001 table remains below as an audit baseline; two removed document RPCs and all 29 CORE additions are reconciled in the CORE delta. Default is deny; frontend visibility is never an authorization control.
+Date: 2026-08-24. Inventory source: Python whitelist decorators at the IB closeout revision. Total: **104/104 current endpoints classified**. The original 58-row GATE-001 table remains below as an audit baseline; CORE additions and the 19 Installed Base additions are reconciled in phase deltas. Default is deny; frontend visibility is never an authorization control.
 
 Legend: access `G` = explicit Guest, `A` = authenticated. Scope columns use `C` = Company User Permission, `T` = Service Territory, `O` = current Customer ownership, `A` = assigned Technician, `—` = not applicable. Read/bypass values are `No`, `Scoped` (root IDs or warehouses were authorized first), or the named documented exception. Tests: `AUTH`, `COMP`, `CUST`, `TECH`, `GUEST`, `FIELDS`, `STATE`, `AGG`, `RATE`, `ROLLBACK`, `CHILD`, `E2E`.
 
@@ -100,3 +100,29 @@ Legend: access `G` = explicit Guest, `A` = authenticated. Scope columns use `C` 
 | `ServiceRequest.create_service_job` | A document RPC; optional idempotency key | forwards to manager-scoped canonical conversion command | same approved Job/event inserts |
 
 The command names above are under `fsm.service_operations.commands`; read projections are under `fsm.service_operations.api`. `T*`, `C*`, `O*`, and `A*` mean scope inherited from the authorized root relation. Positive/negative CORE coverage is in `fsm.tests.test_service_operations`.
+
+## Installed Base endpoint delta (19 additions)
+
+| Endpoint | Access and accepted input | Root guard/scope | Bypass decision |
+|---|---|---|---|
+| `create_customer_site` | A Manager/System Manager; fixed site create fields | company/territory scope; Address/Contact ownership | guarded Site insert |
+| `update_customer_site` | A Manager/System Manager; fixed mutable fields | exact Site write scope | none |
+| `create_equipment_location` | A Manager/System Manager; fixed location fields | exact Site write scope | guarded Location insert |
+| `update_equipment_location` | A Manager/System Manager; fixed mutable fields | exact Location→Site write scope | none |
+| `create_installed_equipment` | A Manager/System Manager; fixed technical/link fields | company scope; Item/Serial/Batch/Site validation | guarded equipment insert |
+| `confirm_installation` | A Manager/System Manager; equipment/site/location/dates | exact equipment and site write scope; same customer/company | none |
+| `move_equipment_location` | A Manager/System Manager; destination and notes | exact equipment/site/location scope; same customer/company | none |
+| `change_equipment_status` | A Manager/System Manager; equipment/status/reason | exact equipment write scope + transition map | none |
+| `link_equipment_to_job` | A Manager/System Manager; job/equipment/scope/notes | both roots authorized; same customer/company; duplicate/terminal guard | none |
+| `provision_delivery_note` | A Manager/System Manager; Delivery Note | Delivery company scope + submitted/non-return guard | guarded idempotent equipment inserts |
+| `reconcile_delivery_note_provisioning` | A Manager/System Manager; Delivery Note | Delivery company scope; delegates normal/return projection | guarded system projection |
+| `list_customer_sites` | A FSM actor; bounded filters | Customer Site permission query hook | none |
+| `get_customer_site` | A FSM actor; Site | exact Site access; linked reads remain permission-aware | none |
+| `list_equipment_locations` | A FSM actor; Site | exact Site access first | root-scoped child/list read |
+| `get_customer_equipment` | A FSM actor; bounded filters | Installed Equipment permission query hook | none |
+| `get_equipment` | A FSM actor; equipment | exact equipment access; Customer owner / Technician assignment / Manager company | root-scoped Job child read |
+| `resolve_equipment_by_qr` | A FSM actor; token | authentication then exact equipment access | none; Guest denied |
+| `get_equipment_history` | A FSM actor; equipment | exact equipment access first; event query hook | root-scoped Job child read |
+| `get_job_equipment` | A FSM actor; Job | exact Job read access first | root-scoped child read |
+
+Installed Base positive/negative authorization and ERPNext integration coverage is in `fsm.tests.test_installed_base`.

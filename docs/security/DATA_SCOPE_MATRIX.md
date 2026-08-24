@@ -29,6 +29,12 @@ This matrix covers user-facing lists/aggregations plus all remaining production 
 | User Permission resolution | `get_all(User Permission)` | exact session user and `allow` type | `for_value` only | Closed; security metadata self-read |
 | Hourly SLA scheduler | `get_all(Service Job)` | system-only scheduler intentionally global | names only | Approved system read |
 | Daily manager recipient resolution | `get_all(Has Role)` | system-only scheduler; fixed FSM Manager role then enabled check | user IDs only | Approved system read |
+| Customer Site list/detail | `get_list` plus authorized-root child reads | System Manager global; Manager company/territory; Customer ownership; Technician via assigned Job Equipment | explicit site projection; max 200 | Closed |
+| Installed Equipment list/detail | `get_list/get_doc` | System Manager global; Manager company; Customer ownership; Technician via assigned Job Equipment | explicit safe projection; max 200 | Closed |
+| Equipment Location | `get_list` | exact Customer Site is authorized first; query hook inherits Site scope | explicit hierarchy fields; max 500 | Closed |
+| Equipment History | `get_list(Service Event Log)` | Installed Equipment root is authorized first; Job IDs come from the exact equipment child links | fixed audit fields; max 1000 | Closed |
+| Job Equipment | `get_all` child read | exact parent Job is authorized first | fixed equipment snapshot fields; max 500 | Closed; root-scoped child read |
+| Delivery bundle entries | `get_all(Serial and Batch Entry)` | system hook operates on submitted ERPNext Delivery Note row; retry command authorizes Delivery Note company first | serial/batch/qty only | Closed; exact ERPNext bundle root |
 
 `get_all` is retained only for child tables/system metadata where Frappe User Permissions do not supply a useful root check, and every retained user-reachable occurrence is constrained by authorized root IDs or warehouses.
 

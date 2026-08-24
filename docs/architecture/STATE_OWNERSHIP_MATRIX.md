@@ -13,6 +13,10 @@ Status: **CORE slice implemented and verified**. Only the named owner authors st
 | Technician duty | Off Duty, Available, Busy | FSM Workforce | current Technician and guarded projections | Dispatch |
 | Service Return | existing FSM lifecycle | FSM Returns | scoped Manager/assigned actors per controller | Job timeline/ERPNext stock |
 | ERPNext commercial/stock documents | native ERPNext states/docstatus | ERPNext | ERPNext-authorized actors | linked Job projections |
+| Customer Site | Active, Inactive | FSM Installed Base commands | scoped Manager/System Manager | Console, Portal, equipment validation |
+| Installed Equipment | Pending Installation, Active, Inactive, Removed, Returned, Replaced, Disposed | FSM Installed Base commands and guarded ERPNext delivery projection | scoped Manager/System Manager; ERPNext submit/cancel system hook | Console, Portal, assigned Mobile Jobs |
+| Equipment warranty | Not Applicable, Active, Expired projection | warranty helper from Item policy + configured date basis | system projection only | all authorized equipment surfaces |
+| Delivery provisioning | Completed, Cancelled, Return Reconciled projection | FSM provisioning service after ERPNext lifecycle | ERPNext hook or scoped Manager retry | Delivery Note UI/audit |
 
 ## Projection rules
 
@@ -22,5 +26,8 @@ Status: **CORE slice implemented and verified**. Only the named owner authors st
 - Job completion rejects any non-terminal Visit and applies checklist/evidence policy.
 - Request conversion creates Jobs and marks the Request Converted; Visits never write Request.
 - Checklist completion never changes Job status.
+- Delivery Note submission may create Installed Equipment but never changes ERPNext sales/stock ownership.
+- Delivery cancellation/return transitions equipment and retains history; it never deletes the registry.
+- Service Visit does not own or duplicate Job equipment rows.
 
 Completed and Cancelled Request/Job/Visit states are terminal in CORE. A future reopen design requires a separately approved command/event contract.
