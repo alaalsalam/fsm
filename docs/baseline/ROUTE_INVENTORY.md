@@ -9,7 +9,7 @@
 | `/book` | `fsm/www/book.html` | Public entry; account pages authenticate | Portal Vite build |
 | `/book/<path>` | `book` | Same | `website_route_rules` |
 
-Final runtime smoke test on `bench --site fsm-dev.localhost serve --port 8017 --noreload`: both base paths returned HTTP 200.
+Final runtime smoke test on `bench --site digit16.trilogy-erp.com serve --port 8017 --noreload`: both base paths returned HTTP 200.
 
 ## Console routes
 

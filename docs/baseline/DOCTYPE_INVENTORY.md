@@ -71,4 +71,4 @@ No Frappe Report, Dashboard, Dashboard Chart, Number Card, or Workspace files ar
 | Material Request | `fsm_service_job` | Link | Service Job |
 | Delivery Note | `fsm_service_job` | Link | Service Job |
 
-No other FSM-managed ERPNext custom fields were observed on the isolated site.
+No other FSM-managed ERPNext custom fields were observed in the app fixtures or installation result.

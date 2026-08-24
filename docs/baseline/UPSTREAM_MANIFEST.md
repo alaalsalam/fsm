@@ -32,5 +32,5 @@ SwiftService was cloned to `/tmp/swiftservice-reference.ivm9la`, outside the ben
 ## Version caveats
 
 - The local Frappe and ERPNext checkouts have no configured `origin` remote, so their recorded commit SHAs—not a remote URL—are the reproducibility anchor.
-- The development bench contains other apps and pre-existing Frappe changes, but the isolated site installed only `frappe`, `erpnext`, and `fsm`.
+- The designated execution site is `digit16.trilogy-erp.com` in the v16 development bench. Its installed apps are `frappe`, `erpnext`, `ksa_compliance`, `crm`, and `fsm`. The disposable clean-install site was deleted after validation.
 - The source manifest declares Node 20 support, while the frozen frontend dependencies require Node 22.12 or later.
