@@ -10,7 +10,7 @@ from fsm.api import (
 	complete_job,
 	get_dashboard_stats,
 	get_dispatch_jobs,
-	get_my_appointments,
+	get_my_requests,
 	get_my_job,
 	get_my_jobs,
 	get_portal_session,
@@ -48,8 +48,8 @@ class SecurityFixture(FrappeTestCase):
 		self.technician_b = self._make_technician("GATE Technician B", self.technician_user_b, self.company_b)
 		self.job_a = self._make_job(self.company_a, self.customer_a, self.technician_a)
 		self.job_b = self._make_job(self.company_b, self.customer_b, self.technician_b)
-		self.appointment_a = self._make_appointment(self.company_a, self.customer_a)
-		self.appointment_b = self._make_appointment(self.company_b, self.customer_b)
+		self.request_a = self._make_request(self.company_a, self.customer_a)
+		self.request_b = self._make_request(self.company_b, self.customer_b)
 
 	def tearDown(self):
 		frappe.set_user("Administrator")
@@ -60,6 +60,8 @@ class SecurityFixture(FrappeTestCase):
 		customers = ["GATE Customer A", "GATE Customer B"]
 		jobs = frappe.get_all("Service Job", filters={"customer": ["in", customers]}, pluck="name")
 		for doctype in (
+			"Service Event Log",
+			"Service Visit",
 			"Service Job Message",
 			"Service Feedback",
 			"Service Time Log",
@@ -68,7 +70,7 @@ class SecurityFixture(FrappeTestCase):
 			"Service Return",
 		):
 			frappe.db.delete(doctype, {"service_job": ["in", jobs]})
-		frappe.db.delete("Service Appointment", {"customer_name": ["in", customers]})
+		frappe.db.delete("Service Request", {"customer": ["in", customers]})
 		frappe.db.delete("Service Job", {"name": ["in", jobs]})
 
 	def _make_user(self, email: str, role: str, user_type: str = "System User") -> str:
@@ -133,33 +135,31 @@ class SecurityFixture(FrappeTestCase):
 		)
 
 	def _make_job(self, company: str, customer: str, technician: str) -> str:
-		return (
-			frappe.get_doc(
+		doc = frappe.get_doc(
 				{
 					"doctype": "Service Job",
 					"company": company,
 					"customer": customer,
 					"primary_technician": technician,
+					"status": "In Progress",
 				}
-			)
-			.insert(ignore_permissions=True)
-			.name
 		)
+		doc.flags.fsm_command = True
+		return doc.insert(ignore_permissions=True).name
 
-	def _make_appointment(self, company: str, customer: str) -> str:
-		return (
-			frappe.get_doc(
+	def _make_request(self, company: str, customer: str) -> str:
+		doc = frappe.get_doc(
 				{
-					"doctype": "Service Appointment",
+					"doctype": "Service Request",
 					"company": company,
 					"customer": customer,
-					"customer_name": customer,
-					"contact_phone": "+49123456789",
+					"subject": f"Request for {customer}",
+					"phone": "+49123456789",
+					"status": "Open",
 				}
-			)
-			.insert(ignore_permissions=True)
-			.name
 		)
+		doc.flags.fsm_command = True
+		return doc.insert(ignore_permissions=True).name
 
 
 class TestDataIsolation(SecurityFixture):
@@ -173,7 +173,7 @@ class TestDataIsolation(SecurityFixture):
 	def test_customer_can_only_read_owned_records(self):
 		frappe.set_user(self.customer_user_a)
 		self.assertEqual([row.name for row in get_my_jobs()], [self.job_a])
-		self.assertEqual([row.name for row in get_my_appointments()], [self.appointment_a])
+		self.assertEqual([row.name for row in get_my_requests()], [self.request_a])
 		self.assertEqual(get_my_job(self.job_a)["name"], self.job_a)
 		self.assertTrue(post_message(self.job_a, "customer-owned message")["name"])
 		self.assertTrue(submit_feedback(self.job_a, 5, "customer-owned feedback")["name"])
