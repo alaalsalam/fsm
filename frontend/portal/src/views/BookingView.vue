@@ -1,18 +1,18 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { RouterLink } from "vue-router";
-import { Spinner } from "@kodlyft/ui";
+import { Spinner, t } from "@kodlyft/ui";
 import { requestService } from "@/lib/api";
 import { session } from "@/lib/session";
 
 type ServiceId = "hvac" | "plumbing" | "electrical" | "appliance" | "pest" | "other";
-const services: { id: ServiceId; key: string }[] = [
-	{ id: "hvac", key: "HVAC repair" },
-	{ id: "plumbing", key: "Plumbing" },
-	{ id: "electrical", key: "Electrical" },
-	{ id: "appliance", key: "Appliance repair" },
-	{ id: "pest", key: "Pest control" },
-	{ id: "other", key: "Other" },
+const services: { id: ServiceId; key: string; ar: string }[] = [
+	{ id: "hvac", key: "HVAC repair", ar: "إصلاح التكييف" },
+	{ id: "plumbing", key: "Plumbing", ar: "السباكة" },
+	{ id: "electrical", key: "Electrical", ar: "الكهرباء" },
+	{ id: "appliance", key: "Appliance repair", ar: "إصلاح الأجهزة" },
+	{ id: "pest", key: "Pest control", ar: "مكافحة الآفات" },
+	{ id: "other", key: "Other", ar: "أخرى" },
 ];
 
 const form = ref({
@@ -41,7 +41,10 @@ async function submit() {
 		const res = await requestService({ ...form.value });
 		booked.value = res.name;
 	} catch {
-		error.value = "Something went wrong. Please call us or try again.";
+		error.value = t(
+			"حدث خطأ. اتصل بنا أو حاول مرة أخرى.",
+			"Something went wrong. Please call us or try again.",
+		);
 	} finally {
 		busy.value = false;
 	}
@@ -50,23 +53,32 @@ async function submit() {
 
 <template>
 	<div v-if="!booked">
-		<p class="text-xs font-semibold uppercase tracking-[0.14em] text-brand">Request service</p>
-		<h1 class="mt-1 text-3xl font-bold text-cmd-fg">Request a service</h1>
+		<p class="text-xs font-semibold uppercase tracking-[0.14em] text-brand">
+			{{ t("طلب خدمة", "Request service") }}
+		</p>
+		<h1 class="mt-1 text-3xl font-bold text-cmd-fg">
+			{{ t("اطلب خدمة", "Request a service") }}
+		</h1>
 		<p class="mt-1 text-cmd-fg-muted">
-			Tell us what you need — we'll confirm a time and send a live tracking link.
+			{{
+				t(
+					"أخبرنا بما تحتاج إليه وسنؤكد الموعد ونرسل رابط التتبع.",
+					"Tell us what you need — we'll confirm a time and send a live tracking link.",
+				)
+			}}
 		</p>
 
 		<form class="mt-8 space-y-6" @submit.prevent="submit">
 			<fieldset>
 				<legend class="mb-2 text-sm font-medium text-cmd-fg">
-					What do you need help with?
+					{{ t("ما الخدمة التي تحتاج إليها؟", "What do you need help with?") }}
 				</legend>
 				<div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
 					<button
 						v-for="s in services"
 						:key="s.id"
 						type="button"
-						class="flex cursor-pointer flex-col items-start gap-2 rounded-2xl border p-4 text-left transition duration-200"
+						class="flex cursor-pointer flex-col items-start gap-2 rounded-2xl border p-4 text-start transition duration-200"
 						:class="
 							form.service_type === s.key
 								? 'kl-glass-strong border-transparent text-cmd-fg shadow-glass'
@@ -119,14 +131,16 @@ async function submit() {
 								</template>
 							</svg>
 						</span>
-						<span class="text-sm font-medium">{{ s.key }}</span>
+						<span class="text-sm font-medium">{{ t(s.ar, s.key) }}</span>
 					</button>
 				</div>
 			</fieldset>
 
 			<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
 				<label class="block">
-					<span class="mb-1.5 block text-sm font-medium text-cmd-fg">Your name</span>
+					<span class="mb-1.5 block text-sm font-medium text-cmd-fg">{{
+						t("اسمك", "Your name")
+					}}</span>
 					<input
 						v-model="form.customer_name"
 						required
@@ -134,7 +148,9 @@ async function submit() {
 					/>
 				</label>
 				<label class="block">
-					<span class="mb-1.5 block text-sm font-medium text-cmd-fg">Phone</span>
+					<span class="mb-1.5 block text-sm font-medium text-cmd-fg">{{
+						t("الهاتف", "Phone")
+					}}</span>
 					<input
 						v-model="form.contact_phone"
 						type="tel"
@@ -145,7 +161,9 @@ async function submit() {
 			</div>
 
 			<label class="block">
-				<span class="mb-1.5 block text-sm font-medium text-cmd-fg">Service address</span>
+				<span class="mb-1.5 block text-sm font-medium text-cmd-fg">{{
+					t("عنوان الخدمة", "Service address")
+				}}</span>
 				<input
 					v-model="form.service_address"
 					required
@@ -155,7 +173,7 @@ async function submit() {
 
 			<label class="block">
 				<span class="mb-1.5 block text-sm font-medium text-cmd-fg">
-					Preferred date &amp; time
+					{{ t("التاريخ والوقت المفضلان", "Preferred date & time") }}
 				</span>
 				<input
 					v-model="form.preferred_date"
@@ -165,7 +183,9 @@ async function submit() {
 			</label>
 
 			<label class="block">
-				<span class="mb-1.5 block text-sm font-medium text-cmd-fg">Anything else?</span>
+				<span class="mb-1.5 block text-sm font-medium text-cmd-fg">{{
+					t("ملاحظات إضافية؟", "Anything else?")
+				}}</span>
 				<textarea
 					v-model="form.notes"
 					rows="3"
@@ -180,14 +200,15 @@ async function submit() {
 				:disabled="busy"
 				class="kl-grad-brand flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-base font-semibold text-white shadow-e2 transition-[filter] hover:brightness-110 focus-visible:outline-none focus-visible:[box-shadow:var(--kl-elevation-focus)] disabled:opacity-60"
 			>
-				<Spinner v-if="busy" :size="18" /> {{ busy ? "Sending…" : "Request service" }}
+				<Spinner v-if="busy" :size="18" />
+				{{ busy ? t("جارٍ الإرسال…", "Sending…") : t("طلب الخدمة", "Request service") }}
 			</button>
 
 			<p v-if="!session.session.authenticated" class="text-center text-sm text-cmd-fg-muted">
-				Want to track and rebook easily?
-				<RouterLink to="/signup" class="font-semibold text-brand"
-					>Create an account</RouterLink
-				>
+				{{ t("هل تريد التتبع وإعادة الحجز بسهولة؟", "Want to track and rebook easily?") }}
+				<RouterLink to="/signup" class="font-semibold text-brand">{{
+					t("أنشئ حسابًا", "Create an account")
+				}}</RouterLink>
 			</p>
 		</form>
 	</div>
@@ -209,26 +230,31 @@ async function submit() {
 				<path d="M20 6 9 17l-5-5" />
 			</svg>
 		</div>
-		<h2 class="text-2xl font-bold text-cmd-fg">Request received</h2>
+		<h2 class="text-2xl font-bold text-cmd-fg">
+			{{ t("تم استلام الطلب", "Request received") }}
+		</h2>
 		<p class="mt-2 text-cmd-fg-muted">
-			Thanks {{ form.customer_name }}! We'll text {{ form.contact_phone }} to confirm your
-			service request.
+			{{ t("شكرًا", "Thanks") }} {{ form.customer_name }}!
+			{{ t("سنتواصل معك على", "We'll contact you at") }} {{ form.contact_phone }}
+			{{ t("لتأكيد طلب الخدمة.", "to confirm your service request.") }}
 		</p>
-		<p class="mt-1 font-mono text-sm text-cmd-fg-muted">Ref: {{ booked }}</p>
+		<p class="mt-1 font-mono text-sm text-cmd-fg-muted">
+			{{ t("المرجع", "Ref") }}: {{ booked }}
+		</p>
 		<div class="mt-6">
 			<RouterLink
 				v-if="session.session.authenticated"
 				to="/account"
 				class="inline-flex items-center gap-2 rounded-xl border border-cmd-border bg-white/5 px-4 py-2 text-sm font-medium text-cmd-fg transition-colors hover:bg-white/10"
 			>
-				View my account
+				{{ t("عرض حسابي", "View my account") }}
 			</RouterLink>
 			<RouterLink
 				v-else
 				to="/signup"
 				class="kl-grad-brand inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-white shadow-e2 transition-[filter] hover:brightness-110"
 			>
-				Create an account to track it
+				{{ t("أنشئ حسابًا لتتبع الطلب", "Create an account to track it") }}
 			</RouterLink>
 		</div>
 	</div>

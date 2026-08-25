@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { Spinner } from "@kodlyft/ui";
+import { Spinner, t } from "@kodlyft/ui";
 import { signUp } from "@/lib/session";
 
 const router = useRouter();
@@ -19,7 +19,10 @@ async function submit() {
 	} catch (e) {
 		error.value =
 			(e as { message?: string })?.message ||
-			"Couldn't create your account. Please try again.";
+			t(
+				"تعذر إنشاء حسابك. حاول مرة أخرى.",
+				"Couldn't create your account. Please try again.",
+			);
 	} finally {
 		busy.value = false;
 	}
@@ -29,14 +32,23 @@ async function submit() {
 <template>
 	<div class="mx-auto max-w-md">
 		<div class="kl-glass rounded-2xl p-7">
-			<h1 class="text-2xl font-bold text-cmd-fg">Create your account</h1>
+			<h1 class="text-2xl font-bold text-cmd-fg">
+				{{ t("أنشئ حسابك", "Create your account") }}
+			</h1>
 			<p class="mt-1 text-sm text-cmd-fg-muted">
-				Track your visits, see your history, and rebook in one tap.
+				{{
+					t(
+						"تابع زياراتك وسجل خدماتك وأعد الحجز بسهولة.",
+						"Track your visits, see your history, and rebook in one tap.",
+					)
+				}}
 			</p>
 
 			<form class="mt-6 space-y-4" @submit.prevent="submit">
 				<label class="block">
-					<span class="mb-1.5 block text-sm font-medium text-cmd-fg">Full name</span>
+					<span class="mb-1.5 block text-sm font-medium text-cmd-fg">{{
+						t("الاسم الكامل", "Full name")
+					}}</span>
 					<input
 						v-model="form.full_name"
 						required
@@ -46,7 +58,9 @@ async function submit() {
 				</label>
 				<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
 					<label class="block">
-						<span class="mb-1.5 block text-sm font-medium text-cmd-fg">Email</span>
+						<span class="mb-1.5 block text-sm font-medium text-cmd-fg">{{
+							t("البريد الإلكتروني", "Email")
+						}}</span>
 						<input
 							v-model="form.email"
 							type="email"
@@ -56,7 +70,9 @@ async function submit() {
 						/>
 					</label>
 					<label class="block">
-						<span class="mb-1.5 block text-sm font-medium text-cmd-fg">Phone</span>
+						<span class="mb-1.5 block text-sm font-medium text-cmd-fg">{{
+							t("الهاتف", "Phone")
+						}}</span>
 						<input
 							v-model="form.phone"
 							type="tel"
@@ -66,7 +82,9 @@ async function submit() {
 					</label>
 				</div>
 				<label class="block">
-					<span class="mb-1.5 block text-sm font-medium text-cmd-fg">Password</span>
+					<span class="mb-1.5 block text-sm font-medium text-cmd-fg">{{
+						t("كلمة المرور", "Password")
+					}}</span>
 					<input
 						v-model="form.password"
 						type="password"
@@ -85,13 +103,17 @@ async function submit() {
 					class="kl-grad-brand flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-base font-semibold text-white shadow-e2 transition-[filter] hover:brightness-110 focus-visible:outline-none focus-visible:[box-shadow:var(--kl-elevation-focus)] disabled:opacity-60"
 				>
 					<Spinner v-if="busy" :size="18" />
-					{{ busy ? "Creating…" : "Create account" }}
+					{{
+						busy ? t("جارٍ الإنشاء…", "Creating…") : t("إنشاء الحساب", "Create account")
+					}}
 				</button>
 			</form>
 
 			<p class="mt-5 text-center text-sm text-cmd-fg-muted">
-				Already have an account?
-				<RouterLink to="/login" class="font-semibold text-brand">Sign in</RouterLink>
+				{{ t("لديك حساب بالفعل؟", "Already have an account?") }}
+				<RouterLink to="/login" class="font-semibold text-brand">{{
+					t("تسجيل الدخول", "Sign in")
+				}}</RouterLink>
 			</p>
 		</div>
 	</div>

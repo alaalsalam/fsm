@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
 import { RouterLink } from "vue-router";
-import { StatusPill, Spinner } from "@kodlyft/ui";
+import { StatusPill, Spinner, formatDate, formatMoney, statusLabel, t } from "@kodlyft/ui";
 import { session } from "@/lib/session";
 import { getMyJobs, getMyRequests, type MyJob, type MyRequest } from "@/lib/api";
 
@@ -21,15 +21,8 @@ const REQUEST_TONE: Record<string, string> = {
 	Cancelled: "bg-fg-muted/15 text-fg-muted",
 };
 
-const currency = (n?: number) =>
-	n == null
-		? "—"
-		: new Intl.NumberFormat(undefined, { style: "currency", currency: "USD" }).format(n);
-
-const date = (iso?: string) =>
-	iso
-		? new Date(iso).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })
-		: "—";
+const currency = (n?: number) => (n == null ? "—" : formatMoney(n));
+const date = (iso?: string) => formatDate(iso, true);
 
 async function load() {
 	loading.value = true;
@@ -37,7 +30,10 @@ async function load() {
 	try {
 		[jobs.value, requests.value] = await Promise.all([getMyJobs(), getMyRequests()]);
 	} catch {
-		error.value = "Couldn't load your history. Please try again.";
+		error.value = t(
+			"تعذر تحميل سجلك. حاول مرة أخرى.",
+			"Couldn't load your history. Please try again.",
+		);
 	} finally {
 		loading.value = false;
 	}
@@ -51,10 +47,10 @@ onMounted(load);
 		<div class="flex flex-wrap items-end justify-between gap-3">
 			<div>
 				<p class="text-xs font-semibold uppercase tracking-[0.14em] text-brand">
-					My account
+					{{ t("حسابي", "My account") }}
 				</p>
 				<h1 class="mt-1 text-2xl font-bold text-cmd-fg sm:text-3xl">
-					Hi {{ session.session.full_name || "there" }}
+					{{ t("مرحبًا", "Hi") }} {{ session.session.full_name || t("بك", "there") }}
 				</h1>
 			</div>
 			<RouterLink
@@ -73,7 +69,7 @@ onMounted(load);
 				>
 					<path d="M12 5v14M5 12h14" />
 				</svg>
-				Request service
+				{{ t("طلب خدمة", "Request service") }}
 			</RouterLink>
 		</div>
 
@@ -89,7 +85,9 @@ onMounted(load);
 		<template v-else>
 			<!-- Active jobs -->
 			<section>
-				<h2 class="mb-3 text-lg font-bold text-cmd-fg">Active visits</h2>
+				<h2 class="mb-3 text-lg font-bold text-cmd-fg">
+					{{ t("الزيارات النشطة", "Active visits") }}
+				</h2>
 				<div v-if="activeJobs.length" class="space-y-3">
 					<RouterLink
 						v-for="job in activeJobs"
@@ -99,34 +97,43 @@ onMounted(load);
 					>
 						<div class="min-w-0">
 							<p class="truncate font-semibold text-cmd-fg">
-								{{ job.service_type || "Service visit" }}
+								{{ job.service_type || t("زيارة خدمة", "Service visit") }}
 							</p>
 							<p class="truncate text-sm text-cmd-fg-muted">
 								{{ date(job.scheduled_date) }}
 							</p>
 						</div>
-						<StatusPill :status="job.status" />
+						<StatusPill :status="job.status" :label="statusLabel(job.status)" />
 					</RouterLink>
 				</div>
 				<p
 					v-else
 					class="rounded-2xl border border-dashed border-cmd-border px-4 py-8 text-center text-sm text-cmd-fg-muted"
 				>
-					No active visits. Book a service to get started.
+					{{
+						t(
+							"لا توجد زيارات نشطة. اطلب خدمة للبدء.",
+							"No active visits. Book a service to get started.",
+						)
+					}}
 				</p>
 			</section>
 
 			<!-- History -->
 			<section v-if="pastJobs.length">
-				<h2 class="mb-3 text-lg font-bold text-cmd-fg">Past visits</h2>
+				<h2 class="mb-3 text-lg font-bold text-cmd-fg">
+					{{ t("الزيارات السابقة", "Past visits") }}
+				</h2>
 				<div class="kl-glass overflow-hidden rounded-2xl">
-					<table class="w-full text-left text-sm">
+					<table class="w-full text-start text-sm">
 						<thead class="border-b border-cmd-border text-cmd-fg-muted">
 							<tr>
-								<th class="px-4 py-3 font-medium">Service</th>
-								<th class="px-4 py-3 font-medium">Date</th>
-								<th class="px-4 py-3 font-medium">Status</th>
-								<th class="px-4 py-3 text-right font-medium">Total</th>
+								<th class="px-4 py-3 font-medium">{{ t("الخدمة", "Service") }}</th>
+								<th class="px-4 py-3 font-medium">{{ t("التاريخ", "Date") }}</th>
+								<th class="px-4 py-3 font-medium">{{ t("الحالة", "Status") }}</th>
+								<th class="px-4 py-3 text-end font-medium">
+									{{ t("الإجمالي", "Total") }}
+								</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -136,13 +143,18 @@ onMounted(load);
 								class="border-b border-cmd-border/60 last:border-0"
 							>
 								<td class="px-4 py-3 text-cmd-fg">
-									{{ job.service_type || "Service" }}
+									{{ job.service_type || t("خدمة", "Service") }}
 								</td>
 								<td class="px-4 py-3 text-cmd-fg-muted">
 									{{ date(job.completed_on || job.scheduled_date) }}
 								</td>
-								<td class="px-4 py-3"><StatusPill :status="job.status" /></td>
-								<td class="px-4 py-3 text-right font-mono tabular-nums text-cmd-fg">
+								<td class="px-4 py-3">
+									<StatusPill
+										:status="job.status"
+										:label="statusLabel(job.status)"
+									/>
+								</td>
+								<td class="px-4 py-3 text-end font-mono tabular-nums text-cmd-fg">
 									{{ currency(job.total_amount) }}
 								</td>
 							</tr>
@@ -153,7 +165,7 @@ onMounted(load);
 
 			<!-- Service requests -->
 			<section v-if="requests.length">
-				<h2 class="mb-3 text-lg font-bold text-cmd-fg">Requests</h2>
+				<h2 class="mb-3 text-lg font-bold text-cmd-fg">{{ t("الطلبات", "Requests") }}</h2>
 				<div class="space-y-2">
 					<div
 						v-for="request in requests"
@@ -162,17 +174,22 @@ onMounted(load);
 					>
 						<div class="min-w-0">
 							<p class="truncate text-sm font-medium text-cmd-fg">
-								{{ request.subject || request.service_type || "Service request" }}
+								{{
+									request.subject ||
+									request.service_type ||
+									t("طلب خدمة", "Service request")
+								}}
 							</p>
 							<p class="truncate text-xs text-cmd-fg-muted">
-								Requested {{ date(request.preferred_start || request.creation) }}
+								{{ t("طُلب في", "Requested") }}
+								{{ date(request.preferred_start || request.creation) }}
 							</p>
 						</div>
 						<span
 							class="shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium"
 							:class="REQUEST_TONE[request.status] || REQUEST_TONE.Open"
 						>
-							{{ request.status }}
+							{{ statusLabel(request.status) }}
 						</span>
 					</div>
 				</div>

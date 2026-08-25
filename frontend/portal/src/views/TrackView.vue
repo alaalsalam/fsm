@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { StatusPill } from "@kodlyft/ui";
+import { StatusPill, formatDate, statusLabel, t } from "@kodlyft/ui";
 import {
 	getJobMessages,
 	postJobMessage,
@@ -13,10 +13,10 @@ import {
 const props = defineProps<{ job: string }>();
 
 const timeline = [
-	{ label: "Request received", done: true },
-	{ label: "Service request confirmed", done: true },
-	{ label: "Technician on the way", done: true, active: true },
-	{ label: "Job completed", done: false },
+	{ ar: "تم استلام الطلب", en: "Request received", done: true },
+	{ ar: "تم تأكيد طلب الخدمة", en: "Service request confirmed", done: true },
+	{ ar: "الفني في الطريق", en: "Technician on the way", done: true, active: true },
+	{ ar: "اكتمل العمل", en: "Job completed", done: false },
 ];
 
 const messages = ref<JobMessage[]>([]);
@@ -44,8 +44,7 @@ async function send() {
 	}
 }
 
-const datetime = (iso: string) =>
-	new Date(iso).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
+const datetime = (iso: string) => formatDate(iso, true);
 
 const feedback = ref<JobFeedback | null>(null);
 const stars = ref(0);
@@ -70,7 +69,8 @@ async function rate() {
 		await loadFeedback();
 	} catch (e) {
 		feedbackError.value =
-			(e as { message?: string })?.message || "Couldn't submit your rating.";
+			(e as { message?: string })?.message ||
+			t("تعذر إرسال تقييمك.", "Couldn't submit your rating.");
 	} finally {
 		submitting.value = false;
 	}
@@ -86,22 +86,24 @@ onMounted(() => {
 	<div class="space-y-6">
 		<div class="flex items-center justify-between gap-3">
 			<div>
-				<h1 class="text-2xl font-bold text-cmd-fg">Your technician is on the way</h1>
+				<h1 class="text-2xl font-bold text-cmd-fg">
+					{{ t("الفني في الطريق", "Your technician is on the way") }}
+				</h1>
 				<p class="mt-0.5 font-mono text-sm text-cmd-fg-muted">{{ job }}</p>
 			</div>
-			<StatusPill status="In Progress" />
+			<StatusPill status="In Progress" :label="statusLabel('In Progress')" />
 		</div>
 
 		<div
 			class="flex h-48 items-center justify-center rounded-2xl border border-cmd-border bg-white/3 text-cmd-fg-muted"
 		>
-			Live map (Leaflet)
+			{{ t("الخريطة المباشرة", "Live map") }}
 		</div>
 
-		<ol class="relative ml-2 space-y-5 border-l border-cmd-border pl-6">
+		<ol class="relative ms-2 space-y-5 border-s border-cmd-border ps-6">
 			<li v-for="(step, i) in timeline" :key="i" class="relative">
 				<span
-					class="absolute -left-7.75 flex size-4 items-center justify-center rounded-full"
+					class="absolute -start-7.75 flex size-4 items-center justify-center rounded-full"
 					:class="step.done ? 'bg-brand' : 'border border-cmd-border bg-cmd-bg'"
 				>
 					<span
@@ -113,15 +115,20 @@ onMounted(() => {
 					class="text-sm"
 					:class="step.active ? 'font-medium text-cmd-fg' : 'text-cmd-fg-muted'"
 				>
-					{{ step.label }}
+					{{ t(step.ar, step.en) }}
 				</p>
 			</li>
 		</ol>
 		<section class="kl-glass rounded-2xl p-4">
-			<h2 class="mb-3 text-lg font-bold text-cmd-fg">Messages</h2>
+			<h2 class="mb-3 text-lg font-bold text-cmd-fg">{{ t("الرسائل", "Messages") }}</h2>
 			<div class="max-h-64 space-y-3 overflow-y-auto">
 				<p v-if="messages.length === 0" class="text-sm text-cmd-fg-muted">
-					No messages yet. Send a note to your technician or our team.
+					{{
+						t(
+							"لا توجد رسائل بعد. أرسل ملاحظة إلى الفني أو فريقنا.",
+							"No messages yet. Send a note to your technician or our team.",
+						)
+					}}
 				</p>
 				<div v-for="m in messages" :key="m.name" class="text-sm">
 					<p class="text-xs text-cmd-fg-muted">
@@ -135,7 +142,7 @@ onMounted(() => {
 			<div class="mt-3 flex gap-2">
 				<input
 					v-model="newMessage"
-					placeholder="Write a message…"
+					:placeholder="t('اكتب رسالة…', 'Write a message…')"
 					class="flex-1 rounded-lg border border-cmd-border bg-white/5 px-3 py-2 text-sm text-cmd-fg"
 					@keydown.enter="send"
 				/>
@@ -145,12 +152,14 @@ onMounted(() => {
 					class="kl-grad-brand rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
 					@click="send"
 				>
-					Send
+					{{ t("إرسال", "Send") }}
 				</button>
 			</div>
 		</section>
 		<section class="kl-glass rounded-2xl p-4">
-			<h2 class="mb-3 text-lg font-bold text-cmd-fg">Rate your service</h2>
+			<h2 class="mb-3 text-lg font-bold text-cmd-fg">
+				{{ t("قيّم الخدمة", "Rate your service") }}
+			</h2>
 			<div v-if="feedback">
 				<p class="text-2xl text-warning">
 					{{ "★".repeat(feedback.rating)
@@ -159,17 +168,19 @@ onMounted(() => {
 				<p v-if="feedback.comments" class="mt-1 text-sm text-cmd-fg">
 					“{{ feedback.comments }}”
 				</p>
-				<p class="mt-1 text-xs text-cmd-fg-muted">Thanks for your feedback!</p>
+				<p class="mt-1 text-xs text-cmd-fg-muted">
+					{{ t("شكرًا لتقييمك!", "Thanks for your feedback!") }}
+				</p>
 			</div>
 			<div v-else>
-				<div class="flex gap-1" role="radiogroup" aria-label="rating">
+				<div class="flex gap-1" role="radiogroup" :aria-label="t('التقييم', 'rating')">
 					<button
 						v-for="n in 5"
 						:key="n"
 						type="button"
 						class="text-3xl transition-transform hover:scale-110"
 						:class="n <= stars ? 'text-warning' : 'text-cmd-fg-muted'"
-						:aria-label="`${n} star`"
+						:aria-label="t(`${n} نجمة`, `${n} star`)"
 						@click="stars = n"
 					>
 						★
@@ -178,7 +189,9 @@ onMounted(() => {
 				<textarea
 					v-model="comments"
 					rows="2"
-					placeholder="Tell us about your experience (optional)"
+					:placeholder="
+						t('أخبرنا عن تجربتك (اختياري)', 'Tell us about your experience (optional)')
+					"
 					class="mt-3 w-full rounded-lg border border-cmd-border bg-white/5 px-3 py-2 text-sm text-cmd-fg"
 				/>
 				<p v-if="feedbackError" class="mt-1 text-xs text-danger">{{ feedbackError }}</p>
@@ -188,7 +201,7 @@ onMounted(() => {
 					class="kl-grad-brand mt-3 rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
 					@click="rate"
 				>
-					Submit rating
+					{{ t("إرسال التقييم", "Submit rating") }}
 				</button>
 			</div>
 		</section>

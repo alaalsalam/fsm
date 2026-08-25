@@ -3,6 +3,7 @@ import { onMounted } from "vue";
 import { RouterView, RouterLink, useRouter } from "vue-router";
 import { session, loadSession, signOut } from "@/lib/session";
 import { theme, toggleTheme } from "@/lib/theme";
+import { locale, t, toggleLocale } from "@kodlyft/ui";
 
 const router = useRouter();
 
@@ -41,6 +42,14 @@ async function handleSignOut() {
 				<nav class="flex items-center gap-1 text-sm sm:gap-2">
 					<button
 						type="button"
+						class="rounded-lg px-2 py-1.5 font-semibold text-brand"
+						:aria-label="t('تغيير اللغة إلى الإنجليزية', 'Switch language to Arabic')"
+						@click="toggleLocale"
+					>
+						{{ locale === "ar" ? "EN" : "ع" }}
+					</button>
+					<button
+						type="button"
 						class="flex size-9 items-center justify-center rounded-lg text-cmd-fg-muted transition-colors hover:bg-white/5 hover:text-cmd-fg"
 						:aria-label="
 							theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'
@@ -72,31 +81,31 @@ async function handleSignOut() {
 						<RouterLink
 							to="/dashboard"
 							class="hidden rounded-lg px-2 py-1.5 font-medium text-cmd-fg-muted transition-colors hover:text-cmd-fg sm:inline-flex"
-							>Dashboard</RouterLink
+							>{{ t("لوحة التحكم", "Dashboard") }}</RouterLink
 						>
 						<RouterLink
 							to="/my-sites"
 							class="hidden rounded-lg px-2 py-1.5 font-medium text-cmd-fg-muted transition-colors hover:text-cmd-fg sm:inline-flex"
-							>Sites</RouterLink
+							>{{ t("المواقع", "Sites") }}</RouterLink
 						>
 						<RouterLink
 							to="/my-equipment"
 							class="hidden rounded-lg px-2 py-1.5 font-medium text-cmd-fg-muted transition-colors hover:text-cmd-fg sm:inline-flex"
-							>Equipment</RouterLink
+							>{{ t("المعدات", "Equipment") }}</RouterLink
 						>
 						<RouterLink
 							to="/account"
 							class="rounded-lg px-3 py-1.5 font-medium text-cmd-fg-muted transition-colors hover:text-cmd-fg"
 							active-class="text-cmd-fg"
 						>
-							My account
+							{{ t("حسابي", "My account") }}
 						</RouterLink>
 						<button
 							type="button"
 							class="rounded-lg px-3 py-1.5 font-medium text-cmd-fg-muted transition-colors hover:text-cmd-fg"
 							@click="handleSignOut"
 						>
-							Sign out
+							{{ t("تسجيل الخروج", "Sign out") }}
 						</button>
 					</template>
 					<template v-else>
@@ -104,13 +113,13 @@ async function handleSignOut() {
 							to="/login"
 							class="rounded-lg px-3 py-1.5 font-medium text-cmd-fg-muted transition-colors hover:text-cmd-fg"
 						>
-							Sign in
+							{{ t("تسجيل الدخول", "Sign in") }}
 						</RouterLink>
 						<RouterLink
 							to="/signup"
 							class="kl-grad-brand rounded-lg px-3.5 py-1.5 font-semibold text-white shadow-e2 transition-[filter] hover:brightness-110"
 						>
-							Sign up
+							{{ t("إنشاء حساب", "Sign up") }}
 						</RouterLink>
 					</template>
 				</nav>
@@ -125,7 +134,7 @@ async function handleSignOut() {
 			class="mx-auto flex w-full max-w-3xl flex-col items-center justify-between gap-2 px-4 py-6 text-sm text-cmd-fg-muted sm:flex-row"
 		>
 			<span>© KodLyft</span>
-			<span>Fast, friendly field service.</span>
+			<span>{{ t("خدمة ميدانية سريعة وموثوقة.", "Fast, friendly field service.") }}</span>
 		</footer>
 	</div>
 </template>
