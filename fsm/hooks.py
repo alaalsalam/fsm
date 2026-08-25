@@ -151,6 +151,8 @@ permission_query_conditions = {
 	"Service Time Log": "fsm.security.permissions.time_log_query",
 	"Customer Field Note": "fsm.security.permissions.field_note_query",
 	"Technician Location Log": "fsm.security.permissions.location_log_query",
+	"Maintenance Plan": "fsm.security.permissions.maintenance_plan_query",
+	"Maintenance Occurrence": "fsm.security.permissions.maintenance_occurrence_query",
 }
 
 has_permission = {
@@ -167,6 +169,8 @@ has_permission = {
 	"Service Time Log": "fsm.security.permissions.job_child_permission",
 	"Customer Field Note": "fsm.security.permissions.job_child_permission",
 	"Technician Location Log": "fsm.security.permissions.job_child_permission",
+	"Maintenance Plan": "fsm.security.permissions.maintenance_plan_permission",
+	"Maintenance Occurrence": "fsm.security.permissions.maintenance_occurrence_permission",
 }
 
 # Document Events
@@ -175,7 +179,10 @@ has_permission = {
 
 doc_events = {
 	"Service Job": {
-		"on_update": "fsm.realtime.on_service_job_update",
+		"on_update": [
+			"fsm.realtime.on_service_job_update",
+			"fsm.maintenance.projections.on_service_job_update",
+		],
 	},
 	"Technician": {
 		"on_update": "fsm.realtime.on_technician_update",
@@ -196,6 +203,7 @@ scheduler_events = {
 	"daily": [
 		"fsm.tasks.notify_low_stock",
 		"fsm.contracts.tasks.update_contract_statuses",
+		"fsm.maintenance.tasks.run_daily_maintenance",
 	],
 }
 

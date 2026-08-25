@@ -180,6 +180,56 @@ def installed_equipment_permission(doc, user: str | None = None, permission_type
 	return True
 
 
+def maintenance_plan_query(user: str | None = None) -> str:
+	user = user or frappe.session.user
+	roles = user_roles(user)
+	if SYSTEM_MANAGER in roles:
+		return ""
+	if FSM_MANAGER in roles:
+		return sql_in_condition("`tabMaintenance Plan`.`company`", allowed_companies(user) or set())
+	if FSM_CUSTOMER in roles:
+		return f"`tabMaintenance Plan`.`customer` = {frappe.db.escape(current_customer(user, True) or '__none__')}"
+	return "1=0"
+
+
+def maintenance_plan_permission(doc, user: str | None = None, permission_type: str | None = None):
+	from fsm.maintenance.access import require_plan_access
+
+	try:
+		require_plan_access(doc, permission_type or "read", user=user)
+	except (frappe.AuthenticationError, frappe.PermissionError):
+		return False
+	return True
+
+
+def maintenance_occurrence_query(user: str | None = None) -> str:
+	user = user or frappe.session.user
+	roles = user_roles(user)
+	if SYSTEM_MANAGER in roles:
+		return ""
+	if FSM_MANAGER in roles:
+		return sql_in_condition("`tabMaintenance Occurrence`.`company`", allowed_companies(user) or set())
+	if FSM_CUSTOMER in roles:
+		return f"`tabMaintenance Occurrence`.`customer` = {frappe.db.escape(current_customer(user, True) or '__none__')}"
+	if FSM_TECHNICIAN in roles:
+		job_scope = service_job_query(user)
+		return (
+			"exists (select 1 from `tabService Job` where `tabService Job`.`name` = "
+			f"`tabMaintenance Occurrence`.`released_job` and ({job_scope or '1=1'}))"
+		)
+	return "1=0"
+
+
+def maintenance_occurrence_permission(doc, user: str | None = None, permission_type: str | None = None):
+	from fsm.maintenance.access import require_occurrence_access
+
+	try:
+		require_occurrence_access(doc, permission_type or "read", user=user)
+	except (frappe.AuthenticationError, frappe.PermissionError):
+		return False
+	return True
+
+
 def equipment_location_query(user: str | None = None) -> str:
 	site_scope = customer_site_query(user)
 	return (

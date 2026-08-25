@@ -1,0 +1,33 @@
+{
+ "actions": [],
+ "creation": "2026-08-25 14:00:00",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": ["line_code","service_type","interval_count","interval_unit","first_due_date","scheduled_time","equipment_scope","item_group","installed_equipment","lead_days","grace_days","auto_release_job","active"],
+ "fields": [
+  {"fieldname":"line_code","fieldtype":"Data","in_list_view":1,"label":"Line Code","reqd":1},
+  {"fieldname":"service_type","fieldtype":"Data","in_list_view":1,"label":"Service Type","reqd":1},
+  {"default":"1","fieldname":"interval_count","fieldtype":"Int","in_list_view":1,"label":"Every","non_negative":1,"reqd":1},
+  {"default":"Months","fieldname":"interval_unit","fieldtype":"Select","in_list_view":1,"label":"Interval Unit","options":"Days\nWeeks\nMonths\nYears","reqd":1},
+  {"description":"Defaults to the Plan Start Date.","fieldname":"first_due_date","fieldtype":"Date","label":"First Due Date"},
+  {"default":"09:00:00","fieldname":"scheduled_time","fieldtype":"Time","label":"Local Scheduled Time"},
+  {"default":"All Plan Equipment","fieldname":"equipment_scope","fieldtype":"Select","label":"Equipment Scope","options":"All Plan Equipment\nItem Group\nSingle Equipment","reqd":1},
+  {"fieldname":"item_group","fieldtype":"Link","label":"Item Group","options":"Item Group"},
+  {"fieldname":"installed_equipment","fieldtype":"Link","label":"Installed Equipment","options":"Installed Equipment"},
+  {"default":"7","fieldname":"lead_days","fieldtype":"Int","label":"Release Lead Days","non_negative":1},
+  {"default":"0","fieldname":"grace_days","fieldtype":"Int","label":"Grace Days","non_negative":1},
+  {"default":"1","fieldname":"auto_release_job","fieldtype":"Check","label":"Auto Release Job"},
+  {"default":"1","fieldname":"active","fieldtype":"Check","in_list_view":1,"label":"Active"}
+ ],
+ "istable": 1,
+ "modified": "2026-08-25 14:00:00",
+ "modified_by": "Administrator",
+ "module": "Field Service Management",
+ "name": "Maintenance Plan Line",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "idx",
+ "sort_order": "ASC",
+ "states": []
+}

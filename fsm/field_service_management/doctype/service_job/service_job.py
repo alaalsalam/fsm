@@ -37,6 +37,7 @@ class ServiceJob(Document):
 		customer: DF.Link
 		customer_name: DF.Data | None
 		items: DF.Table[ServiceJobItem]
+		maintenance_release_key: DF.Data | None
 		equipment: DF.Table[ServiceJobEquipment]
 		naming_series: DF.Literal["FSM-JOB-.YYYY.-"]
 		notes: DF.Text | None

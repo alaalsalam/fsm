@@ -8,7 +8,8 @@
   "naming_series",
   "service_request",
   "request_idempotency_key",
-	"request_operation_key",
+  "request_operation_key",
+  "maintenance_release_key",
   "customer",
   "customer_name",
   "contact",
@@ -103,6 +104,14 @@
 	 "read_only": 1,
 	 "unique": 1
 	},
+  {
+   "fieldname": "maintenance_release_key",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Maintenance Release Key",
+   "read_only": 1,
+   "unique": 1
+  },
   {
    "fieldname": "customer",
    "fieldtype": "Link",
