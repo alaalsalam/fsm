@@ -11,3 +11,4 @@ export { default as Spinner } from "./src/Spinner.vue";
 export { default as LinkField } from "./src/LinkField.vue";
 
 export * from "./src/types";
+export * from "./src/i18n";

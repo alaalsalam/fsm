@@ -2,6 +2,7 @@
 import { computed } from "vue";
 import StatusPill from "./StatusPill.vue";
 import { STATUS_TONE, type JobSummary } from "./types";
+import { formatDate, statusLabel, t } from "./i18n";
 
 const props = defineProps<{ job: JobSummary }>();
 defineEmits<{ open: [name: string] }>();
@@ -16,24 +17,19 @@ const ACCENT: Record<string, string> = {
 const accent = computed(() => ACCENT[STATUS_TONE[props.job.status]] ?? "bg-fg-muted");
 
 function formatTime(iso?: string): string {
-	if (!iso) return "Unscheduled";
-	const d = new Date(iso);
-	return d.toLocaleString(undefined, {
-		weekday: "short",
-		hour: "numeric",
-		minute: "2-digit",
-	});
+	if (!iso) return t("غير مجدول", "Unscheduled");
+	return formatDate(iso, true);
 }
 </script>
 
 <template>
 	<button
 		type="button"
-		class="group relative w-full cursor-pointer overflow-hidden rounded-2xl border border-border bg-bg p-4 pl-5 text-left shadow-card backdrop-blur-xl transition duration-200 hover:-translate-y-0.5 hover:border-cmd-border-strong hover:shadow-glass-lg focus-visible:outline-none focus-visible:[box-shadow:var(--kl-elevation-focus)]"
+		class="group relative w-full cursor-pointer overflow-hidden rounded-2xl border border-border bg-bg p-4 ps-5 text-start shadow-card backdrop-blur-xl transition duration-200 hover:-translate-y-0.5 hover:border-cmd-border-strong hover:shadow-glass-lg focus-visible:outline-none focus-visible:[box-shadow:var(--kl-elevation-focus)]"
 		@click="$emit('open', job.name)"
 	>
 		<span
-			class="absolute inset-y-3 left-0 w-1 rounded-full"
+			class="absolute inset-y-3 start-0 w-1 rounded-full"
 			:class="accent"
 			aria-hidden="true"
 		/>
@@ -45,7 +41,7 @@ function formatTime(iso?: string): string {
 						{{ job.address }}
 					</p>
 				</div>
-				<StatusPill :status="job.status" />
+				<StatusPill :status="job.status" :label="statusLabel(job.status)" />
 			</div>
 			<div class="flex items-center justify-between gap-2 text-sm text-fg-muted">
 				<span class="inline-flex items-center gap-1.5">

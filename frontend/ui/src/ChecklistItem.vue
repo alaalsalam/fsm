@@ -16,7 +16,7 @@ function toggle() {
 <template>
 	<button
 		type="button"
-		class="flex w-full items-start gap-3 rounded-md px-2 py-2 text-left transition-colors hover:bg-bg-subtle focus-visible:outline-none focus-visible:[box-shadow:var(--kl-elevation-focus)]"
+		class="flex w-full items-start gap-3 rounded-md px-2 py-2 text-start transition-colors hover:bg-bg-subtle focus-visible:outline-none focus-visible:[box-shadow:var(--kl-elevation-focus)]"
 		style="min-height: var(--kl-touch-min)"
 		role="checkbox"
 		:aria-checked="modelValue"
