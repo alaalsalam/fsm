@@ -15,3 +15,14 @@ export {
 	type EquipmentStatus,
 	type WarrantyStatus,
 } from "./src/installed-base";
+export {
+	ContractsApi,
+	type ContractStatus,
+	type CoverageStatus,
+	type ContractSummary,
+	type ContractCoverageRule,
+	type ContractEntitlement,
+	type ContractDetail,
+	type CoverageDecision,
+	type CreateContractInput,
+} from "./src/contracts";
