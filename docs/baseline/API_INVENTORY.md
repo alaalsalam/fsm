@@ -111,6 +111,9 @@ No payment gateway integration, external map/ETA provider, email/SMS gateway ada
 `fsm.logistics.request_parts` endpoint is a compatibility alias to `request_shortage`, not a second implementation.
 The shared `MaterialsApi` in `frontend/api` is the one typed consumer contract for all three surfaces.
 
+Phase 7 adds six guarded RCA methods under `fsm.failure_analysis`: create, update, transition, explicitly apply
+priority suggestion, list and get. `frontend/api` exposes the single typed `FailureAnalysisApi` contract.
+
 ## Contract gaps
 
 - No API version prefix or compatibility policy.

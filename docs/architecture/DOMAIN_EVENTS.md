@@ -15,6 +15,7 @@ Status: **CORE operational audit implemented**.
 | Visit               | `visit.created`, `visit.dispatched`, `visit.travel.started`, `visit.checked_in`, `visit.work.started`, `visit.checked_out`, `visit.completed`, `visit.cancelled`                                            |
 | Installed Equipment | `EquipmentProvisioned`, `InstallationConfirmed`, `EquipmentActivated`, `EquipmentMoved`, `EquipmentReturned`, `EquipmentDeactivated`, `EquipmentLinkedToJob`, `EquipmentStatusChanged`, `DeliveryCancelled` |
 | Materials           | `MaterialShortageRequested`, `MaterialsReserved`, `MaterialsTransferred`, `MaterialsIssued`, `MaterialsConsumed`, `MaterialsReturned`                                                                       |
+| Failure Analysis    | `FailureAnalysisCreated`, `FailureAnalysisUpdated`, `FailureAnalysisStatusChanged`, `JobPriorityChangedFromFailureAnalysis`                                                                                  |
 
 Rejected commands write no lifecycle fact. Read access to timelines is authorized against the referenced Request, Job, Visit or Installed Equipment root. Equipment History is a projection over these events and linked Job events; no duplicate history table exists.
 

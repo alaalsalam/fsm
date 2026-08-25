@@ -24,6 +24,7 @@ Status: **CORE slice implemented and verified**. Only the named owner authors st
 | Maintenance Occurrence                     | Forecast, Due, Released, Completed, Skipped, Cancelled, Overdue                                                                | FSM Maintenance engine/commands; Job completion projection          | scheduler or scoped Manager; assigned Job is read-only to Technician         | Console, Service Job, reports              |
 | Inspection Template                        | Draft, Active, Inactive, Archived                                                                                              | FSM Inspections command service                                     | scoped Manager/System Manager                                                | Mobile, Console, Equipment Inspection      |
 | Equipment Inspection                       | In Progress, Completed, Cancelled; result Pending/Pass/Fail/Needs Refill/Needs Repair/Needs Replacement/Not Accessible/Skipped | FSM Inspections commands and server outcome engine                  | scoped Manager or assigned Job Technician                                    | Job/equipment history, reports, later RCA  |
+| Failure Analysis                           | Draft, Inspection, Analysis, Root Cause Identified, Corrective Action, Verification, Closed, Cancelled                       | FSM RCA command service                                             | scoped Manager or exact assigned Job Technician                              | Job/equipment history, reports, workshop   |
 
 ## Projection rules
 
@@ -42,5 +43,6 @@ Status: **CORE slice implemented and verified**. Only the named owner authors st
 - Occurrence release creates/reuses one canonical grouped Service Job and never owns Job lifecycle.
 - Inspection results never author Job status; the server computes outcomes from typed responses and evidence.
 - Material commands never author Job lifecycle state or stock balances; ERPNext documents and ledgers remain authoritative.
+- Failure Analysis suggests Job priority only; an explicit scoped Manager command applies it and emits an event.
 
 Completed and Cancelled Request/Job/Visit states are terminal in CORE. A future reopen design requires a separately approved command/event contract.

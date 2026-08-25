@@ -78,3 +78,8 @@ No Frappe Report, Dashboard, Dashboard Chart, Number Card, or Workspace files ar
 | Delivery Note         | `fsm_service_job`                                             | Link        | Service Job                                         |
 
 The extra rows are post-baseline Phase 6 correlations. They do not store stock balances or duplicate native state.
+
+## Post-baseline Phase 7 root
+
+`Failure Analysis` is an FSM diagnostic root owned by Quality/RCA and correlated to Service Job, Service Visit,
+Installed Equipment and Equipment Inspection. It is not an additional work-order aggregate.

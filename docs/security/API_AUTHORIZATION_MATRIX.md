@@ -213,3 +213,17 @@ Fire Safety ownership, template completeness, no-stock behavior and authorizatio
 Materials ownership, cross-company/Visit guards, standard-document posting and cost coverage is in
 `fsm.tests.test_materials`. `fsm.logistics.request_parts` is a compatibility alias to `request_shortage` and adds no
 second mutation path.
+
+## Failure Analysis endpoint delta (6 additions)
+
+| Endpoint | Access and accepted input | Root guard/scope | Bypass decision |
+|---|---|---|---|
+| `create_failure_analysis` | A Manager or assigned Technician; fixed context/diagnostic fields | exact Job write/assignment; Equipment→Job; Visit→Job; Inspection→Job+Equipment | guarded Failure Analysis insert |
+| `update_failure_analysis` | same; fixed diagnostic evidence fields | exact parent Job write; terminal records immutable | none |
+| `transition_failure_analysis` | same; target status/reason | exact parent Job write; transition map and required evidence | event insert only |
+| `apply_priority_suggestion` | A Manager/System Manager; Failure Analysis | manager-only parent Job scope; server suggestion required | Job save plus mandatory event |
+| `list_failure_analyses` | A visible Job actor; bounded filters | Failure Analysis query hook delegates to Job scope | none |
+| `get_failure_analysis` | A visible Job actor; exact record | exact parent Job read | none |
+
+RCA command ownership, context isolation, repeat/escalation projection and explicit priority behavior are covered
+in `fsm.tests.test_failure_analysis`.
