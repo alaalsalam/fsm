@@ -73,3 +73,4 @@ export {
 	type ServiceReport,
 	type ServiceCertificate,
 } from "./src/reporting";
+export { CommercialApi, type BillableLine, type ProfitabilityRow } from "./src/commercial";
