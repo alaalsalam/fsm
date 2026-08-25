@@ -1,6 +1,12 @@
 # Permission-sensitive data scope matrix
 
-This matrix covers user-facing lists/aggregations plus all remaining production `get_all` calls. There is no direct SQL or Query Builder expression in FSM application code at this revision.
+Date: 2026-08-26 (Phase 15 HARDENING refresh). This matrix covers user-facing lists/aggregations plus
+all remaining production `get_all` calls. Since the previous revision, FSM application code **does**
+contain raw SQL: five runtime `frappe.db.sql` sites (`fsm/contracts/commands.py:168,170`,
+`fsm/installed_base/access.py:72,87`, `fsm/maintenance/engine.py:133`) — all parametrized `%s`
+row-locks/assignment probes with server-side inputs — plus one static-fragment migration patch
+(`fsm/patches/v1_0/migrate_service_request_data.py`). No user input reaches SQL text, `fields`, or
+`order_by` anywhere.
 
 | Data/read path | Query form | Scope applied before/inside query | Fields/output control | Leakage decision |
 |---|---|---|---|---|
@@ -39,3 +45,18 @@ This matrix covers user-facing lists/aggregations plus all remaining production 
 `get_all` is retained only for child tables/system metadata where Frappe User Permissions do not supply a useful root check, and every retained user-reachable occurrence is constrained by authorized root IDs or warehouses.
 
 CORE adds no unscoped `get_all`. Request→Job and Job→Visit reads remain permission-aware `get_list` calls. The sole Visit projection write targets its already-authorized parent Job; no Visit→Request mutation exists.
+
+## Phase 15 HARDENING delta (2026-08-26)
+
+| Data/read path | Query form | Scope applied before/inside query | Fields/output control | Leakage decision |
+|---|---|---|---|---|
+| Portal hub (`fsm/portal.py:16`) | `get_list` ×6 + `get_all` native docs + `db.count` | server-resolved current Customer on every filter; Quotation/Sales Invoice keyed to owned Job names | fixed customer-safe projections; bounded limits | Closed |
+| Report/Certificate detail (`fsm/reporting.py:178,183`) + REST read | `get_doc` after parent-Job read guard | Job root authorized; FSM Customer passes read on own Job | **full `snapshot` returned incl. internal `labor_cost`/`materials_cost`/`total_cost`, Stock Entry values, workshop notes** | **Open — M-1 (Medium)**: owning customer sees internal costs, contradicting the portal-hub exclusion policy |
+| Realtime events (`fsm/realtime.py:12,29`) | `publish_realtime` on doc update | **none** — no room/user scoping | Job summary incl. `customer_name`; Technician live GPS | **Open — H-1 (High)**: broadcast to all authenticated sessions cross-company |
+| Master reads for FSM Technician role (`/api/resource`) | framework `get_list` | role read only; **no query hook** on Technician, Service Team, Subcontractor, Service Territory, Checklist Template | full role-readable fields incl. Technician phone + last GPS, Subcontractor `hourly_rate`/contact | **Open — M-2 (Medium)**: cross-company staff/partner data |
+| Bin stock, technician path (`fsm/inventory.py:39-45`) | `get_all(Bin)` | own-van resolution; manager-only company check on supplied warehouse | quantity fields only | **Open — M-3 (Medium)**: technician without a van warehouse keeps an unchecked caller-supplied warehouse |
+| Offline receipts (`fsm/offline.py`) | `db.get_value` + `get_doc` | receipt `user == session.user`; Mobile Command Receipt REST read is System-Manager-only | fixed result projection | Closed (failure path echoes raw `str(exc)` — L-6, Low) |
+| Equipment history/QR (`fsm/installed_base/api.py:151-210`) | `get_value` token→name, then guarded reads | `require_equipment_access` before any field; Event Log hook + authorized roots | fixed audit fields; bounded | Closed (token-existence oracle only) |
+| Subcontractor probe (`fsm/contractors.py:28`) | `db.get_value` before guard | company value used only for the subsequent `require_company_scope` | company name never returned | Closed for data; L-1 records the pre-guard probe/missing role gate |
+| Maintenance summary (`fsm/maintenance/api.py:95`) | `db.count` (hook-bypassing) | manual current-Customer / allowed-company filters | counts only | Closed; manual filters are the sole protection |
+| Contract lists (`fsm/contracts/api.py:18`) | `get_list` (no Service Contract query hook exists) | manual current-Customer / allowed-company filters | explicit fields; bounded | Closed; manual filters are the sole protection |

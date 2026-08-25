@@ -1,6 +1,58 @@
 # `ignore_permissions` register
 
-Date: 2026-08-25. Search patterns include `ignore_permissions=True`, spaced assignment, and `save/insert/delete(ignore_permissions=True)`. Current result: **all 70 occurrences classified**. Materials replaced the legacy logistics bypass with three explicitly guarded native-document writes; RCA, Workshop, Reporting and Commercial add guarded canonical writes. There is no generic bypass helper.
+Date: 2026-08-26 (Phase 15 HARDENING re-grep; previous pass 2026-08-25). Search patterns include
+`ignore_permissions=True`, spaced assignment, `flags.ignore_permissions = True`, and
+`save/insert/delete(ignore_permissions=True)`. Current result: **all 72 occurrences classified —
+38 runtime + 34 test-fixture**. The exact-line runtime register below supersedes approximate
+locations in the baseline table. Materials replaced the legacy logistics bypass with three explicitly
+guarded native-document writes; RCA, Workshop, Reporting and Commercial add guarded canonical writes.
+There is no generic bypass helper.
+
+## Phase 15 exact-line runtime register (38 occurrences, all verified guarded or system-only)
+
+| # | file:line | Write | Guard before bypass |
+|--:|---|---|---|
+| 1 | `fsm/api.py:155` | Website User insert | guest registration allowlist + signup setting + duplicates + rate limit + savepoint |
+| 2 | `fsm/api.py:166` | Customer insert | same registration transaction |
+| 3 | `fsm/api.py:176` | Contact insert/link | same registration transaction + rollback |
+| 4 | `fsm/api.py:341` | Service Request insert | guest intake allowlist + required fields + fixed company + rate limit |
+| 5 | `fsm/setup.py:210` | FSM Role insert | install/after-migrate hook only (not HTTP) |
+| 6 | `fsm/tasks.py:64` | Notification Log insert | daily scheduler only (not HTTP); non-idempotent — finding L-3 |
+| 7 | `fsm/tracking.py:36` | Technician Location Log insert | server-resolved technician + `require_technician_assignment` when Job supplied |
+| 8 | `fsm/messaging.py:51` | System message insert | controller-internal (`post_system_message`, called from `service_job.py` only) |
+| 9 | `fsm/integrations.py:145` | Webhook insert | `_require_admin` (System Manager) |
+| 10 | `fsm/commercial.py:75` | Quotation insert | `require_job_access(write, manager_only)` at `commercial.py:64` |
+| 11 | `fsm/materials.py:146` | Material Request insert | `_context(manager_only=True)` at `materials.py:123` + item allowlist + warehouse company |
+| 12 | `fsm/materials.py:195` | Pick List insert/submit | `_context(manager_only=True)` at `materials.py:160` + Bin availability |
+| 13 | `fsm/materials.py:261` | Stock Entry insert/submit | `_context` at `materials.py:215` (manager-only except assigned-technician Consume) |
+| 14 | `fsm/returns.py:120` | Service Return insert (`_new_case`) | both callers guard `require_job_access(write)` (`returns.py:69`, `returns.py:86-87`) |
+| 15 | `fsm/failure_analysis.py:79` | Failure Analysis insert | `require_job_access(write)` + equipment∈job (`failure_analysis.py:49-50`) |
+| 16 | `fsm/reporting.py:66` | Service Report insert | `require_job_access(write)` at `reporting.py:50` + unique generation key |
+| 17 | `fsm/reporting.py:82` | Service Report save (update) | `_report(write)` + field allowlist + immutability gate (`reporting.py:73-76`) |
+| 18 | `fsm/reporting.py:106` | Service Report save (transition) | `_report(write)` + transition map; Verify/Submit manager-only (`reporting.py:96`) |
+| 19 | `fsm/reporting.py:154` | Service Certificate insert | Job `write, manager_only` (`reporting.py:129`) + Submitted report + unique key |
+| 20 | `fsm/offline.py:99` | Mobile Command Receipt insert | role gate + UUID + allowlist; rolled back by savepoint if the guarded command fails |
+| 21 | `fsm/offline.py:106` | Mobile Command Receipt save | same envelope; only after the domain command's own guard succeeded |
+| 22 | `fsm/field_service_management/doctype/service_job/service_job.py:349` | Sales Invoice insert | manual path guards `require_job_access(write, manager_only)` (`service_job.py:317-320`); system path controller-only |
+| 23 | `fsm/field_service_management/doctype/service_return/service_return.py:105` | Stock Entry receipt | `require_job_access(write, manager_only)` (`service_return.py:52`) + state/warehouse guards; idempotent on `stock_entry` |
+| 24 | `fsm/service_operations/events.py:48` | Service Event Log insert | internal-flag controller; reachable only from guarded commands/projections |
+| 25 | `fsm/service_operations/commands.py:96` | Service Job insert (from Request) | `_request_access(manager_only)` (`commands.py:69`) + bounded unique idempotency key |
+| 26 | `fsm/service_operations/commands.py:225` | Service Visit insert | `require_job_access(write, manager_only)` (`commands.py:209`) + active same-company technician |
+| 27 | `fsm/contracts/commands.py:59` | Service Contract insert | `require_manager_scope(company)` (`commands.py:57`) + field allowlist |
+| 28 | `fsm/contracts/commands.py:114` | renewal Contract insert | `require_contract_access(write, manager_only)` (`commands.py:98`) |
+| 29 | `fsm/contracts/commands.py:199` | Entitlement Consumption insert | Contract+Job manager scope + `FOR UPDATE` lock + unique idempotency key (`commands.py:152-173`) |
+| 30 | `fsm/maintenance/commands.py:53` | Maintenance Plan insert | `require_manager_scope(company)` (`commands.py:51`) + field allowlist |
+| 31 | `fsm/maintenance/engine.py:82` | Maintenance Occurrence insert | guarded command or scheduler; unique `identity_key` + DuplicateEntry re-fetch |
+| 32 | `fsm/maintenance/engine.py:169` | released Service Job insert | exact Plan/Occurrence scope upstream; row lock + unique `maintenance_release_key` |
+| 33 | `fsm/installed_base/commands.py:89` | Customer Site insert | `require_manager_scope(company, territory)` (`commands.py:86`) |
+| 34 | `fsm/installed_base/commands.py:109` | Equipment Location insert | `require_site_access(write, manager_only)` (`commands.py:106`) |
+| 35 | `fsm/installed_base/commands.py:138` | Installed Equipment insert | `require_manager_scope(company)` (`commands.py:126`) + controller link validation |
+| 36 | `fsm/installed_base/provisioning.py:120` | provisioned equipment insert | Delivery Note submit hook, or retry after `require_manager_scope(doc.company)` (`provisioning.py:80/254`); unique `provisioning_key` |
+| 37 | `fsm/inspections/commands.py:115` | Equipment Inspection insert | Job write + active same-company template (`commands.py:67-69`); equipment/visit relation enforced in `EquipmentInspection.validate` (single-layer — finding L-7) |
+| 38 | `fsm/fire_safety/commands.py:69` | Installed Equipment service-history save | Job write/assignment + linked equipment + same-Job visit + category (`commands.py:51-57`) |
+
+The 34 remaining grep hits are confined to `fsm/tests/` fixtures/negative assertions and are never
+imported by runtime code.
 
 | Location                                           | Operation                                | Reachability and guard                                                                                                                                     | Classification                                         | Decision                                                                                                           |
 | -------------------------------------------------- | ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ |

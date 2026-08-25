@@ -1,6 +1,11 @@
 # API authorization matrix
 
-Date: 2026-08-25. Inventory source: Python whitelist decorators at the Fire Safety gate revision. Total: **142/142 current endpoints classified**. The original 58-row GATE-001 table remains below as an audit baseline; later gate additions are reconciled in phase deltas. Default is deny; frontend visibility is never an authorization control.
+Date: 2026-08-26 (Phase 15 HARDENING re-audit; previous full pass 2026-08-25). Inventory source: Python
+whitelist decorators. Total: **174/174 current whitelist decorators classified** (line-level re-grep of
+every module; includes aliases and doctype RPCs). The original 58-row GATE-001 table remains below as an
+audit baseline; later gate additions are reconciled in phase deltas, and the Phase 15 corrections at the
+end of this file amend specific rows. Default is deny; frontend visibility is never an authorization
+control. Full findings and severity classification: `HARDENING_SECURITY_AUDIT.md`.
 
 Legend: access `G` = explicit Guest, `A` = authenticated. Scope columns use `C` = Company User Permission, `T` = Service Territory, `O` = current Customer ownership, `A` = assigned Technician, `—` = not applicable. Read/bypass values are `No`, `Scoped` (root IDs or warehouses were authorized first), or the named documented exception. Tests: `AUTH`, `COMP`, `CUST`, `TECH`, `GUEST`, `FIELDS`, `STATE`, `AGG`, `RATE`, `ROLLBACK`, `CHILD`, `E2E`.
 
@@ -277,3 +282,28 @@ Cross-company isolation and non-manager denial are covered in `fsm.tests.test_an
 | `command_status` | Technician/Manager; ≤100 UUIDs | receipt user must equal session user | none |
 
 Idempotency, conflict, customer denial and cross-company failure are covered in `fsm.tests.test_offline`.
+
+## Phase 15 HARDENING corrections (2026-08-26)
+
+Every prior row was re-verified against current code. The following rows are **amended** — the guard or
+residual-risk statement previously recorded is inaccurate at this revision:
+
+| Row | Correction | Finding |
+|---|---|---|
+| 24 `fsm.tracking.update_location` "Medium: precise location" | Residual risk is understated: the Technician `on_update` doc event rebroadcasts `last_seen_latitude/longitude` via an **unscoped** `frappe.publish_realtime` (`fsm/realtime.py:29`) to every connected authenticated session, including self-registered FSM Customer accounts. Same for Job summaries (`fsm/realtime.py:12`). | **H-1 (High, open)** |
+| Reporting delta ("List/get methods use Job-root scope") | Correct for authorization, but `get_service_report`/`get_service_certificate` return the full stored `snapshot` (internal `labor_cost`, `materials_cost`, `total_cost`, Stock Entry values, workshop notes — `fsm/reporting.py:38-44`) to any actor with Job **read**, which includes the owning FSM Customer (HTTP and direct REST). | **M-1 (Medium, open)** |
+| 24/25 `fsm.inventory.get_stock_levels` / `get_van_stock` "role + own van/company warehouse guard" | The warehouse company check (`fsm/inventory.py:44-45`) runs only for FSM Manager. A technician whose Technician record has no `warehouse` retains the caller-supplied `warehouse` (`fsm/inventory.py:39`) unchecked → cross-company Bin read in that configuration. | **M-3 (Medium, open)** |
+| 41 `fsm.contractors.get_subcontractor_work` "role + subcontractor company scope" | No `require_role` is present; authorization is only `require_company_scope`, and a `db.get_value` existence probe (`fsm/contractors.py:28`) precedes the guard. | **L-1 (Low, open)** |
+| 47 `fsm.integrations.create_job` | `customer`/`service_address`/item `rate` are manager-trusted with no binding beyond company scope (Customer is a global master). | **L-2 (Low, accepted manager-trust)** |
+| Inspection delta `start_inspection` "equipment/Visit root relation" | The relation guard lives **only** in `EquipmentInspection.validate` (`equipment_inspection.py:30-48`), not in the command (`fsm/inspections/commands.py:59-115`). Effective, but single-layer. | **L-7 (Low, open)** |
+
+New non-endpoint authorization surface registered this phase:
+
+| Surface | Access | Guard | Status |
+|---|---|---|---|
+| socket.io events `fsm_service_job_update`, `fsm_technician_update` | any authenticated session | **none** (no room/user scoping) | **H-1 open** |
+| `/api/resource/Technician`, `/Subcontractor`, `/Service Team`, `/Service Territory`, `/Checklist Template` for FSM Technician role | role read, no permission query hook | company scope **absent** | **M-2 open** |
+
+All other rows and deltas in this file were confirmed accurate at the Phase 15 revision, including the
+QR path (auth → token→name → `require_equipment_access` before any field), the offline ingress
+allowlist/receipt binding, and all raw-SQL parametrization.
