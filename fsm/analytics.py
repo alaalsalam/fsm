@@ -2,9 +2,9 @@
 # For license information, please see license.txt
 
 import frappe
-from frappe.utils import add_days, get_datetime, nowdate, time_diff_in_hours
+from frappe.utils import add_days, flt, get_datetime, nowdate, time_diff_in_hours
 
-from fsm.security.policy import bounded_int, require_role
+from fsm.security.policy import bounded_int, require_manager_scope, require_role, resolve_manager_company
 from fsm.security.scopes import FSM_MANAGER, SYSTEM_MANAGER
 
 
@@ -171,3 +171,100 @@ def _count_by(rows, key) -> dict:
 		k = key(r)
 		out[k] = out.get(k, 0) + 1
 	return out
+
+
+@frappe.whitelist()
+def domain_dashboard(days: int = 90):
+	"""Cross-domain operational scorecard; every root is explicitly Company scoped."""
+	days = bounded_int(days, 1, 730)
+	company = resolve_manager_company()
+	require_manager_scope(company)
+	since = _since(days)
+	jobs = frappe.get_list(
+		"Service Job",
+		filters={"company": company, "creation": [">=", since]},
+		fields=["name", "customer", "status", "assigned_service_team", "service_contract", "actual_hours", "completed_on", "sales_invoice", "total_cost"],
+		limit=5000,
+	)
+	job_names = [row.name for row in jobs]
+	completed_names = [row.name for row in jobs if row.status == "Completed"]
+	sites = frappe.get_list("Customer Site", filters={"company": company}, pluck="name", limit=0)
+	equipment = frappe.get_list("Installed Equipment", filters={"company": company}, fields=["name", "customer", "model_no", "expiry_date", "hydro_due_date"], limit=0)
+	contracts = frappe.get_list("Service Contract", filters={"company": company}, fields=["name", "status", "end_date", "included_visits"], limit=1000)
+	occurrences = frappe.get_list("Maintenance Occurrence", filters={"company": company}, fields=["status", "installed_equipment", "due_date"], limit=5000)
+	inspections = frappe.get_list("Equipment Inspection", filters={"company": company, "creation": [">=", since]}, fields=["overall_result", "installed_equipment"], limit=5000)
+	failures = frappe.get_list("Failure Analysis", filters={"service_job": ["in", job_names or [""]]}, fields=["installed_equipment", "repeat_failure", "severity"], limit=5000)
+	returns = frappe.get_list("Service Return", filters={"service_job": ["in", job_names or [""]]}, fields=["installed_equipment", "final_outcome", "status"], limit=5000)
+	profit = _profit_totals(jobs)
+	team_rows = _team_metrics(jobs, completed_names)
+	contract_usage = frappe.get_all("Service Contract Entitlement", filters={"parent": ["in", [row.name for row in contracts] or [""]]}, fields=["included_quantity", "used_quantity", "remaining_quantity"])
+	today = nowdate()
+	return {
+		"window_days": days,
+		"company": company,
+		"executive": {
+			"customers": len({row.customer for row in jobs if row.customer}), "sites": len(sites), "installed_equipment": len(equipment),
+			"active_contracts": sum(row.status == "Active" for row in contracts), "due_maintenance": sum(row.status == "Due" for row in occurrences),
+			"overdue_maintenance": sum(row.status == "Overdue" for row in occurrences), **profit,
+		},
+		"operations": service_performance(days),
+		"maintenance": {
+			"pm_compliance_pct": _percent(sum(row.status == "Completed" for row in occurrences), sum(row.status in {"Completed", "Overdue"} for row in occurrences)),
+			"due": sum(row.status == "Due" for row in occurrences), "overdue": sum(row.status == "Overdue" for row in occurrences),
+			"first_time_pass_pct": _percent(sum(row.overall_result == "Pass" for row in inspections), len(inspections)),
+			"failed_inspections": sum(row.overall_result in {"Fail", "Needs Repair", "Needs Replacement"} for row in inspections),
+			"refill_due": sum(row.overall_result == "Needs Refill" for row in inspections),
+			"hydro_due": sum(bool(row.hydro_due_date and str(row.hydro_due_date) <= today) for row in equipment),
+			"expired_equipment": sum(bool(row.expiry_date and str(row.expiry_date) <= today) for row in equipment),
+		},
+		"teams": team_rows,
+		"contracts": {
+			"active": sum(row.status == "Active" for row in contracts), "renewal_due": sum(row.status == "Active" and str(row.end_date) <= add_days(today, 60) for row in contracts),
+			"expired": sum(row.status == "Expired" for row in contracts), "visits_used": sum(flt(row.used_quantity) for row in contract_usage),
+			"visits_remaining": sum(flt(row.remaining_quantity) for row in contract_usage), "revenue": profit["service_revenue"], "cost": profit["service_cost"], "margin": profit["gross_margin"],
+		},
+		"equipment": {
+			"failures": len(failures), "repeat_failures": sum(row.repeat_failure for row in failures),
+			"repair": sum(row.final_outcome == "Repaired" for row in returns), "replacement": sum(row.final_outcome in {"Replacement Recommended", "Replaced"} for row in returns),
+			"model_trends": _count_by(equipment, lambda row: row.model_no or "Unspecified"),
+		},
+	}
+
+
+def _profit_totals(jobs):
+	revenue = 0.0
+	for job in jobs:
+		if job.sales_invoice:
+			revenue += flt(frappe.db.get_value("Sales Invoice", job.sales_invoice, "grand_total"))
+	cost = sum(flt(row.total_cost) for row in jobs)
+	return {"service_revenue": revenue, "service_cost": cost, "gross_margin": revenue - cost}
+
+
+def _team_metrics(jobs, completed_names):
+	by_team: dict[str, dict] = {}
+	for job in jobs:
+		team = job.assigned_service_team or "Unassigned"
+		row = by_team.setdefault(team, {"team": team, "jobs": 0, "completed": 0, "units_inspected": 0, "hours": 0.0, "revisits": 0, "customer_rating": None})
+		row["jobs"] += 1
+		row["completed"] += int(job.status == "Completed")
+		row["hours"] += flt(job.actual_hours)
+	if completed_names:
+		units = frappe.get_all("Service Job Equipment", filters={"parent": ["in", completed_names]}, fields=["parent"])
+		team_by_job = {row.name: row.assigned_service_team or "Unassigned" for row in jobs}
+		for unit in units:
+			by_team[team_by_job[unit.parent]]["units_inspected"] += 1
+		visits = frappe.get_all("Service Visit", filters={"service_job": ["in", completed_names]}, fields=["service_job"])
+		visit_counts = _count_by(visits, lambda row: row.service_job)
+		for job, count in visit_counts.items():
+			by_team[team_by_job[job]]["revisits"] += max(count - 1, 0)
+		feedback = frappe.get_all("Service Feedback", filters={"service_job": ["in", completed_names]}, fields=["service_job", "rating"])
+		for team in by_team:
+			ratings = [flt(row.rating) for row in feedback if team_by_job[row.service_job] == team]
+			by_team[team]["customer_rating"] = round(sum(ratings) / len(ratings), 2) if ratings else None
+	for row in by_team.values():
+		row["units_per_hour"] = round(row["units_inspected"] / row["hours"], 2) if row["hours"] else 0
+	return sorted(by_team.values(), key=lambda row: row["jobs"], reverse=True)
+
+
+def _percent(value, total):
+	return round(value / total * 100) if total else None
