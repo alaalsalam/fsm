@@ -59,3 +59,9 @@ export {
 	type FailureSeverity,
 	type FailureAnalysis,
 } from "./src/failure-analysis";
+export {
+	WorkshopApi,
+	type WorkshopStatus,
+	type WorkshopOutcome,
+	type WorkshopCase,
+} from "./src/workshop";
