@@ -1,15 +1,9 @@
 # Copyright (c) 2026, KodLyft and contributors
 # For license information, please see license.txt
 
-import json
-
 import frappe
-from frappe import _
-from frappe.utils import nowdate
 
-from fsm.security.policy import require_job_access, validate_allowed_fields
-
-PART_FIELDS = {"item_code", "qty"}
+from fsm.security.policy import require_job_access
 
 
 @frappe.whitelist()
@@ -20,46 +14,12 @@ def request_parts(
 	material_request_type: str = "Material Transfer",
 	schedule_date: str | None = None,
 ):
-	"""Raise a (draft) Material Request for parts needed on a job, linked back to it.
+	"""Compatibility alias for the canonical ERPNext-backed shortage command."""
+	if material_request_type != "Material Transfer":
+		frappe.throw("FSM material requirements must use ERPNext Material Transfer requests.")
+	from fsm.materials import request_shortage
 
-	items: list of {"item_code", "qty"} (JSON string when called over HTTP).
-	warehouse: target stock location; defaults to the assigned technician's van, then
-	the Service Settings default warehouse.
-	"""
-	rows = json.loads(items) if isinstance(items, str) else items
-	if not rows:
-		frappe.throw(_("Add at least one item to request."))
-	job_doc = require_job_access(job, "write")
-	for row in rows:
-		validate_allowed_fields(row, PART_FIELDS)
-
-	target = warehouse or _job_warehouse(job)
-	if not target:
-		frappe.throw(
-			_(
-				"No warehouse to deliver to. Set a van warehouse on the technician or a default in Service Settings."
-			)
-		)
-
-	sched = schedule_date or nowdate()
-	mr = frappe.new_doc("Material Request")
-	mr.company = job_doc.company
-	mr.material_request_type = material_request_type
-	mr.transaction_date = nowdate()
-	mr.schedule_date = sched
-	mr.fsm_service_job = job
-	for r in rows:
-		mr.append(
-			"items",
-			{
-				"item_code": r["item_code"],
-				"qty": r["qty"],
-				"schedule_date": sched,
-				"warehouse": target,
-			},
-		)
-	mr.insert(ignore_permissions=True)
-	return {"name": mr.name, "warehouse": target}
+	return request_shortage(job, items, warehouse=warehouse, schedule_date=schedule_date)
 
 
 @frappe.whitelist()
@@ -90,7 +50,12 @@ def get_job_logistics(job: str):
 
 
 def _job_warehouse(job: str) -> str | None:
-	"""Resolve the delivery warehouse for a job: technician van → settings default."""
+	"""Resolve team → technician van → settings warehouse (compatibility helper)."""
+	team = frappe.db.get_value("Service Job", job, "assigned_service_team")
+	if team:
+		warehouse = frappe.db.get_value("Service Team", team, "default_warehouse")
+		if warehouse:
+			return warehouse
 	technician = frappe.db.get_value("Service Job", job, "primary_technician")
 	if technician:
 		van = frappe.db.get_value("Technician", technician, "warehouse")

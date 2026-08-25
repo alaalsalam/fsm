@@ -67,6 +67,88 @@ FSM_CUSTOM_FIELDS = {
 			"options": "Service Job",
 			"insert_after": "company",
 			"read_only": 1,
+		},
+		{
+			"fieldname": "fsm_service_visit",
+			"label": "Service Visit",
+			"fieldtype": "Link",
+			"options": "Service Visit",
+			"insert_after": "fsm_service_job",
+			"read_only": 1,
+		},
+	],
+	"Material Request Item": [
+		{
+			"fieldname": "fsm_installed_equipment",
+			"label": "Installed Equipment",
+			"fieldtype": "Link",
+			"options": "Installed Equipment",
+			"insert_after": "item_code",
+			"read_only": 1,
+		}
+	],
+	"Pick List": [
+		{
+			"fieldname": "fsm_service_job",
+			"label": "Service Job",
+			"fieldtype": "Link",
+			"options": "Service Job",
+			"insert_after": "company",
+			"read_only": 1,
+		},
+		{
+			"fieldname": "fsm_service_visit",
+			"label": "Service Visit",
+			"fieldtype": "Link",
+			"options": "Service Visit",
+			"insert_after": "fsm_service_job",
+			"read_only": 1,
+		},
+	],
+	"Pick List Item": [
+		{
+			"fieldname": "fsm_installed_equipment",
+			"label": "Installed Equipment",
+			"fieldtype": "Link",
+			"options": "Installed Equipment",
+			"insert_after": "item_code",
+			"read_only": 1,
+		}
+	],
+	"Stock Entry": [
+		{
+			"fieldname": "fsm_service_job",
+			"label": "Service Job",
+			"fieldtype": "Link",
+			"options": "Service Job",
+			"insert_after": "company",
+			"read_only": 1,
+		},
+		{
+			"fieldname": "fsm_service_visit",
+			"label": "Service Visit",
+			"fieldtype": "Link",
+			"options": "Service Visit",
+			"insert_after": "fsm_service_job",
+			"read_only": 1,
+		},
+		{
+			"fieldname": "fsm_material_action",
+			"label": "FSM Material Action",
+			"fieldtype": "Select",
+			"options": "\nTransfer\nIssue\nConsume\nReturn",
+			"insert_after": "fsm_service_visit",
+			"read_only": 1,
+		},
+	],
+	"Stock Entry Detail": [
+		{
+			"fieldname": "fsm_installed_equipment",
+			"label": "Installed Equipment",
+			"fieldtype": "Link",
+			"options": "Installed Equipment",
+			"insert_after": "item_code",
+			"read_only": 1,
 		}
 	],
 	"Delivery Note": [
@@ -109,7 +191,19 @@ def ensure_roles():
 
 
 def ensure_custom_fields():
-	if all(frappe.db.exists("DocType", name) for name in ("Item", "Delivery Note", "Material Request")):
+	if all(
+		frappe.db.exists("DocType", name)
+		for name in (
+			"Item",
+			"Delivery Note",
+			"Material Request",
+			"Material Request Item",
+			"Pick List",
+			"Pick List Item",
+			"Stock Entry",
+			"Stock Entry Detail",
+		)
+	):
 		create_custom_fields(FSM_CUSTOM_FIELDS, ignore_validate=True)
 
 

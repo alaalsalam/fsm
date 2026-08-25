@@ -17,7 +17,12 @@ def sum_job_hours(job: str) -> float:
 def compute_costs(doc) -> dict:
 	"""Derive the cost fields for a Service Job document (in-memory, no write)."""
 	actual = sum_job_hours(doc.name) if doc.name else (doc.actual_hours or 0)
-	materials = sum((i.amount or 0) for i in doc.items)
+	consumed = None
+	if doc.name:
+		from fsm.materials import consumed_material_cost
+
+		consumed = consumed_material_cost(doc.name)
+	materials = consumed if consumed is not None else sum((i.amount or 0) for i in doc.items)
 	labor = (actual or 0) * (doc.labor_rate or 0)
 	total = labor + materials + (doc.overhead_cost or 0)
 	return {

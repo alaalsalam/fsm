@@ -8,6 +8,8 @@
  "field_order": [
   "item_code",
   "item_name",
+  "installed_equipment",
+  "material_type",
   "qty",
   "uom",
   "rate",
@@ -29,6 +31,19 @@
    "fieldtype": "Data",
    "label": "Item Name",
    "read_only": 1
+  },
+  {
+   "fieldname": "installed_equipment",
+   "fieldtype": "Link",
+   "label": "Installed Equipment",
+   "options": "Installed Equipment"
+  },
+  {
+   "default": "Spare",
+   "fieldname": "material_type",
+   "fieldtype": "Select",
+   "label": "Material Type",
+   "options": "Spare\nConsumable\nRefill"
   },
   {
    "columns": 1,

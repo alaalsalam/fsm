@@ -14,8 +14,10 @@ class ServiceJobItem(Document):
 		from frappe.types import DF
 
 		amount: DF.Currency
+		installed_equipment: DF.Link | None
 		item_code: DF.Link
 		item_name: DF.Data | None
+		material_type: DF.Literal["Spare", "Consumable", "Refill"]
 		parent: DF.Data
 		parentfield: DF.Data
 		parenttype: DF.Data

@@ -74,6 +74,7 @@ class ServiceJob(Document):
 		self.set_address_display()
 		self.calculate_totals()
 		self.validate_equipment_rows()
+		self.validate_material_rows()
 		self.validate_service_contract()
 		self.normalize_tasks()
 		self.set_completion_timestamp()
@@ -96,6 +97,13 @@ class ServiceJob(Document):
 			row.item_code = equipment.item_code
 			row.serial_no = equipment.serial_no
 			row.equipment_status = equipment.status
+
+	def validate_material_rows(self):
+		"""Material intent may target only equipment included in this aggregate."""
+		allowed = {row.installed_equipment for row in self.equipment}
+		for row in self.items:
+			if row.installed_equipment and row.installed_equipment not in allowed:
+				frappe.throw(_("Material Installed Equipment must be linked to the Service Job."))
 
 	def validate_service_contract(self):
 		if not self.service_contract:
