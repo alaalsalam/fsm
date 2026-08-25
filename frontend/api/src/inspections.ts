@@ -42,6 +42,8 @@ export interface InspectionResultRow {
 
 export interface EquipmentInspection {
 	name: string;
+	/** Server version stamp — used as expected_version for offline conflict detection. */
+	modified?: string;
 	installed_equipment: string;
 	service_job: string;
 	service_visit?: string;

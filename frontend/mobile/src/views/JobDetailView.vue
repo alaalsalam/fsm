@@ -251,6 +251,7 @@ async function saveSignature() {
 			createOfflineCommand({
 				entity_type: "Service Report",
 				entity_id: report.name,
+				expected_version: report.modified,
 				action: "report.update",
 				payload: { customer_signature: data },
 			}),
@@ -259,6 +260,7 @@ async function saveSignature() {
 			createOfflineCommand({
 				entity_type: "Service Report",
 				entity_id: report.name,
+				expected_version: report.modified,
 				action: "report.transition",
 				payload: { status: "Customer Signed" },
 			}),
@@ -323,6 +325,7 @@ async function saveInspection(inspection: EquipmentInspection, complete = false)
 				createOfflineCommand({
 					entity_type: "Equipment Inspection",
 					entity_id: inspection.name,
+					expected_version: inspection.modified,
 					action: "inspection.save",
 					payload: { responses },
 				}),
@@ -332,6 +335,7 @@ async function saveInspection(inspection: EquipmentInspection, complete = false)
 					createOfflineCommand({
 						entity_type: "Equipment Inspection",
 						entity_id: inspection.name,
+						expected_version: inspection.modified,
 						action: "inspection.complete",
 						payload: {},
 					}),

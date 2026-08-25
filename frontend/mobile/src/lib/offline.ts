@@ -101,10 +101,37 @@ export async function retryCommand(commandId: string) {
 	if (command) await saveCommand({ ...command, state: "Queued", error: undefined });
 }
 
-export async function syncQueued(): Promise<OfflineCommand[]> {
-	const pending = (await listCommands())
+async function deleteCommand(commandId: string) {
+	await transact("commands", "readwrite", (store) => store.delete(commandId));
+}
+
+const SYNCED_RETENTION_MS = 7 * 24 * 60 * 60 * 1000;
+
+/** A Synced command may be dropped once it ages past the retention window.
+ * Queued/Failed/Conflict rows are never prunable. */
+export function isPrunable(row: OfflineCommand, now: number): boolean {
+	return row.state === "Synced" && now - Date.parse(row.created_at) > SYNCED_RETENTION_MS;
+}
+
+/** Drop Synced commands older than the retention window so the queue store
+ * cannot grow without bound. */
+export async function pruneSynced(now = Date.now()) {
+	for (const row of await listCommands()) {
+		if (isPrunable(row, now)) await deleteCommand(row.command_id);
+	}
+}
+
+/** IndexedDB getAll() returns key order (random UUIDs); visit/report state
+ * machines need submission in capture order, so sort by created_at. */
+export function orderForSync(rows: OfflineCommand[]): OfflineCommand[] {
+	return rows
 		.filter((row) => row.state === "Queued" || row.state === "Failed")
+		.sort((a, b) => a.created_at.localeCompare(b.created_at))
 		.slice(0, 50);
+}
+
+export async function syncQueued(): Promise<OfflineCommand[]> {
+	const pending = orderForSync(await listCommands());
 	if (!pending.length) return listCommands();
 	for (const row of pending) await saveCommand({ ...row, state: "Syncing" });
 	try {
@@ -115,6 +142,7 @@ export async function syncQueued(): Promise<OfflineCommand[]> {
 			const source = pending.find((row) => row.command_id === result.command_id);
 			if (source) await saveCommand({ ...source, state: result.state, error: result.error });
 		}
+		await pruneSynced();
 	} catch (error) {
 		for (const row of pending)
 			await saveCommand({ ...row, state: "Failed", error: String(error) });

@@ -15,6 +15,8 @@ export type CertificateType = "Refill Certificate" | "Hydro Test Certificate";
 
 export interface ServiceReport {
 	name: string;
+	/** Server version stamp — used as expected_version for offline conflict detection. */
+	modified?: string;
 	service_job: string;
 	report_type: ServiceReportType;
 	revision: number;

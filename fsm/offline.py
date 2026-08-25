@@ -63,7 +63,7 @@ def _result(doc):
 	}
 
 
-def _execute(row):
+def _execute(row, chain=None):
 	command_id = _valid_uuid(row.get("command_id"))
 	existing = _receipt(command_id)
 	if existing and existing.state == "Synced":
@@ -81,7 +81,14 @@ def _execute(row):
 		frappe.throw(_("Offline command target no longer exists."), frappe.DoesNotExistError)
 	expected = str(row.get("expected_version") or "").strip()
 	actual = str(frappe.db.get_value(doctype, entity_id, "modified") or "")
-	if expected and expected != actual:
+	# A batch is one client's ordered offline queue. Commands captured against the
+	# same pre-sync snapshot legitimately share one expected_version, so after the
+	# batch's first successful mutation of an entity, later commands in the SAME
+	# batch are validated against that pre-batch version instead of live modified.
+	# A mismatch with both is a genuine external edit -> Conflict.
+	chain_key = (doctype, entity_id)
+	pre_batch = (chain or {}).get(chain_key)
+	if expected and expected != actual and expected != pre_batch:
 		return {"command_id": command_id, "state": "Conflict", "server_version": actual}
 	payload = _payload(row.get("payload") or {})
 	payload[parameter] = entity_id
@@ -104,6 +111,8 @@ def _execute(row):
 			"error_message": None})
 		receipt.flags.fsm_offline_command = True
 		receipt.save(ignore_permissions=True)
+		if chain is not None:
+			chain.setdefault(chain_key, actual)
 		return _result(receipt)
 	except Exception as exc:
 		frappe.db.rollback(save_point="offline_command")
@@ -118,7 +127,8 @@ def sync_commands(commands):
 	commands = frappe.parse_json(commands) if isinstance(commands, str) else commands
 	if not isinstance(commands, list) or len(commands) > 50:
 		frappe.throw(_("Provide a list of at most 50 offline commands."), frappe.ValidationError)
-	return {"results": [_execute(row) for row in commands]}
+	chain: dict = {}
+	return {"results": [_execute(row, chain) for row in commands]}
 
 
 @frappe.whitelist()
