@@ -40,4 +40,6 @@ erDiagram
 - Terminal equipment (`Returned`, `Replaced`, `Disposed`) cannot enter a new Job.
 - Equipment used by a Job cannot be deleted.
 
-PM, AMC, recurrence, refill, inspection and workshop fields are intentionally absent.
+Preventive Maintenance and Inspection remain separate aggregates linked to Installed Equipment. Fire-extinguisher
+nameplate and refill/hydro history are now an approved specialization on the physical Installed Equipment record;
+stock consumption and workshop concepts remain separate/later domains.

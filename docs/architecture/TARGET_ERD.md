@@ -93,6 +93,7 @@ erDiagram
 | Maintenance Occurrence | Implemented durable ledger | FSM Maintenance | unique due obligation; releases only canonical Service Job |
 | Inspection Template/Item | Implemented root/child | FSM Inspections | versioned typed definition; not a Job task checklist duplicate |
 | Equipment Inspection/Result | Implemented durable root/child | FSM Inspections | per-equipment evidence and server outcome within authorized Job |
+| Fire Extinguisher profile | Implemented specialization on Installed Equipment | FSM Fire Safety | physical-unit nameplate and refill/hydro history only; Item and stock remain ERPNext |
 
 Failure Analysis, workshop and other later-phase concepts remain design-only.
 

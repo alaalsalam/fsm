@@ -1,6 +1,6 @@
 # API authorization matrix
 
-Date: 2026-08-25. Inventory source: Python whitelist decorators at the Inspection gate revision. Total: **139/139 current endpoints classified**. The original 58-row GATE-001 table remains below as an audit baseline; later gate additions are reconciled in phase deltas. Default is deny; frontend visibility is never an authorization control.
+Date: 2026-08-25. Inventory source: Python whitelist decorators at the Fire Safety gate revision. Total: **142/142 current endpoints classified**. The original 58-row GATE-001 table remains below as an audit baseline; later gate additions are reconciled in phase deltas. Default is deny; frontend visibility is never an authorization control.
 
 Legend: access `G` = explicit Guest, `A` = authenticated. Scope columns use `C` = Company User Permission, `T` = Service Territory, `O` = current Customer ownership, `A` = assigned Technician, `—` = not applicable. Read/bypass values are `No`, `Scoped` (root IDs or warehouses were authorized first), or the named documented exception. Tests: `AUTH`, `COMP`, `CUST`, `TECH`, `GUEST`, `FIELDS`, `STATE`, `AGG`, `RATE`, `ROLLBACK`, `CHILD`, `E2E`.
 
@@ -190,3 +190,13 @@ Preventive Maintenance ownership, authorization, lifecycle, timezone, idempotenc
 | `get_inspection` | A Manager, assigned Technician or owning Customer | exact parent Job/customer access | none |
 
 Inspection positive/negative authorization and server outcome coverage is in `fsm.tests.test_inspection_engine`.
+
+## Fire Safety endpoint delta (3 additions)
+
+| Endpoint | Access and accepted input | Root guard/scope | Bypass decision |
+|---|---|---|---|
+| `update_fire_safety_profile` | A Manager/System Manager; Equipment + fixed profile fields | exact Installed Equipment write/Company scope and profile validation | none |
+| `record_extinguisher_service` | A Manager or assigned Technician; Job/equipment/optional Visit/refill/hydro fields | Job write/assignment, linked equipment, same Visit and extinguisher-category guards | guarded Installed Equipment service-history save |
+| `install_standard_extinguisher_template` | A Manager/System Manager; Company | Manager Company scope; deterministic company/template lookup; typed Template commands | none |
+
+Fire Safety ownership, template completeness, no-stock behavior and authorization coverage is in `fsm.tests.test_fire_safety`.

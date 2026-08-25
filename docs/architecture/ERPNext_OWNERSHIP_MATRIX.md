@@ -29,6 +29,8 @@ Status: **Binding target proposal**
 | Visit execution | FSM Service Visit | Own attendance evidence | ERPNext billing/stock state |
 | Technician operational profile | FSM Technician linked to User/Employee | Skills, duty, dispatch state | Duplicate User/Employee identity |
 | Maintenance recurrence | FSM Maintenance Plan/Occurrence per ADR-007 | Idempotent Installed Equipment scheduling and grouped Service Job release | ERPNext Maintenance Schedule/Visit clone, duplicate execution Job, or ERP accounting |
+| Fire extinguisher product definition | ERPNext Item/Brand | Link from Installed Equipment; read generic catalogue facts | FSM extinguisher Item/product catalogue |
+| Fire extinguisher physical-unit/service facts | FSM Installed Equipment | Nameplate values, refill/hydro history and due projection | Parallel stock/material ledger or duplicated Item prices/spec catalogue |
 
 ## Integration invariant
 

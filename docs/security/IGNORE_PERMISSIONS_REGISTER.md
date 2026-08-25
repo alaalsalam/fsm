@@ -1,6 +1,6 @@
 # `ignore_permissions` register
 
-Date: 2026-08-25. Search patterns include `ignore_permissions=True`, spaced assignment, and `save/insert/delete(ignore_permissions=True)`. Current result: **all 59 occurrences classified**. Preventive Maintenance added three guarded runtime occurrences; the Inspection Engine adds one guarded runtime occurrence. There is no generic bypass helper.
+Date: 2026-08-25. Search patterns include `ignore_permissions=True`, spaced assignment, and `save/insert/delete(ignore_permissions=True)`. Current result: **all 60 occurrences classified**. The Inspection Engine added one guarded runtime occurrence; Fire Safety adds one guarded runtime occurrence. There is no generic bypass helper.
 
 | Location | Operation | Reachability and guard | Classification | Decision |
 |---|---|---|---|---|
@@ -30,6 +30,7 @@ Date: 2026-08-25. Search patterns include `ignore_permissions=True`, spaced assi
 | `maintenance/engine.py` Occurrence insert | generate/reschedule durable occurrence | Scheduler or HTTP after exact Plan/Occurrence Manager scope; active/open state, deterministic identity and unique constraint | Internal system operation after explicit authorization | Approved durable retry-safe schedule ledger append. |
 | `maintenance/engine.py` Service Job insert | release grouped occurrences | Scheduler or HTTP after exact Plan/Occurrence scope; eligible-state filter, row lock, deterministic unique release key; Job controller validates equipment | Internal system operation after explicit authorization | Approved canonical grouped Job release. |
 | `inspections/commands.py` Inspection insert | start Equipment Inspection | HTTP after Job write/assigned-Technician guard, active same-company Template, exact Job Equipment/Visit relation; fixed ownership snapshots | Internal operation after explicit authorization | Approved canonical Inspection command; direct create remains controller-blocked. |
+| `fire_safety/commands.py` Installed Equipment save | record refill/hydro service history | HTTP after Job write/assigned-Technician guard, exact linked equipment, optional same-Job Visit and extinguisher-category validation | Internal operation after explicit authorization | Approved narrow projection because Technician has read-only equipment permission; no stock/commercial side effect. |
 | `fsm/tests/test_security.py:86` | create test User | test runner as Administrator | Approved documented exception | Test fixture only. |
 | `fsm/tests/test_security.py:102` | create test Customer | test runner as Administrator | Approved documented exception | Test fixture only. |
 | `fsm/tests/test_security.py:109` | create Company User Permission | test runner as Administrator | Approved documented exception | Test fixture only. |
