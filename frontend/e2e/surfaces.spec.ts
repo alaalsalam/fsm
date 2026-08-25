@@ -114,6 +114,67 @@ test("portal creates a canonical service request", async ({ page }) => {
 	expect(errors).toEqual([]);
 });
 
+test("customer portal dashboard presents isolated after-sales capabilities", async ({ page }) => {
+	await page.route(/\/api\/(method|resource)\//, (route) => {
+		const url = route.request().url();
+		if (url.includes("get_portal_session"))
+			return json(route, {
+				message: {
+					authenticated: true,
+					user: "customer@example.com",
+					full_name: "Customer A",
+				},
+			});
+		if (url.includes("get_my_portal_hub"))
+			return json(route, {
+				message: {
+					dashboard: {
+						sites: 2,
+						equipment: 20,
+						open_jobs: 1,
+						upcoming_maintenance: 2,
+						overdue_maintenance: 0,
+						active_contracts: 1,
+					},
+					requests: [],
+					jobs: [
+						{
+							name: "FSM-JOB-0001",
+							status: "Scheduled",
+							service_type: "Preventive Maintenance",
+						},
+					],
+					service_history: [],
+					upcoming_maintenance: [],
+					overdue_maintenance: [],
+					contracts: [
+						{
+							name: "FSM-CON-0001",
+							status: "Active",
+							start_date: "2026-01-01",
+							end_date: "2026-12-31",
+						},
+					],
+					renewals: [],
+					reports: [],
+					certificates: [],
+					quotations: [],
+					invoices: [],
+				},
+			});
+		return json(route, { message: [] });
+	});
+	await page.goto("http://127.0.0.1:4175/dashboard");
+	await expect(page.getByRole("heading", { name: "After-sales dashboard" })).toBeVisible();
+	await expect(page.getByRole("heading", { name: "Maintenance" })).toBeVisible();
+	await expect(page.getByRole("heading", { name: "Contracts & renewals" })).toBeVisible();
+	await expect(page.getByRole("heading", { name: "Reports & certificates" })).toBeVisible();
+	await expect(page.getByRole("heading", { name: "Quotations & invoices" })).toBeVisible();
+	expect(
+		await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+	).toBe(true);
+});
+
 test("mobile jobs surface handles an unavailable API", async ({ page }) => {
 	const errors: Error[] = [];
 	page.on("pageerror", (error) => errors.push(error));
