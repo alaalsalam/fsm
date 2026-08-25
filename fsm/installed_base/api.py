@@ -5,7 +5,7 @@ import json
 import frappe
 
 from fsm.installed_base.access import require_equipment_access, require_site_access
-from fsm.installed_base.warranty import get_equipment_warranty_status
+from fsm.installed_base.warranty import get_equipment_warranty_status, warranty_status_for
 from fsm.security.policy import bounded_int, require_authenticated
 
 
@@ -127,7 +127,7 @@ def get_customer_equipment(
 		limit=bounded_int(limit, 1, 200),
 	)
 	for row in rows:
-		row.warranty_status = get_equipment_warranty_status(row.name)
+		row.warranty_status = warranty_status_for(row.warranty_end_date)
 	if warranty:
 		rows = [row for row in rows if row.warranty_status == warranty]
 	return rows

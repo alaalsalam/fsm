@@ -13,13 +13,19 @@ def warranty_start_for(doc):
 	}.get(basis)
 
 
+def warranty_status_for(warranty_end_date) -> str:
+	"""Pure status computation — callers that already hold warranty_end_date
+	(list rows) must use this instead of loading a full document per row."""
+	if not warranty_end_date:
+		return "Not Applicable"
+	return "Active" if getdate(warranty_end_date) >= getdate(nowdate()) else "Expired"
+
+
 def get_equipment_warranty_status(equipment) -> str:
 	doc = (
 		equipment if getattr(equipment, "doctype", None) else frappe.get_doc("Installed Equipment", equipment)
 	)
-	if not doc.warranty_end_date:
-		return "Not Applicable"
-	return "Active" if getdate(doc.warranty_end_date) >= getdate(nowdate()) else "Expired"
+	return warranty_status_for(doc.warranty_end_date)
 
 
 def apply_warranty_projection(doc) -> None:
