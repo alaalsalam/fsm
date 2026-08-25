@@ -1,0 +1,42 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "autoname": "format:FSM-CERT-{YYYY}-{#####}",
+ "creation": "2026-08-25 00:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": ["service_report","service_job","installed_equipment","certificate_type","revision","generation_key","status","customer","company","customer_site","issued_on","revoked_on","revocation_reason","snapshot"],
+ "fields": [
+  {"fieldname":"service_report","fieldtype":"Link","label":"Service Report","options":"Service Report","reqd":1},
+  {"fieldname":"service_job","fieldtype":"Link","label":"Service Job","options":"Service Job","read_only":1,"reqd":1},
+  {"fieldname":"installed_equipment","fieldtype":"Link","label":"Installed Equipment","options":"Installed Equipment"},
+  {"fieldname":"certificate_type","fieldtype":"Select","label":"Certificate Type","options":"Refill Certificate\nHydro Test Certificate","reqd":1},
+  {"default":"1","fieldname":"revision","fieldtype":"Int","label":"Revision","read_only":1},
+  {"fieldname":"generation_key","fieldtype":"Data","label":"Generation Key","read_only":1,"unique":1},
+  {"default":"Issued","fieldname":"status","fieldtype":"Select","label":"Status","options":"Issued\nRevoked","read_only":1,"reqd":1},
+  {"fieldname":"customer","fieldtype":"Link","label":"Customer","options":"Customer","read_only":1,"reqd":1},
+  {"fieldname":"company","fieldtype":"Link","label":"Company","options":"Company","read_only":1,"reqd":1},
+  {"fieldname":"customer_site","fieldtype":"Link","label":"Customer Site","options":"Customer Site","read_only":1},
+  {"fieldname":"issued_on","fieldtype":"Datetime","label":"Issued On","read_only":1,"reqd":1},
+  {"fieldname":"revoked_on","fieldtype":"Datetime","label":"Revoked On","read_only":1},
+  {"fieldname":"revocation_reason","fieldtype":"Small Text","label":"Revocation Reason","read_only":1},
+  {"fieldname":"snapshot","fieldtype":"Code","label":"Certificate Snapshot","options":"JSON","read_only":1,"reqd":1}
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-08-25 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Field Service Management",
+ "name": "Service Certificate",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {"create":1,"delete":1,"email":1,"export":1,"print":1,"read":1,"report":1,"role":"System Manager","share":1,"write":1},
+  {"create":1,"email":1,"export":1,"print":1,"read":1,"report":1,"role":"FSM Manager","share":1,"write":1},
+  {"read":1,"role":"FSM Technician"},
+  {"read":1,"print":1,"role":"FSM Customer"}
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

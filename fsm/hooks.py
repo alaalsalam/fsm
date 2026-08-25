@@ -156,6 +156,8 @@ permission_query_conditions = {
 	"Inspection Template": "fsm.security.permissions.inspection_template_query",
 	"Equipment Inspection": "fsm.security.permissions.equipment_inspection_query",
 	"Failure Analysis": "fsm.security.permissions.failure_analysis_query",
+	"Service Report": "fsm.security.permissions.service_report_query",
+	"Service Certificate": "fsm.security.permissions.service_certificate_query",
 }
 
 has_permission = {
@@ -177,6 +179,8 @@ has_permission = {
 	"Inspection Template": "fsm.security.permissions.inspection_template_permission",
 	"Equipment Inspection": "fsm.security.permissions.equipment_inspection_permission",
 	"Failure Analysis": "fsm.security.permissions.job_child_permission",
+	"Service Report": "fsm.security.permissions.job_child_permission",
+	"Service Certificate": "fsm.security.permissions.job_child_permission",
 }
 
 # Document Events

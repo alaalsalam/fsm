@@ -307,6 +307,14 @@ def failure_analysis_query(user: str | None = None) -> str:
 	return job_child_query("Failure Analysis", user=user)
 
 
+def service_report_query(user: str | None = None) -> str:
+	return job_child_query("Service Report", user=user)
+
+
+def service_certificate_query(user: str | None = None) -> str:
+	return job_child_query("Service Certificate", user=user)
+
+
 def message_query(user: str | None = None) -> str:
 	return job_child_query("Service Job Message", user=user)
 

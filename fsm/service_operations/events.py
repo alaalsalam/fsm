@@ -78,6 +78,13 @@ def _links(reference) -> dict:
 			"service_job": job.name,
 			"installed_equipment": reference.installed_equipment,
 		}
+	if reference.doctype in {"Service Report", "Service Certificate"}:
+		job = frappe.get_cached_doc("Service Job", reference.service_job)
+		return {
+			"service_request": job.service_request,
+			"service_job": job.name,
+			"installed_equipment": reference.get("installed_equipment"),
+		}
 	return {}
 
 
