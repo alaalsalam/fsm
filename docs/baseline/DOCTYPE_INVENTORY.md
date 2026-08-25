@@ -94,3 +94,6 @@ stock respectively.
 
 `Service Report` owns an approved immutable Job snapshot and revision chain. `Service Certificate` owns issued
 Refill/Hydro evidence derived from a Submitted report. Neither duplicates ERPNext sales, stock or accounting state.
+
+Phase 10 adds no DocType. Quotation and Sales Invoice receive only an `fsm_service_job` correlation custom field;
+Service Job receives `travel_cost` for operational profitability.

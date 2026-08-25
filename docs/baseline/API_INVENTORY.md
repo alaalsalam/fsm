@@ -134,3 +134,8 @@ introduced.
 
 `fsm.reporting` exposes ten scoped command/query endpoints for report generation/update/transition/revision,
 certificate issue/revocation, and authorized list/get projections. Current whitelist decorator count: **164**.
+## Post-baseline Phase 10 delta
+
+`fsm.commercial` adds six scoped endpoints for classification, native Quotation/Sales Invoice creation, payment
+projection and profitability. Current whitelist decorator count: **170**. `fsm.api.create_invoice_from_job` remains
+a compatibility route into the same billable-only native invoice implementation.

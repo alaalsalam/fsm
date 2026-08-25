@@ -43,3 +43,4 @@ No new screen is approved unless it has one domain owner, one primary aggregate,
 | Repair work | Existing Service Job plus Service Time Log | No Repair Order screen or DocType | FSM Operations |
 | Estimate / billing / stock | ERPNext Quotation / Sales Invoice / Stock Entry | Link and project native documents only | ERPNext Selling/Accounts/Stock |
 | Reports and certificates | Service Report / Service Certificate | Shared `ReportingApi`; Console/Portal/Mobile presentation in their completion phases | FSM Reporting |
+| Commercial integration | Job commercial panel plus native ERPNext links | Shared `CommercialApi`; no FSM accounting screens | FSM classification / ERPNext financial authority |

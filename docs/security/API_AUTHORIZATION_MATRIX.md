@@ -248,3 +248,9 @@ Generation/update/transition/revision and certificate issue/revoke commands auth
 any guarded write. Verification, submission, issue and revocation are Manager-only. List/get methods use Job-root
 scope. Accepted fields are fixed; generation keys are unique; Submitted reports are immutable. Coverage is in
 `fsm.tests.test_reporting`.
+## Commercial endpoint delta (6 additions)
+
+Classification and payment views authorize exact Job read scope. Native Quotation/Sales Invoice creation and
+profitability require exact Manager Job/Company scope. Guarded native-document inserts are necessary because FSM
+Manager does not receive broad ERPNext Accounts/Selling roles. Coverage chooses billable rows server-side and no
+generic document fields are accepted. Coverage is in `fsm.tests.test_commercial`.
