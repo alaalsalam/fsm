@@ -260,3 +260,11 @@ generic document fields are accepted. Coverage is in `fsm.tests.test_commercial`
 Quotation/Sales Invoice rows are filtered by already-authorized owned Job names and a fixed public field list.
 Internal costs, stock, staff notes and cross-customer rows are excluded and tested in
 `fsm.tests.test_portal_completion`.
+
+## Analytics completion endpoint delta (1 addition)
+
+| Endpoint | Access and accepted input | Root guard/scope | Bypass decision |
+|---|---|---|---|
+| `domain_dashboard` | FSM Manager/System Manager; bounded 1–730 day window | server-resolved Manager Company; every operational root is Company scoped before child projections | none; read-only aggregation |
+
+Cross-company isolation and non-manager denial are covered in `fsm.tests.test_analytics_completion`.

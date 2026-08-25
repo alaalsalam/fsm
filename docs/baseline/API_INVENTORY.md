@@ -143,3 +143,9 @@ a compatibility route into the same billable-only native invoice implementation.
 
 `fsm.portal.get_my_portal_hub` is the customer-safe dashboard contract. Current whitelist decorator count: **171**.
 It exposes fixed operational/commercial projections only after Contact→Customer ownership is established.
+
+## Post-baseline Phase 12 delta
+
+`fsm.analytics.domain_dashboard` adds the company-scoped executive, operations, maintenance, team, contract and
+equipment scorecard. Current whitelist decorator count: **172**. The endpoint is read-only and the shared
+`DomainDashboard` client contract is consumed by Console.
