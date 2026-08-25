@@ -354,3 +354,45 @@ def job_child_permission(doc, user: str | None = None, permission_type: str | No
 	):
 		return False
 	return True
+
+
+def company_master_query(doctype: str, user: str | None = None) -> str:
+	"""Company-scope reads of sensitive people/team masters (technician phone and
+	GPS, subcontractor rates, team rosters). Managers see their permitted
+	companies; technicians see only their own company's records."""
+	user = user or frappe.session.user
+	roles = user_roles(user)
+	if SYSTEM_MANAGER in roles:
+		return ""
+	if FSM_MANAGER in roles:
+		return sql_in_condition(f"`tab{doctype}`.`company`", allowed_companies(user) or set())
+	if FSM_TECHNICIAN in roles:
+		company = frappe.db.get_value("Technician", {"user": user}, "company")
+		return f"`tab{doctype}`.`company` = {frappe.db.escape(company or '__none__')}"
+	return "1=0"
+
+
+def technician_query(user: str | None = None) -> str:
+	return company_master_query("Technician", user=user)
+
+
+def subcontractor_query(user: str | None = None) -> str:
+	return company_master_query("Subcontractor", user=user)
+
+
+def service_team_query(user: str | None = None) -> str:
+	return company_master_query("Service Team", user=user)
+
+
+def company_master_permission(doc, user: str | None = None, permission_type: str | None = None):
+	user = user or frappe.session.user
+	roles = user_roles(user)
+	if SYSTEM_MANAGER in roles:
+		return True
+	if FSM_MANAGER in roles:
+		companies = allowed_companies(user)
+		return companies is None or doc.company in companies
+	if FSM_TECHNICIAN in roles:
+		company = frappe.db.get_value("Technician", {"user": user}, "company")
+		return bool(company) and doc.company == company
+	return False

@@ -25,7 +25,8 @@ def get_stock_levels(
 	"""
 	user = require_authenticated()
 	roles = user_roles(user)
-	if FSM_TECHNICIAN in roles and not ({FSM_MANAGER, SYSTEM_MANAGER} & roles):
+	technician_only = FSM_TECHNICIAN in roles and not ({FSM_MANAGER, SYSTEM_MANAGER} & roles)
+	if technician_only:
 		own_technician = current_technician(user)
 		if technician and technician != own_technician:
 			frappe.throw(_("You can only view your own van stock."), frappe.PermissionError)
@@ -36,7 +37,14 @@ def get_stock_levels(
 		)
 		if not technician_values:
 			frappe.throw(_("Technician not found."))
-		warehouse = technician_values.warehouse or warehouse
+		if technician_only:
+			# A technician's stock view is exactly their van warehouse — never a
+			# caller-supplied warehouse and never the all-warehouses fallback.
+			if not technician_values.warehouse:
+				return []
+			warehouse = technician_values.warehouse
+		else:
+			warehouse = technician_values.warehouse or warehouse
 		if FSM_MANAGER in roles and SYSTEM_MANAGER not in roles:
 			require_company_scope(technician_values.company, user)
 	if not ({FSM_MANAGER, FSM_TECHNICIAN, SYSTEM_MANAGER} & roles):

@@ -158,6 +158,9 @@ permission_query_conditions = {
 	"Failure Analysis": "fsm.security.permissions.failure_analysis_query",
 	"Service Report": "fsm.security.permissions.service_report_query",
 	"Service Certificate": "fsm.security.permissions.service_certificate_query",
+	"Technician": "fsm.security.permissions.technician_query",
+	"Subcontractor": "fsm.security.permissions.subcontractor_query",
+	"Service Team": "fsm.security.permissions.service_team_query",
 }
 
 has_permission = {
@@ -181,6 +184,9 @@ has_permission = {
 	"Failure Analysis": "fsm.security.permissions.job_child_permission",
 	"Service Report": "fsm.security.permissions.job_child_permission",
 	"Service Certificate": "fsm.security.permissions.job_child_permission",
+	"Technician": "fsm.security.permissions.company_master_permission",
+	"Subcontractor": "fsm.security.permissions.company_master_permission",
+	"Service Team": "fsm.security.permissions.company_master_permission",
 }
 
 # Document Events
