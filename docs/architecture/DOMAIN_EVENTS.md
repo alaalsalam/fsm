@@ -8,14 +8,18 @@ Status: **CORE operational audit implemented**.
 
 ## Implemented catalogue
 
-| Domain | Event types |
-|---|---|
-| Request | `request.opened`, `request.triaged`, `request.converted`, `request.closed`, `request.cancelled` |
-| Job | `job.created.from_request`, `job.planned`, `job.scheduled`, `job.dispatched`, `job.started`, `job.started.from_visit`, `job.held`, `job.resumed`, `job.cancelled`, `job.completed`, `job.phase.changed` |
-| Visit | `visit.created`, `visit.dispatched`, `visit.travel.started`, `visit.checked_in`, `visit.work.started`, `visit.checked_out`, `visit.completed`, `visit.cancelled` |
+| Domain              | Event types                                                                                                                                                                                                 |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Request             | `request.opened`, `request.triaged`, `request.converted`, `request.closed`, `request.cancelled`                                                                                                             |
+| Job                 | `job.created.from_request`, `job.planned`, `job.scheduled`, `job.dispatched`, `job.started`, `job.started.from_visit`, `job.held`, `job.resumed`, `job.cancelled`, `job.completed`, `job.phase.changed`     |
+| Visit               | `visit.created`, `visit.dispatched`, `visit.travel.started`, `visit.checked_in`, `visit.work.started`, `visit.checked_out`, `visit.completed`, `visit.cancelled`                                            |
 | Installed Equipment | `EquipmentProvisioned`, `InstallationConfirmed`, `EquipmentActivated`, `EquipmentMoved`, `EquipmentReturned`, `EquipmentDeactivated`, `EquipmentLinkedToJob`, `EquipmentStatusChanged`, `DeliveryCancelled` |
+| Materials           | `MaterialShortageRequested`, `MaterialsReserved`, `MaterialsTransferred`, `MaterialsIssued`, `MaterialsConsumed`, `MaterialsReturned`                                                                       |
 
 Rejected commands write no lifecycle fact. Read access to timelines is authorized against the referenced Request, Job, Visit or Installed Equipment root. Equipment History is a projection over these events and linked Job events; no duplicate history table exists.
+
+ERPNext Material Request, Pick List, Stock Entry and Stock Ledger Entry remain the transaction authority; these
+events are correlations for the Service Job timeline, not a replacement stock ledger.
 
 ## Not claimed by CORE
 
