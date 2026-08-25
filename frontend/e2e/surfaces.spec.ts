@@ -140,6 +140,71 @@ test("console follows Request to Job to Visit", async ({ page }) => {
 	expect(errors).toEqual([]);
 });
 
+test("console lists contract coverage and remaining entitlements", async ({ page }) => {
+	await mockConsoleSession(page);
+	await page.route(/\/api\/(method|resource)\//, (route) => {
+		const url = route.request().url();
+		if (url.includes("list_contracts"))
+			return json(route, {
+				message: [
+					{
+						name: "FSM-CON-2026-00001",
+						contract_no: "FSM-CON-2026-00001",
+						customer: "Customer A",
+						company: "Company A",
+						status: "Active",
+						start_date: "2026-01-01",
+						end_date: "2026-12-31",
+						expiring_soon: 0,
+						renewal_recommended: 0,
+					},
+				],
+			});
+		if (url.includes("get_contract"))
+			return json(route, {
+				message: {
+					name: "FSM-CON-2026-00001",
+					contract_no: "FSM-CON-2026-00001",
+					customer: "Customer A",
+					company: "Company A",
+					status: "Active",
+					start_date: "2026-01-01",
+					end_date: "2026-12-31",
+					included_visits: 2,
+					emergency_visits: 0,
+					response_sla_hours: 4,
+					resolution_sla_hours: 24,
+					covered_equipment: [],
+					coverage_rules: [
+						{
+							name: "RULE-1",
+							rule_name: "Standard PM",
+							service_type: "Preventive Maintenance",
+							classification: "Contract Covered",
+						},
+					],
+					entitlements: [
+						{
+							name: "ENT-1",
+							entitlement_type: "Visit",
+							service_type: "Preventive Maintenance",
+							included_quantity: 2,
+							used_quantity: 0,
+							remaining_quantity: 2,
+							active: 1,
+						},
+					],
+				},
+			});
+		return route.fallback();
+	});
+	await page.goto("http://127.0.0.1:4174/fsm-console/contracts");
+	await expect(page.getByRole("heading", { name: "Service Contracts & AMC" })).toBeVisible();
+	await page.getByText("FSM-CON-2026-00001").first().click();
+	await expect(page.getByText("Standard PM")).toBeVisible();
+	await expect(page.getByText("2 / 2")).toBeVisible();
+});
+
 test("portal account shows requests and their related active job", async ({ page }) => {
 	await page.route(/\/api\/(method|resource)\//, (route) => {
 		const url = route.request().url();
