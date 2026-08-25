@@ -527,6 +527,27 @@ export function getTechnicianUtilization(days = 90): Promise<TechUtilization> {
 	return client.call<TechUtilization>("fsm.analytics.technician_utilization", { days }, "GET");
 }
 
+export interface DomainDashboard {
+	window_days: number;
+	company: string;
+	executive: Record<string, number>;
+	operations: ServicePerformance;
+	maintenance: Record<string, number | null>;
+	teams: Array<Record<string, string | number | null>>;
+	contracts: Record<string, number>;
+	equipment: {
+		failures: number;
+		repeat_failures: number;
+		repair: number;
+		replacement: number;
+		model_trends: Record<string, number>;
+	};
+}
+
+export function getDomainDashboard(days = 90): Promise<DomainDashboard> {
+	return client.call<DomainDashboard>("fsm.analytics.domain_dashboard", { days }, "GET");
+}
+
 export interface ApiKeys {
 	user: string;
 	api_key: string;

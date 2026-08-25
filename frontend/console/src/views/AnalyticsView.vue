@@ -6,10 +6,12 @@ import {
 	getWorkorderVolume,
 	getInventoryUsage,
 	getTechnicianUtilization,
+	getDomainDashboard,
 	type ServicePerformance,
 	type WorkorderVolume,
 	type InventoryUsage,
 	type TechUtilization,
+	type DomainDashboard,
 } from "@/lib/fsm";
 
 const days = ref(90);
@@ -19,6 +21,7 @@ const perf = ref<ServicePerformance | null>(null);
 const volume = ref<WorkorderVolume | null>(null);
 const usage = ref<InventoryUsage | null>(null);
 const util = ref<TechUtilization | null>(null);
+const domains = ref<DomainDashboard | null>(null);
 
 const fmt = (n: number | null | undefined, suffix = "") => (n == null ? "—" : `${n}${suffix}`);
 const currency = (n: number) =>
@@ -45,11 +48,12 @@ async function load() {
 	loading.value = true;
 	error.value = "";
 	try {
-		[perf.value, volume.value, usage.value, util.value] = await Promise.all([
+		[perf.value, volume.value, usage.value, util.value, domains.value] = await Promise.all([
 			getServicePerformance(days.value),
 			getWorkorderVolume(days.value),
 			getInventoryUsage(days.value),
 			getTechnicianUtilization(days.value),
+			getDomainDashboard(days.value),
 		]);
 	} catch {
 		error.value = "Couldn't load analytics.";
@@ -97,6 +101,41 @@ onMounted(load);
 		</div>
 
 		<div v-else class="space-y-6">
+			<section>
+				<h2 class="mb-3 text-lg font-bold">Executive & maintenance</h2>
+				<div class="grid grid-cols-2 gap-3 lg:grid-cols-6">
+					<KpiCard
+						label="Customers"
+						:value="domains?.executive.customers ?? '—'"
+						tone="brand"
+					/>
+					<KpiCard
+						label="Sites"
+						:value="domains?.executive.sites ?? '—'"
+						tone="neutral"
+					/>
+					<KpiCard
+						label="Equipment"
+						:value="domains?.executive.installed_equipment ?? '—'"
+						tone="neutral"
+					/>
+					<KpiCard
+						label="Active contracts"
+						:value="domains?.executive.active_contracts ?? '—'"
+						tone="success"
+					/>
+					<KpiCard
+						label="PM overdue"
+						:value="domains?.maintenance.overdue ?? '—'"
+						tone="danger"
+					/>
+					<KpiCard
+						label="Gross margin"
+						:value="currency(domains?.executive.gross_margin ?? 0)"
+						tone="warning"
+					/>
+				</div>
+			</section>
 			<div class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
 				<KpiCard
 					label="First-time fix"
