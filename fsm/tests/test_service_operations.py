@@ -3,9 +3,10 @@ from frappe.tests.utils import FrappeTestCase
 from frappe.utils import add_to_date, now_datetime
 
 from fsm.api import _default_customer_group, _default_territory
+from fsm.service_operations.api import get_service_request, list_service_requests
 from fsm.service_operations.commands import (
-	cancel_request,
 	cancel_job,
+	cancel_request,
 	cancel_visit,
 	check_in_visit,
 	check_out_visit,
@@ -25,7 +26,6 @@ from fsm.service_operations.commands import (
 	start_visit_work,
 	triage_request,
 )
-from fsm.service_operations.api import get_service_request, list_service_requests
 from fsm.tests.test_security import SecurityFixture
 
 
@@ -34,23 +34,40 @@ class TestCanonicalServiceOperations(FrappeTestCase):
 		super().setUp()
 		frappe.set_user("Administrator")
 		self.company = "_Test Company"
-		self.customer = frappe.get_doc(
-			{
-				"doctype": "Customer", "customer_name": f"CORE {frappe.generate_hash(length=8)}",
-				"customer_type": "Individual", "customer_group": _default_customer_group(),
-				"territory": _default_territory(),
-			}
-		).insert(ignore_permissions=True).name
-		self.technician = frappe.get_doc(
-			{
-				"doctype": "Technician", "technician_name": f"CORE Tech {frappe.generate_hash(length=8)}",
-				"user": "Administrator", "company": self.company, "active": 1,
-			}
-		).insert(ignore_permissions=True).name
+		self.customer = (
+			frappe.get_doc(
+				{
+					"doctype": "Customer",
+					"customer_name": f"CORE {frappe.generate_hash(length=8)}",
+					"customer_type": "Individual",
+					"customer_group": _default_customer_group(),
+					"territory": _default_territory(),
+				}
+			)
+			.insert(ignore_permissions=True)
+			.name
+		)
+		self.technician = (
+			frappe.get_doc(
+				{
+					"doctype": "Technician",
+					"technician_name": f"CORE Tech {frappe.generate_hash(length=8)}",
+					"user": "Administrator",
+					"company": self.company,
+					"active": 1,
+				}
+			)
+			.insert(ignore_permissions=True)
+			.name
+		)
 		request = frappe.get_doc(
 			{
-				"doctype": "Service Request", "company": self.company, "customer": self.customer,
-				"subject": "Canonical request", "status": "Open", "source": "Manual",
+				"doctype": "Service Request",
+				"company": self.company,
+				"customer": self.customer,
+				"subject": "Canonical request",
+				"status": "Open",
+				"source": "Manual",
 			}
 		)
 		request.flags.fsm_command = True
@@ -117,9 +134,15 @@ class TestCanonicalServiceOperations(FrappeTestCase):
 			doc.save()
 		with self.assertRaises(frappe.PermissionError):
 			frappe.get_doc(
-				{"doctype": "Service Event Log", "event_id": frappe.generate_hash(),
-				 "event_type": "forged", "reference_doctype": "Service Job",
-				 "reference_name": job, "event_time": now_datetime(), "source": "API"}
+				{
+					"doctype": "Service Event Log",
+					"event_id": frappe.generate_hash(),
+					"event_type": "forged",
+					"reference_doctype": "Service Job",
+					"reference_name": job,
+					"event_time": now_datetime(),
+					"source": "API",
+				}
 			).insert(ignore_permissions=True)
 
 	def test_checklist_does_not_complete_job(self):
@@ -185,7 +208,14 @@ class TestCanonicalServiceOperations(FrappeTestCase):
 		first = create_visit(job, primary_technician=self.technician).name
 		second = create_visit(job, primary_technician=self.technician).name
 		dispatch_job(job, self.technician)
-		for command in (dispatch_visit, start_travel, check_in_visit, start_visit_work, check_out_visit, complete_visit):
+		for command in (
+			dispatch_visit,
+			start_travel,
+			check_in_visit,
+			start_visit_work,
+			check_out_visit,
+			complete_visit,
+		):
 			command(first)
 		self.assertEqual(frappe.db.get_value("Service Job", job, "status"), "In Progress")
 		self.assertEqual(frappe.db.get_value("Service Visit", second, "status"), "Planned")
@@ -208,9 +238,9 @@ class TestCanonicalServiceOperations(FrappeTestCase):
 	def test_direct_visit_create_is_blocked(self):
 		job = self._scheduled_job()
 		with self.assertRaises(frappe.PermissionError):
-			frappe.get_doc(
-				{"doctype": "Service Visit", "service_job": job, "visit_number": 1}
-			).insert(ignore_permissions=True)
+			frappe.get_doc({"doctype": "Service Visit", "service_job": job, "visit_number": 1}).insert(
+				ignore_permissions=True
+			)
 
 
 class TestCoreAuthorization(SecurityFixture):

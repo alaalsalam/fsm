@@ -10,9 +10,9 @@ from fsm.api import (
 	complete_job,
 	get_dashboard_stats,
 	get_dispatch_jobs,
-	get_my_requests,
 	get_my_job,
 	get_my_jobs,
+	get_my_requests,
 	get_portal_session,
 	register_customer,
 )
@@ -136,27 +136,27 @@ class SecurityFixture(FrappeTestCase):
 
 	def _make_job(self, company: str, customer: str, technician: str) -> str:
 		doc = frappe.get_doc(
-				{
-					"doctype": "Service Job",
-					"company": company,
-					"customer": customer,
-					"primary_technician": technician,
-					"status": "In Progress",
-				}
+			{
+				"doctype": "Service Job",
+				"company": company,
+				"customer": customer,
+				"primary_technician": technician,
+				"status": "In Progress",
+			}
 		)
 		doc.flags.fsm_command = True
 		return doc.insert(ignore_permissions=True).name
 
 	def _make_request(self, company: str, customer: str) -> str:
 		doc = frappe.get_doc(
-				{
-					"doctype": "Service Request",
-					"company": company,
-					"customer": customer,
-					"subject": f"Request for {customer}",
-					"phone": "+49123456789",
-					"status": "Open",
-				}
+			{
+				"doctype": "Service Request",
+				"company": company,
+				"customer": customer,
+				"subject": f"Request for {customer}",
+				"phone": "+49123456789",
+				"status": "Open",
+			}
 		)
 		doc.flags.fsm_command = True
 		return doc.insert(ignore_permissions=True).name

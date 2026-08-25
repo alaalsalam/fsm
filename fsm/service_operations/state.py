@@ -3,7 +3,6 @@ from __future__ import annotations
 import frappe
 from frappe import _
 
-
 REQUEST_TRANSITIONS = {
 	"Draft": {"Open", "Cancelled"},
 	"Open": {"Triaged", "Converted", "Closed", "Cancelled"},
