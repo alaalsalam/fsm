@@ -487,3 +487,34 @@ test("mobile job displays multiple linked equipment records", async ({ page }) =
 	await expect(page.getByText("FSM-EQ-000001")).toBeVisible();
 	await expect(page.getByText("FSM-EQ-000002")).toBeVisible();
 });
+
+test("portal switches English LTR to Arabic RTL without overflow", async ({ page }) => {
+	await page.route(/\/api\/(method|resource)\//, (route) =>
+		json(route, { message: { authenticated: false } }),
+	);
+	await page.goto("http://127.0.0.1:4175/");
+	await expect(page.locator("html")).toHaveAttribute("lang", "en");
+	await expect(page.locator("html")).toHaveAttribute("dir", "ltr");
+	await expect(page.getByRole("heading", { name: "Request a service" })).toBeVisible();
+	await page.getByRole("button", { name: "Switch language to Arabic" }).click();
+	await expect(page.locator("html")).toHaveAttribute("lang", "ar");
+	await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
+	await expect(page.getByRole("heading", { name: "اطلب خدمة" })).toBeVisible();
+	expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+		true,
+	);
+});
+
+test("mobile switches English LTR to Arabic RTL without overflow", async ({ page }) => {
+	await page.route(/\/api\/(method|resource)\//, (route) => json(route, { message: [] }));
+	await page.goto("http://127.0.0.1:4176/jobs");
+	await expect(page.locator("html")).toHaveAttribute("dir", "ltr");
+	await expect(page.getByText("My jobs", { exact: true })).toBeVisible();
+	await page.getByRole("button", { name: "Switch language to Arabic" }).click();
+	await expect(page.locator("html")).toHaveAttribute("lang", "ar");
+	await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
+	await expect(page.getByText("أعمالي", { exact: true })).toBeVisible();
+	expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+		true,
+	);
+});
