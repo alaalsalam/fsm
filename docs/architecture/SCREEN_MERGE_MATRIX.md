@@ -42,3 +42,4 @@ No new screen is approved unless it has one domain owner, one primary aggregate,
 | Returns / RMA / workshop | One Service Return lifecycle linked to Service Job | Shared `WorkshopApi`; Console evidence-rich presentation completed in the later UX screen pass | FSM Workshop/RMA |
 | Repair work | Existing Service Job plus Service Time Log | No Repair Order screen or DocType | FSM Operations |
 | Estimate / billing / stock | ERPNext Quotation / Sales Invoice / Stock Entry | Link and project native documents only | ERPNext Selling/Accounts/Stock |
+| Reports and certificates | Service Report / Service Certificate | Shared `ReportingApi`; Console/Portal/Mobile presentation in their completion phases | FSM Reporting |

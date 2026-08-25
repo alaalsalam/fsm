@@ -96,8 +96,10 @@ erDiagram
 | Fire Extinguisher profile | Implemented specialization on Installed Equipment | FSM Fire Safety | physical-unit nameplate and refill/hydro history only; Item and stock remain ERPNext |
 | Failure Analysis | Implemented | FSM Quality / RCA | diagnostic child aggregate linked to one Job Equipment; never a work order or silent Job state owner |
 | Service Return | Implemented | FSM Workshop / RMA | custody and workshop lifecycle linked to the canonical Service Job; never a second work order |
+| Service Report | Implemented | FSM Reporting | immutable approved Job snapshot with N+1 revisions |
+| Service Certificate | Implemented | FSM Reporting | issued evidence derived only from a Submitted Service Report |
 
-Reporting and other later-phase concepts remain design-only.
+Other later-phase concepts remain design-only.
 
 ## Aggregate boundary
 

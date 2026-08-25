@@ -25,6 +25,8 @@ Status: **CORE slice implemented and verified**. Only the named owner authors st
 | Inspection Template                        | Draft, Active, Inactive, Archived                                                                                              | FSM Inspections command service                                     | scoped Manager/System Manager                                                | Mobile, Console, Equipment Inspection      |
 | Equipment Inspection                       | In Progress, Completed, Cancelled; result Pending/Pass/Fail/Needs Refill/Needs Repair/Needs Replacement/Not Accessible/Skipped | FSM Inspections commands and server outcome engine                  | scoped Manager or assigned Job Technician                                    | Job/equipment history, reports, later RCA  |
 | Failure Analysis                           | Draft, Inspection, Analysis, Root Cause Identified, Corrective Action, Verification, Closed, Cancelled                       | FSM RCA command service                                             | scoped Manager or exact assigned Job Technician                              | Job/equipment history, reports, workshop   |
+| Service Report | Draft, Generated, Customer Review, Customer Signed, Verified, Submitted | FSM Reporting commands | scoped Job actor; Manager verifies/submits | Console, Portal, Mobile, certificates |
+| Service Certificate | Issued, Revoked | FSM Reporting commands | scoped Manager/System Manager | Portal and equipment history |
 
 ## Projection rules
 

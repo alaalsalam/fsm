@@ -89,3 +89,8 @@ Installed Equipment and Equipment Inspection. It is not an additional work-order
 The existing `Service Return` root was extended into the canonical pickup/RMA/workshop case. No `Repair Order`
 DocType was added. ERPNext Quotation, Sales Invoice and Stock Entry remain authoritative for estimate, billing and
 stock respectively.
+
+## Post-baseline Phase 9 roots
+
+`Service Report` owns an approved immutable Job snapshot and revision chain. `Service Certificate` owns issued
+Refill/Hydro evidence derived from a Submitted report. Neither duplicates ERPNext sales, stock or accounting state.

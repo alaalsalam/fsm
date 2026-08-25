@@ -70,3 +70,9 @@ SwiftService contains 79 DocTypes (21 standalone and 58 child tables), 113 white
 | Estimate, invoice and parts stock | Duplicate of ERPNext | Native Quotation, Sales Invoice and Stock Entry only |
 
 No SwiftService source code was copied.
+
+## Phase 9 reporting disposition
+
+Service/inspection/PM reports and refill/hydro certificates were implemented clean-room as versioned approved FSM
+snapshots. Any invoicing, payment or stock facts remain references to ERPNext and were classified as duplicates,
+not reimplemented. No SwiftService source code was copied.

@@ -241,3 +241,10 @@ in `fsm.tests.test_failure_analysis`.
 
 Workshop ownership, evidence guards, cross-company rejection and native Stock Entry coverage are in
 `fsm.tests.test_workshop`.
+
+## Reporting endpoint delta (10 additions)
+
+Generation/update/transition/revision and certificate issue/revoke commands authorize the exact parent Job before
+any guarded write. Verification, submission, issue and revocation are Manager-only. List/get methods use Job-root
+scope. Accepted fields are fixed; generation keys are unique; Submitted reports are immutable. Coverage is in
+`fsm.tests.test_reporting`.

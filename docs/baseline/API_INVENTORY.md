@@ -129,3 +129,8 @@ Workshop/RMA extends the existing returns module with `create_workshop_case`, `u
 `transition_workshop_case`; `create_return` and `process_return` remain compatibility paths into the same aggregate.
 The shared `WorkshopApi` is the typed consumer contract. No generic CRUD endpoint or parallel Repair Order API was
 introduced.
+
+## Post-baseline Phase 9 delta
+
+`fsm.reporting` exposes ten scoped command/query endpoints for report generation/update/transition/revision,
+certificate issue/revocation, and authorized list/get projections. Current whitelist decorator count: **164**.
