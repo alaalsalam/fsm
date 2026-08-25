@@ -65,3 +65,11 @@ export {
 	type WorkshopOutcome,
 	type WorkshopCase,
 } from "./src/workshop";
+export {
+	ReportingApi,
+	type ServiceReportType,
+	type ServiceReportStatus,
+	type CertificateType,
+	type ServiceReport,
+	type ServiceCertificate,
+} from "./src/reporting";
