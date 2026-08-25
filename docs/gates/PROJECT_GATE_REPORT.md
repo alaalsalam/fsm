@@ -25,7 +25,7 @@
 | 12 | ANALYTICS | PASS |
 | 13 | MOBILE-FUNCTIONAL | PASS |
 | 14 | UX-RTL | **PASS** — shared bilingual locale, responsive RTL evidence |
-| 15 | HARDENING | NOT STARTED — unlocked |
+| 15 | HARDENING | **PASS** (2026-08-26) — 143/143 backend, 17/17 frontend, 28/28 E2E, 0 unresolved critical/high security findings (1 high + 3 medium found and fixed), N+1 fixed 201→2 queries, PM 500-unit campaign idempotent, migrate ×2 no-op, bundle split + LOW residual. See `HARDENING_GATE_REPORT.md`. |
 | 16 | UAT | NOT STARTED — locked by hardening |
 | 17 | FINAL MOBILE RELEASE | NOT STARTED — locked by hardening/UAT |
 
@@ -49,9 +49,9 @@ No final Release APK or AAB was built because Phase 17 is explicitly locked unti
 
 ## Exact remaining scope
 
-1. Execute Phase 15 full regression, realistic-volume performance profiling and renewed security audit.
+1. ~~Execute Phase 15 full regression, realistic-volume performance profiling and renewed security audit.~~ **DONE — HARDENING-GATE PASS (2026-08-26).**
 2. Execute the two complete Phase 16 UAT lifecycles with recorded evidence.
 3. Only then clean/package/sign/test Android Release APK+AAB and record their SHA256 values.
 
-This repository has passed the functional and UX/RTL gates through Phase 14, but it is **not yet
-production/release ready** until Phases 15–17 pass.
+This repository has passed all gates through Phase 15 (Hardening), but it is **not yet
+production/release ready** until Phases 16–17 pass.
