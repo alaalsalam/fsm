@@ -1,4 +1,4 @@
-import { createClient, Auth } from "@kodlyft/api";
+import { createClient, Auth, InspectionsApi } from "@kodlyft/api";
 import { Preferences } from "@capacitor/preferences";
 
 const TOKEN_KEY = "fsm_token";
@@ -12,6 +12,7 @@ export const client = createClient({
 });
 
 export const auth = new Auth(client);
+export const inspections = new InspectionsApi(client);
 
 export async function setToken(token: string): Promise<void> {
 	await Preferences.set({ key: TOKEN_KEY, value: token });

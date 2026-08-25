@@ -35,3 +35,12 @@ export {
 	type MaintenanceSummary,
 	type CreateMaintenancePlanInput,
 } from "./src/maintenance";
+export {
+	InspectionsApi,
+	type InspectionResponseType,
+	type InspectionOverallResult,
+	type InspectionResultRow,
+	type EquipmentInspection,
+	type InspectionTemplateSummary,
+	type InspectionResponseInput,
+} from "./src/inspections";
