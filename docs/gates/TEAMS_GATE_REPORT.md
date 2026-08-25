@@ -1,6 +1,6 @@
 # Phase 1 — Service Teams & Dispatch — Gate Report
 
-**Date:** 2026-08-24
+**Date:** 2026-08-25
 **Branch:** `develop`
 **Pre-phase HEAD:** `b79b8c7` (PRE-FEATURE-GATE PASS)
 
@@ -73,10 +73,11 @@ Service Job / Service Visit — reusing ERPNext + existing FSM masters, no dupli
 | Test module byte-compiles | ✅ OK |
 | AST parse of engine/api/controller | ✅ OK |
 
-## Gate status — **TEAMS-GATE: FAIL (cycle 1) → remediated, PENDING cycle-2 test run**
+## Gate status — **TEAMS-GATE: PASS (cycle 3, isolated production-clone evidence)**
 
-Cycle 1 failed on a test-only ImportError (details below). Remediated test-side; awaiting a clean
-test-environment run to certify. No implementation/schema change in the remediation.
+Cycles 1 and 2 are retained below as historical evidence. Cycle 3 used the authorized isolated site
+`digit16.digit-erp.com`, restored from a fresh `pro.digit-erp.com` backup, and passed the complete
+backend and frontend gates. No production data or application code was modified.
 
 ### ⚠ Deployment ordering (important)
 `get_dispatch_jobs` now selects `assigned_service_team` and `team_leader`. Until migrate lands, those
@@ -211,5 +212,66 @@ No digit16 data modified or deleted; no other site created, dropped, restored, o
 2. Phase-1-relevant E2E (Playwright, `frontend/e2e`) on the same evidence pass.
 
 Frontend typecheck/lint/build evidence for Phase 1 is on record (this audit + cycle-1/2 sections).
-Single missing authorization: an isolated test site (or one of the two documented alternatives).
-TEAMS-GATE remains **FAIL/BLOCKED** pending that evidence.
+At the time of that audit, the single missing authorization was an isolated test site (or one of the
+two documented alternatives), so TEAMS-GATE remained **FAIL/BLOCKED** pending that evidence. Cycle 3
+below supplies it.
+
+---
+
+## Manager gate cycle 3 — TEAMS-GATE: PASS (2026-08-25)
+
+The user authorized a direct, isolated restore from production into a new test site. This cycle
+supersedes the earlier blocked state and closes Phase 1.
+
+### Restore and isolation evidence
+
+- Source (read-only apart from creating backup artifacts): `pro.digit-erp.com` on
+  `/home/erpnext/frappe-bench-startd-prod`.
+- Target: `digit16.digit-erp.com` on `/home/erpnext/frappe-bench16` with a separate database and DB
+  user. The pre-existing `digit16.trilogy-erp.com` site was not changed.
+- Fresh backup timestamp: `20260825_100623`; database, public files, private files and site-config
+  backup were captured. SHA-256 checksums were recorded during the run.
+- Database plus public/private files restored successfully; source site configuration and encryption
+  key were not restored into the test site.
+- Installed apps on target: Frappe 16.22.0, ERPNext 16.22.0, ksa_compliance 0.61.4, digit 0.0.1,
+  fsm 0.0.1 and payments 0.0.1.
+- Scheduler is disabled and outgoing mail is muted on the target. `developer_mode` and `allow_tests`
+  are enabled only there.
+- Repeated `migrate` runs completed with exit 0 and no pending migrations reported.
+- Local HTTP smoke test against gunicorn with `Host: digit16.digit-erp.com` returned the expected
+  application redirect (`301` to `/login`). The public hostname does not currently resolve in DNS;
+  public TLS access therefore remains an infrastructure routing item, not an application-test failure.
+
+### Test-site-only ERPNext harness normalization
+
+ERPNext v16's test bootstrap assumes INR and specific test fixtures even when a restored operating
+site uses SAR. On the isolated target only, the ZATCA test-field default, `_Test Company` fiscal year,
+Standard Buying/Selling test currency, and global test currency were normalized so the upstream
+bootstrap could run idempotently. These are test-environment changes and were never applied to the
+production source.
+
+### Defects found and remediated
+
+- Two Service Team tests reused a technician already assigned to another active team. The production
+  overlap guard correctly rejected that fixture. Each test now creates its own technician, preserving
+  the intended capacity and suspended-team assertions.
+- Console E2E assertions were English while a clean browser correctly defaults the Console to Arabic.
+  Playwright now selects English in test setup via the existing `kl-lang` preference; application
+  localization behavior is unchanged.
+
+### Final acceptance evidence
+
+| Check | Result |
+|---|---|
+| Full backend discovery: `run-tests --app fsm` | ✅ 57/57 passed |
+| Frontend unit tests | ✅ 10/10 passed |
+| Playwright E2E, mobile + desktop | ✅ 18/18 passed |
+| TypeScript typecheck | ✅ Passed |
+| ESLint | ✅ Passed |
+| Console build | ✅ Passed |
+| Portal build | ✅ Passed |
+| Mobile web build | ✅ Passed (non-blocking large-chunk warning only) |
+| Migrations | ✅ Repeated exit 0 |
+| Production mutation | ✅ None; backup creation only |
+
+**Final verdict: TEAMS-GATE PASS.** Phase 1 is certified on the restored isolated test site.
