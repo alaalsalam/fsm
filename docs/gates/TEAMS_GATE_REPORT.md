@@ -185,3 +185,31 @@ digit16** — the testing log shows `site=digit16-core-test.localhost` and `site
 **TEAMS-GATE remains FAIL/BLOCKED** pending one of the above. Not claiming PASS. Not starting Phase 2.
 No production site touched. No `ignore_permissions` on user-driven writes. No ERPNext duplication.
 No digit16 data modified or deleted; no other site created, dropped, restored, or purged.
+
+---
+
+## Manager audit — commit `392840b` (console team UI) · 2026-08-25
+
+**Verdict: VALID Phase 1 scope; included in gate evidence. Not Phase 2 work.**
+
+- The PROJECT-COMPLETE Phase 1 spec explicitly requires the Dispatch surface to support
+  **Assign Team / Reassign Team**. `392840b` implements exactly that: `suggestTeams`/`assignTeam`
+  service functions + `TeamSuggestion` type + team fields on `JobDoc` (`lib/fsm.ts`, +19), and an
+  Assign/Reassign Team panel + assigned-team/leader display in `JobDetailView.vue` (+99).
+- **Additive only**: 118 insertions, 0 deletions; no schema change (→ no migrate needed), no new
+  endpoints (calls the already-migrated `fsm.scheduling.suggest_teams` / `assign_team`), no
+  contracts/AMC or any later-phase surface touched.
+- Verification recorded at commit time: `vue-tsc --noEmit` exit 0 · pre-commit lint-staged
+  (eslint --fix + prettier) via husky · `vite build` success · preview served the new bundle.
+- Created while the gate was BLOCKED, on explicit user instruction; building remaining Phase 1
+  scope during a blocked gate does not violate the phase order — only *certifying* the gate or
+  starting Phase 2 would.
+
+### Exact gate evidence still missing (unchanged)
+1. Backend: `bench --site <authorized-isolated-test-site> run-tests --app fsm` — all **57** tests
+   (39 baseline + 18 team). Environment-blocked as documented above.
+2. Phase-1-relevant E2E (Playwright, `frontend/e2e`) on the same evidence pass.
+
+Frontend typecheck/lint/build evidence for Phase 1 is on record (this audit + cycle-1/2 sections).
+Single missing authorization: an isolated test site (or one of the two documented alternatives).
+TEAMS-GATE remains **FAIL/BLOCKED** pending that evidence.
