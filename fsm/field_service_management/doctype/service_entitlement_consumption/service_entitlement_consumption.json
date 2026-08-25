@@ -1,0 +1,34 @@
+{
+ "actions": [],
+ "autoname": "hash",
+ "creation": "2026-08-25 10:00:00",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": ["idempotency_key", "service_contract", "entitlement_row", "service_job", "service_visit", "quantity", "consumed_on", "reversed", "reversed_on", "reason"],
+ "fields": [
+  {"fieldname":"idempotency_key","fieldtype":"Data","in_list_view":1,"label":"Idempotency Key","reqd":1,"unique":1},
+  {"fieldname":"service_contract","fieldtype":"Link","in_list_view":1,"label":"Service Contract","options":"Service Contract","reqd":1,"search_index":1},
+  {"description":"Stable row name from Service Contract Entitlement.","fieldname":"entitlement_row","fieldtype":"Data","label":"Entitlement Row","reqd":1},
+  {"fieldname":"service_job","fieldtype":"Link","in_list_view":1,"label":"Service Job","options":"Service Job","reqd":1,"search_index":1},
+  {"fieldname":"service_visit","fieldtype":"Link","label":"Service Visit","options":"Service Visit"},
+  {"fieldname":"quantity","fieldtype":"Float","label":"Quantity","non_negative":1,"reqd":1},
+  {"fieldname":"consumed_on","fieldtype":"Datetime","label":"Consumed On","reqd":1},
+  {"default":"0","fieldname":"reversed","fieldtype":"Check","label":"Reversed","read_only":1},
+  {"fieldname":"reversed_on","fieldtype":"Datetime","label":"Reversed On","read_only":1},
+  {"fieldname":"reason","fieldtype":"Small Text","label":"Reason"}
+ ],
+ "index_web_pages_for_search": 0,
+ "modified": "2026-08-25 10:00:00",
+ "modified_by": "Administrator",
+ "module": "Field Service Management",
+ "name": "Service Entitlement Consumption",
+ "owner": "Administrator",
+ "permissions": [
+  {"export":1,"read":1,"report":1,"role":"System Manager"},
+  {"export":1,"read":1,"report":1,"role":"FSM Manager"}
+ ],
+ "sort_field": "consumed_on",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 0
+}

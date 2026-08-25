@@ -27,6 +27,13 @@ class ServiceJob(Document):
 		company: DF.Link
 		completed_on: DF.Datetime | None
 		contact: DF.Link | None
+		coverage_reason: DF.SmallText | None
+		coverage_status: DF.Literal[
+			"Warranty", "Contract Covered", "Partially Covered", "Chargeable", "FOC", "Not Covered"
+		] | None
+		covered_labour: DF.Check
+		covered_parts: DF.Check
+		covered_travel: DF.Check
 		customer: DF.Link
 		customer_name: DF.Data | None
 		items: DF.Table[ServiceJobItem]
@@ -39,6 +46,7 @@ class ServiceJob(Document):
 		quotation: DF.Link | None
 		responded_on: DF.Datetime | None
 		sales_invoice: DF.Link | None
+		service_contract: DF.Link | None
 		scheduled_date: DF.Datetime | None
 		scheduled_end: DF.Datetime | None
 		service_address: DF.Link | None
@@ -65,6 +73,7 @@ class ServiceJob(Document):
 		self.set_address_display()
 		self.calculate_totals()
 		self.validate_equipment_rows()
+		self.validate_service_contract()
 		self.normalize_tasks()
 		self.set_completion_timestamp()
 		self.track_sla()
@@ -86,6 +95,16 @@ class ServiceJob(Document):
 			row.item_code = equipment.item_code
 			row.serial_no = equipment.serial_no
 			row.equipment_status = equipment.status
+
+	def validate_service_contract(self):
+		if not self.service_contract:
+			return
+		contract = frappe.get_cached_doc("Service Contract", self.service_contract)
+		if contract.customer != self.customer or contract.company != self.company:
+			frappe.throw(_("Service Contract must belong to the Job Customer and Company."))
+		before = self.get_doc_before_save()
+		if (not before or before.service_contract != self.service_contract) and contract.status != "Active":
+			frappe.throw(_("Only an Active Service Contract can be assigned to a Service Job."))
 
 	def calculate_costs(self):
 		"""Roll up labour + materials + overhead into the job's cost fields.

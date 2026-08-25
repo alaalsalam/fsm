@@ -1,0 +1,33 @@
+{
+ "actions": [],
+ "creation": "2026-08-25 10:00:00",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": ["rule_name", "service_type", "item_group", "classification", "labour", "parts", "travel", "consumables", "refill", "inspection", "workshop", "limits_json", "active"],
+ "fields": [
+  {"fieldname":"rule_name","fieldtype":"Data","in_list_view":1,"label":"Rule Name","reqd":1},
+  {"description":"Blank applies to every service type.","fieldname":"service_type","fieldtype":"Data","in_list_view":1,"label":"Service Type"},
+  {"description":"Blank applies to every equipment category.","fieldname":"item_group","fieldtype":"Link","label":"Item Group","options":"Item Group"},
+  {"default":"Contract Covered","fieldname":"classification","fieldtype":"Select","in_list_view":1,"label":"Classification","options":"Contract Covered\nPartially Covered\nFOC\nNot Covered","reqd":1},
+  {"default":"1","fieldname":"labour","fieldtype":"Check","label":"Labour"},
+  {"default":"0","fieldname":"parts","fieldtype":"Check","label":"Parts"},
+  {"default":"1","fieldname":"travel","fieldtype":"Check","label":"Travel"},
+  {"default":"0","fieldname":"consumables","fieldtype":"Check","label":"Consumables"},
+  {"default":"0","fieldname":"refill","fieldtype":"Check","label":"Refill"},
+  {"default":"1","fieldname":"inspection","fieldtype":"Check","label":"Inspection"},
+  {"default":"0","fieldname":"workshop","fieldtype":"Check","label":"Workshop"},
+  {"description":"Optional JSON object containing monetary, quantity, or policy limits.","fieldname":"limits_json","fieldtype":"Code","label":"Limits","options":"JSON"},
+  {"default":"1","fieldname":"active","fieldtype":"Check","in_list_view":1,"label":"Active"}
+ ],
+ "istable": 1,
+ "modified": "2026-08-25 10:00:00",
+ "modified_by": "Administrator",
+ "module": "Field Service Management",
+ "name": "Service Contract Coverage Rule",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "idx",
+ "sort_order": "ASC",
+ "states": []
+}

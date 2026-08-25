@@ -45,6 +45,14 @@
   "section_break_items",
   "items",
   "total_amount",
+  "section_break_coverage",
+  "service_contract",
+  "coverage_status",
+  "coverage_reason",
+  "column_break_coverage",
+  "covered_labour",
+  "covered_parts",
+  "covered_travel",
   "section_break_completion",
   "completed_on",
   "customer_signature",
@@ -328,6 +336,57 @@
    "fieldname": "total_amount",
    "fieldtype": "Currency",
    "label": "Total Amount",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_coverage",
+   "fieldtype": "Section Break",
+   "label": "Warranty & Contract Coverage"
+  },
+  {
+   "fieldname": "service_contract",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "Service Contract",
+   "options": "Service Contract",
+   "search_index": 1
+  },
+  {
+   "fieldname": "coverage_status",
+   "fieldtype": "Select",
+   "label": "Coverage Status",
+   "options": "\nWarranty\nContract Covered\nPartially Covered\nChargeable\nFOC\nNot Covered",
+   "read_only": 1
+  },
+  {
+   "fieldname": "coverage_reason",
+   "fieldtype": "Small Text",
+   "label": "Coverage Reason",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_coverage",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "covered_labour",
+   "fieldtype": "Check",
+   "label": "Labour Covered",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "covered_parts",
+   "fieldtype": "Check",
+   "label": "Parts Covered",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "covered_travel",
+   "fieldtype": "Check",
+   "label": "Travel Covered",
    "read_only": 1
   },
   {

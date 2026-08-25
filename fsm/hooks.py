@@ -195,6 +195,7 @@ scheduler_events = {
 	],
 	"daily": [
 		"fsm.tasks.notify_low_stock",
+		"fsm.contracts.tasks.update_contract_statuses",
 	],
 }
 
