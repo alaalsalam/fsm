@@ -4,76 +4,74 @@
 import frappe
 from frappe import _
 from frappe.model.document import Document
-from frappe.utils import nowdate
+from frappe.utils import now_datetime, nowdate
 
 STOCKED_DISPOSITIONS = ("Restock", "Refurbish")
 
 
 class ServiceReturn(Document):
-	# begin: auto-generated types
-	# This code is auto-generated. Do not modify anything in this block.
-
-	from typing import TYPE_CHECKING
-
-	if TYPE_CHECKING:
-		from frappe.types import DF
-
-		from fsm.field_service_management.doctype.service_return_item.service_return_item import (
-			ServiceReturnItem,
-		)
-
-		customer: DF.Link | None
-		items: DF.Table[ServiceReturnItem]
-		naming_series: DF.Literal["FSM-RET-.YYYY.-"]
-		notes: DF.Text | None
-		reason: DF.SmallText | None
-		return_date: DF.Date | None
-		service_job: DF.Link
-		status: DF.Literal["Draft", "Requested", "Approved", "Received", "Closed", "Cancelled"]
-		stock_entry: DF.Link | None
-		warehouse: DF.Link | None
-	# end: auto-generated types
+	def before_insert(self):
+		if not self.flags.fsm_command:
+			frappe.throw(_("Workshop/RMA cases must be created through the command API."), frappe.PermissionError)
 
 	def validate(self):
 		if not self.return_date:
 			self.return_date = nowdate()
-		if self.status == "Draft" and not self.is_new():
-			self.status = "Requested"
+		self._guard_command_changes()
+		self._validate_context()
+
+	def _guard_command_changes(self):
+		if self.get_doc_before_save() and not self.flags.fsm_command:
+			frappe.throw(_("Workshop/RMA changes must use the command API."), frappe.PermissionError)
+
+	def _validate_context(self):
+		job = frappe.get_cached_doc("Service Job", self.service_job)
+		if self.installed_equipment and not any(
+			row.installed_equipment == self.installed_equipment for row in job.equipment
+		):
+			frappe.throw(_("Installed Equipment must be linked to the Service Job."))
+		if self.warehouse:
+			company = frappe.db.get_value("Warehouse", self.warehouse, "company")
+			if company != job.company:
+				frappe.throw(_("Workshop Warehouse must belong to the Service Job company."))
+		for doctype, field in (("Quotation", "quotation"), ("Sales Invoice", "sales_invoice")):
+			name = self.get(field)
+			if name and frappe.db.get_value(doctype, name, "company") != job.company:
+				frappe.throw(_("Commercial documents must belong to the Service Job company."))
 
 	@frappe.whitelist()
 	def approve(self):
-		from fsm.security.policy import require_job_access
-
-		require_job_access(self.service_job, "write", manager_only=True)
-		self._guard_status(("Requested",), _("Only a requested return can be approved."))
-		self.status = "Approved"
-		self.save()
-		return self.as_dict()
+		"""Compatibility adapter: accept the pickup request."""
+		return self._compat_transition("Pickup Requested", "Picked Up")
 
 	@frappe.whitelist()
 	def receive(self):
-		"""Post the stock receipt for restock/refurbish items and mark the return received."""
+		"""Compatibility adapter: receive picked-up material/equipment into workshop."""
 		from fsm.security.policy import require_job_access
 
 		require_job_access(self.service_job, "write", manager_only=True)
-		self._guard_status(("Approved",), _("Approve the return before receiving it."))
+		self._guard_status(("Picked Up",), _("Only a picked-up case can be workshop received."))
 		if not self.warehouse:
-			frappe.throw(_("Set a receiving warehouse before receiving the return."))
-
-		receipt_items = [i for i in self.items if i.disposition in STOCKED_DISPOSITIONS]
+			frappe.throw(_("Set a Workshop Warehouse before receiving the case."))
+		receipt_items = [row for row in self.items if row.disposition in STOCKED_DISPOSITIONS]
 		if receipt_items and not self.stock_entry:
 			self.stock_entry = _make_receipt(self, receipt_items)
-		self.status = "Received"
+		self.status = "Workshop Received"
+		self.flags.fsm_command = True
 		self.save()
 		return self.as_dict()
 
 	@frappe.whitelist()
 	def close(self):
+		return self._compat_transition("Reinstalled", "Closed")
+
+	def _compat_transition(self, expected: str, target: str):
 		from fsm.security.policy import require_job_access
 
 		require_job_access(self.service_job, "write", manager_only=True)
-		self._guard_status(("Received",), _("Only a received return can be closed."))
-		self.status = "Closed"
+		self._guard_status((expected,), _("This action is not valid for the current workshop state."))
+		self.status = target
+		self.flags.fsm_command = True
 		self.save()
 		return self.as_dict()
 
@@ -83,11 +81,14 @@ class ServiceReturn(Document):
 
 
 def _make_receipt(doc: "ServiceReturn", items) -> str:
-	"""Create & submit a Material Receipt Stock Entry for the returned parts."""
+	"""Create & submit an ERPNext Material Receipt for workshop-received stock rows."""
 	se = frappe.new_doc("Stock Entry")
 	se.stock_entry_type = "Material Receipt"
+	se.purpose = "Material Receipt"
 	se.posting_date = doc.return_date
 	se.company = frappe.db.get_value("Service Job", doc.service_job, "company")
+	se.fsm_service_job = doc.service_job
+	se.fsm_material_action = "Return"
 	for row in items:
 		se.append(
 			"items",
@@ -97,8 +98,11 @@ def _make_receipt(doc: "ServiceReturn", items) -> str:
 				"uom": row.uom or None,
 				"t_warehouse": doc.warehouse,
 				"allow_zero_valuation_rate": 1,
+				"fsm_installed_equipment": doc.installed_equipment,
 			},
 		)
-	se.insert(ignore_permissions=True)
+	# Manager Job authorization and Approved transition guard are established by receive().
+	se.flags.ignore_permissions = True
+	se.insert()
 	se.submit()
 	return se.name

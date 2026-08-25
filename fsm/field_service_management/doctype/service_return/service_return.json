@@ -7,17 +7,29 @@
  "field_order": [
   "naming_series",
   "service_job",
+  "installed_equipment",
   "customer",
   "column_break_head",
   "status",
   "return_date",
   "warehouse",
+  "pickup_date",
+  "pickup_address",
   "section_break_items",
   "items",
   "section_break_links",
   "stock_entry",
+  "quotation",
+  "sales_invoice",
   "column_break_links",
   "reason",
+  "workshop_section",
+  "customer_approval",
+  "customer_approval_on",
+  "repair_notes",
+  "testing_result",
+  "quality_result",
+  "final_outcome",
   "section_break_notes",
   "notes"
  ],
@@ -29,6 +41,14 @@
    "label": "Series",
    "options": "FSM-RET-.YYYY.-",
    "reqd": 1
+  },
+  {
+   "fieldname": "installed_equipment",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "Installed Equipment",
+   "options": "Installed Equipment",
+   "search_index": 1
   },
   {
    "fieldname": "service_job",
@@ -59,7 +79,7 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Status",
-   "options": "Draft\nRequested\nApproved\nReceived\nClosed\nCancelled",
+   "options": "Draft\nPickup Requested\nPicked Up\nWorkshop Received\nInitial Inspection\nEstimate Required\nAwaiting Customer Approval\nRepair In Progress\nWaiting Material\nRepair Completed\nTesting\nQuality Inspection\nReady for Dispatch\nDispatched\nReinstalled\nClosed\nCancelled",
    "read_only": 1
   },
   {
@@ -76,6 +96,17 @@
    "options": "Warehouse"
   },
   {
+   "fieldname": "pickup_date",
+   "fieldtype": "Datetime",
+   "label": "Pickup Date"
+  },
+  {
+   "fieldname": "pickup_address",
+   "fieldtype": "Link",
+   "label": "Pickup Address",
+   "options": "Address"
+  },
+  {
    "fieldname": "section_break_items",
    "fieldtype": "Section Break",
    "label": "Returned Items"
@@ -84,8 +115,7 @@
    "fieldname": "items",
    "fieldtype": "Table",
    "label": "Items",
-   "options": "Service Return Item",
-   "reqd": 1
+   "options": "Service Return Item"
   },
   {
    "fieldname": "section_break_links",
@@ -100,6 +130,18 @@
    "read_only": 1
   },
   {
+   "fieldname": "quotation",
+   "fieldtype": "Link",
+   "label": "ERPNext Quotation",
+   "options": "Quotation"
+  },
+  {
+   "fieldname": "sales_invoice",
+   "fieldtype": "Link",
+   "label": "ERPNext Sales Invoice",
+   "options": "Sales Invoice"
+  },
+  {
    "fieldname": "column_break_links",
    "fieldtype": "Column Break"
   },
@@ -107,6 +149,46 @@
    "fieldname": "reason",
    "fieldtype": "Small Text",
    "label": "Reason"
+  },
+  {
+   "fieldname": "workshop_section",
+   "fieldtype": "Section Break",
+   "label": "Workshop Repair"
+  },
+  {
+   "default": "Pending",
+   "fieldname": "customer_approval",
+   "fieldtype": "Select",
+   "label": "Customer Approval",
+   "options": "Pending\nApproved\nRejected"
+  },
+  {
+   "fieldname": "customer_approval_on",
+   "fieldtype": "Datetime",
+   "label": "Customer Approval On",
+   "read_only": 1
+  },
+  {
+   "fieldname": "repair_notes",
+   "fieldtype": "Text",
+   "label": "Repair Notes"
+  },
+  {
+   "fieldname": "testing_result",
+   "fieldtype": "Text",
+   "label": "Testing Result"
+  },
+  {
+   "fieldname": "quality_result",
+   "fieldtype": "Select",
+   "label": "Quality Result",
+   "options": "\nPass\nFail"
+  },
+  {
+   "fieldname": "final_outcome",
+   "fieldtype": "Select",
+   "label": "Final Outcome",
+   "options": "\nRepaired\nNot Repairable\nReplacement Recommended\nReplaced"
   },
   {
    "fieldname": "section_break_notes",

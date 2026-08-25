@@ -6,3 +6,4 @@ fsm.patches.v1_0.rename_service_appointment
 [post_model_sync]
 # Patches added in this section will be executed after doctypes are migrated
 fsm.patches.v1_0.migrate_service_request_data
+fsm.patches.v1_0.migrate_service_return_workshop_states
