@@ -1,6 +1,6 @@
 # ARCH-001 Target ERD
 
-Status: **CORE plus IB-001–IB-012 Installed Base slice implemented; later entities remain design-only**.
+Status: **CORE, Installed Base, Service Teams, and Service Contracts/AMC implemented; later entities remain design-only**.
 
 ```mermaid
 erDiagram
@@ -37,6 +37,18 @@ erDiagram
     SERVICE_JOB ||--o{ SERVICE_JOB_EQUIPMENT : scopes
     INSTALLED_EQUIPMENT ||--o{ SERVICE_JOB_EQUIPMENT : serviced_in
     INSTALLED_EQUIPMENT ||--o{ SERVICE_EVENT_LOG : audits
+    CUSTOMER ||--o{ SERVICE_CONTRACT : owns
+    SERVICE_CONTRACT ||--o{ SERVICE_CONTRACT_EQUIPMENT : scopes
+    CUSTOMER_SITE ||--o{ SERVICE_CONTRACT_EQUIPMENT : covered_at
+    INSTALLED_EQUIPMENT o|--o{ SERVICE_CONTRACT_EQUIPMENT : covered_asset
+    SERVICE_CONTRACT ||--o{ SERVICE_CONTRACT_COVERAGE_RULE : defines
+    SERVICE_CONTRACT ||--o{ SERVICE_CONTRACT_ENTITLEMENT : grants
+    SERVICE_CONTRACT ||--o{ SERVICE_ENTITLEMENT_CONSUMPTION : consumes
+    SERVICE_JOB o|--o{ SERVICE_ENTITLEMENT_CONSUMPTION : consumes_for
+    SERVICE_CONTRACT o|--o{ SERVICE_JOB : classifies
+    QUOTATION o|--o{ SERVICE_CONTRACT : commercial_reference
+    SALES_ORDER o|--o{ SERVICE_CONTRACT : commercial_reference
+    SALES_INVOICE o|--o{ SERVICE_CONTRACT : commercial_reference
 ```
 
 ## Ownership and invariants
@@ -54,8 +66,14 @@ erDiagram
 | Equipment Location | Implemented | FSM Installed Base | optional hierarchy within exactly one Site |
 | Installed Equipment | Implemented | FSM Installed Base | after-sales identity and lifecycle; ERPNext Item/Serial/Batch remain masters |
 | Service Job Equipment | Implemented child table | FSM Operations | N equipment per Job; snapshot fields do not replace the equipment root |
+| Service Contract | Implemented | FSM Contracts | owns service period, scope, coverage terms and entitlement policy; never billing truth |
+| Service Contract Equipment | Implemented child table | FSM Contracts | optional Site/equipment/category scope; references Installed Base only |
+| Service Contract Coverage Rule | Implemented child table | FSM Contracts | deterministic operational coverage classification |
+| Service Contract Entitlement | Implemented child table | FSM Contracts | included/used/remaining operational allowance |
+| Service Entitlement Consumption | Implemented append-only ledger | FSM Contracts | unique retry key prevents double consumption; no accounting or stock state |
 
-Multi-technician Visit Assignment, Maintenance Plan/Occurrence, AMC and other later-phase concepts remain design-only. Job Equipment is now implemented by the IB phase.
+Maintenance Plan/Occurrence and other later-phase concepts remain design-only. Job Equipment, Service Teams,
+and AMC/Service Contracts are implemented.
 
 ## Aggregate boundary
 

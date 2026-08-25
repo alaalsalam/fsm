@@ -22,6 +22,8 @@ Status: **Binding target proposal**
 | Collection | ERPNext Payment Entry | Read allocation/status and link | Bill Payment/FSM Receipt |
 | Taxes, discounts, GL | ERPNext Accounts | Never calculate authoritative posting separately | FSM tax/payment ledger |
 | Warranty basis | ERPNext Item/Serial No/Asset warranty data where available | Evaluate service entitlement and snapshot result | Competing warranty master |
+| Service contract operational terms | FSM Service Contract | Own service period, covered scope, SLA and visit entitlements | ERPNext sales/accounting duplicate inside FSM |
+| Contract quotation/order/invoice | ERPNext Quotation/Sales Order/Sales Invoice | Store validated links and use them as commercial truth | FSM quotation, order, invoice or payment document |
 | Operational request | FSM Service Request | Own intake/triage/conversion | ERPNext Issue only if selected later as the canonical request; never both |
 | Operational job | FSM Service Job | Canonical aggregate | Repair Order/work order duplicate |
 | Visit execution | FSM Service Visit | Own attendance evidence | ERPNext billing/stock state |

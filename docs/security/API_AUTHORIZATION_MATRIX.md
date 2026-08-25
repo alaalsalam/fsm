@@ -1,6 +1,6 @@
 # API authorization matrix
 
-Date: 2026-08-24. Inventory source: Python whitelist decorators at the IB closeout revision. Total: **104/104 current endpoints classified**. The original 58-row GATE-001 table remains below as an audit baseline; CORE additions and the 19 Installed Base additions are reconciled in phase deltas. Default is deny; frontend visibility is never an authorization control.
+Date: 2026-08-25. Inventory source: Python whitelist decorators at the Contracts gate revision. Total: **116/116 current endpoints classified**. The original 58-row GATE-001 table remains below as an audit baseline; CORE, Installed Base, Teams, and Contracts additions are reconciled in phase deltas. Default is deny; frontend visibility is never an authorization control.
 
 Legend: access `G` = explicit Guest, `A` = authenticated. Scope columns use `C` = Company User Permission, `T` = Service Territory, `O` = current Customer ownership, `A` = assigned Technician, `—` = not applicable. Read/bypass values are `No`, `Scoped` (root IDs or warehouses were authorized first), or the named documented exception. Tests: `AUTH`, `COMP`, `CUST`, `TECH`, `GUEST`, `FIELDS`, `STATE`, `AGG`, `RATE`, `ROLLBACK`, `CHILD`, `E2E`.
 
@@ -126,3 +126,30 @@ The command names above are under `fsm.service_operations.commands`; read projec
 | `get_job_equipment` | A FSM actor; Job | exact Job read access first | root-scoped child read |
 
 Installed Base positive/negative authorization and ERPNext integration coverage is in `fsm.tests.test_installed_base`.
+
+## Teams endpoint delta (2 additions)
+
+| Endpoint | Access and accepted input | Root guard/scope | Bypass decision |
+|---|---|---|---|
+| `fsm.scheduling.suggest_teams` | A Manager/System Manager; `job,limit≤50` | manager-only Job scope; same-company active teams | none |
+| `fsm.scheduling.assign_team` | A Manager/System Manager; `job,team` | manager-only Job scope; company/status/capacity/conflict guards | none |
+
+Teams positive/negative coverage is in `fsm.tests.test_service_teams`.
+
+## Contracts endpoint delta (10 additions)
+
+| Endpoint | Access and accepted input | Root guard/scope | Bypass decision |
+|---|---|---|---|
+| `create_contract` | A Manager/System Manager; fixed Contract fields/tables | Manager company scope + controller ownership validation | guarded Contract insert |
+| `update_contract` | A Manager/System Manager; fixed mutable fields | exact Contract company write scope; terminal-state guard | none |
+| `transition_contract` | A Manager/System Manager; Contract/status/reason/source | exact Contract company write scope + transition map | event insert only |
+| `renew_contract` | A Manager/System Manager; Contract/start/end | source Contract write scope; fixed cloned terms | guarded renewal insert |
+| `classify_job_coverage` | A Manager/System Manager; Job/equipment/service/date | manager-only Job scope + linked-equipment validation | event insert only |
+| `consume_entitlement` | A Manager/System Manager; Contract/row/Job/Visit/key/qty | both roots authorized; same Customer/Company; row lock; unique key | guarded append-only consumption insert |
+| `list_contracts` | A Manager/System Manager or Customer | company User Permission or exact current Customer ownership | none |
+| `get_contract` | A Manager/System Manager, owning Customer, or assigned Technician | exact Contract company/customer/assigned-Job scope | none |
+| `get_job_coverage` | A visible Job actor | exact Job read scope; linked-equipment validation | none |
+| `list_expiring_contracts` | A Manager/System Manager; bounded days/company | Manager company scope | none |
+
+Contracts authorization, ownership, lifecycle, coverage, and retry coverage is in
+`fsm.tests.test_service_contracts`.

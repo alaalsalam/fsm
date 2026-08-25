@@ -1,6 +1,6 @@
 # `ignore_permissions` register
 
-Date: 2026-08-24. Search patterns include `ignore_permissions=True`, spaced assignment, and `save/insert/delete(ignore_permissions=True)`. Current result: **all 46 occurrences classified**. The CORE register below remains valid; IB adds four runtime command/system occurrences and ten test-fixture occurrences. There is no generic bypass helper.
+Date: 2026-08-25. Search patterns include `ignore_permissions=True`, spaced assignment, and `save/insert/delete(ignore_permissions=True)`. Current result: **all 55 occurrences classified**. The CORE register below remains valid; IB adds four runtime command/system occurrences and ten test-fixture occurrences, Teams adds five test-only occurrences, and Contracts adds three guarded runtime occurrences plus one test fixture. There is no generic bypass helper.
 
 | Location | Operation | Reachability and guard | Classification | Decision |
 |---|---|---|---|---|
@@ -23,6 +23,9 @@ Date: 2026-08-24. Search patterns include `ignore_permissions=True`, spaced assi
 | `installed_base/commands.py` location insert | create Equipment Location | HTTP; fixed field allowlist and exact Site write scope first | Internal operation after explicit authorization | Approved canonical command. |
 | `installed_base/commands.py` equipment insert | manual Installed Equipment | HTTP; fixed field allowlist and Manager company scope first; controller validates ERPNext links | Internal operation after explicit authorization | Approved canonical command. |
 | `installed_base/provisioning.py` equipment insert | provision from Delivery Note | ERPNext submit hook or retry after Manager company scope; eligible Item policy and exact row identity | Internal system operation after explicit authorization | Approved idempotent projection with unique key. |
+| `contracts/commands.py` contract insert | create Service Contract | HTTP; fixed field allowlist and Manager company scope precede insert | Internal operation after explicit authorization | Approved canonical Contract command. |
+| `contracts/commands.py` renewal insert | create renewal Draft | HTTP; source Contract write/Manager scope precedes fixed clone | Internal operation after explicit authorization | Approved canonical renewal command. |
+| `contracts/commands.py` consumption insert | append entitlement consumption | HTTP; Contract Manager scope, Job Manager scope, same Customer/Company, row lock, remaining quantity, and unique idempotency key precede insert | Internal operation after explicit authorization | Approved append-only retry-safe consumption. |
 | `fsm/tests/test_security.py:86` | create test User | test runner as Administrator | Approved documented exception | Test fixture only. |
 | `fsm/tests/test_security.py:102` | create test Customer | test runner as Administrator | Approved documented exception | Test fixture only. |
 | `fsm/tests/test_security.py:109` | create Company User Permission | test runner as Administrator | Approved documented exception | Test fixture only. |
@@ -39,3 +42,6 @@ Every future HTTP-reachable bypass must name its root authorization function in 
 The nine additional test occurrences are confined to `fsm/tests/test_service_operations.py`: fixture roots plus explicit negative attempts to forge initial state or modify/delete Event Log. They are not imported by runtime code.
 
 The ten IB test occurrences are confined to `fsm/tests/test_installed_base.py` and build ERPNext Customer/Item/Serial/Delivery fixtures or direct negative assertions. They are never imported by runtime code.
+
+The five Teams occurrences in `fsm/tests/test_service_teams.py` and the one Contracts occurrence in
+`fsm/tests/test_service_contracts.py` are test fixtures/cleanup only. They are not imported by runtime code.

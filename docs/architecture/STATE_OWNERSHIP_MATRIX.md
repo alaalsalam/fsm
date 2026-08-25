@@ -17,6 +17,9 @@ Status: **CORE slice implemented and verified**. Only the named owner authors st
 | Installed Equipment | Pending Installation, Active, Inactive, Removed, Returned, Replaced, Disposed | FSM Installed Base commands and guarded ERPNext delivery projection | scoped Manager/System Manager; ERPNext submit/cancel system hook | Console, Portal, assigned Mobile Jobs |
 | Equipment warranty | Not Applicable, Active, Expired projection | warranty helper from Item policy + configured date basis | system projection only | all authorized equipment surfaces |
 | Delivery provisioning | Completed, Cancelled, Return Reconciled projection | FSM provisioning service after ERPNext lifecycle | ERPNext hook or scoped Manager retry | Delivery Note UI/audit |
+| Service Contract | Draft, Active, Suspended, Expired, Cancelled | FSM Contracts command service | scoped Manager/System Manager; scheduler may expire | Console, Portal, coverage engine, renewals |
+| Contract coverage | Warranty, Contract Covered, Partially Covered, Chargeable, FOC, Not Covered | FSM coverage engine | deterministic server evaluation; Manager persists Job snapshot | Job, commercial adapter, reports |
+| Contract entitlement | included/used/remaining projection | FSM Contracts consumption service | scoped Manager/System process with unique idempotency key | coverage engine, Portal, renewals |
 
 ## Projection rules
 
@@ -29,5 +32,7 @@ Status: **CORE slice implemented and verified**. Only the named owner authors st
 - Delivery Note submission may create Installed Equipment but never changes ERPNext sales/stock ownership.
 - Delivery cancellation/return transitions equipment and retains history; it never deletes the registry.
 - Service Visit does not own or duplicate Job equipment rows.
+- Coverage classification never creates an invoice; ERPNext commercial documents remain authoritative.
+- Entitlement consumption is append-only, row-locked, and retry-safe by unique operation key.
 
 Completed and Cancelled Request/Job/Visit states are terminal in CORE. A future reopen design requires a separately approved command/event contract.
