@@ -81,6 +81,25 @@ export function getMyJobs(): Promise<MyJob[]> {
 	return client.call<MyJob[]>("fsm.api.get_my_jobs", {}, "GET");
 }
 
+export interface PortalHub {
+	dashboard: Record<string, number>;
+	requests: MyRequest[];
+	jobs: MyJob[];
+	service_history: MyJob[];
+	upcoming_maintenance: Array<Record<string, string>>;
+	overdue_maintenance: Array<Record<string, string>>;
+	contracts: Array<Record<string, string | number>>;
+	renewals: Array<Record<string, string | number>>;
+	reports: Array<Record<string, string | number>>;
+	certificates: Array<Record<string, string | number>>;
+	quotations: Array<Record<string, string | number>>;
+	invoices: Array<Record<string, string | number>>;
+}
+
+export function getMyPortalHub(): Promise<PortalHub> {
+	return client.call<PortalHub>("fsm.portal.get_my_portal_hub", {}, "GET");
+}
+
 export interface JobMessage {
 	name: string;
 	author_role: string;
