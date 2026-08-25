@@ -16,6 +16,12 @@ const nav = computed(() => [
 	{ name: "sites", label: t("المواقع", "Sites"), to: "/sites", exact: false },
 	{ name: "contracts", label: t("العقود", "Contracts"), to: "/contracts", exact: false },
 	{
+		name: "maintenance",
+		label: t("الصيانة الوقائية", "Maintenance"),
+		to: "/maintenance",
+		exact: false,
+	},
+	{
 		name: "equipment-locations",
 		label: t("المواضع", "Locations"),
 		to: "/equipment-locations",
@@ -124,6 +130,10 @@ async function signOut() {
 							<template v-else-if="item.name === 'contracts'">
 								<path d="M6 3h12a2 2 0 0 1 2 2v16H4V5a2 2 0 0 1 2-2z" />
 								<path d="M8 8h8M8 12h8M8 16h5" />
+							</template>
+							<template v-else-if="item.name === 'maintenance'">
+								<path d="M12 3v3M12 18v3M3 12h3M18 12h3" />
+								<circle cx="12" cy="12" r="4" />
 							</template>
 							<template v-else-if="item.name === 'returns'">
 								<path d="M3 7h13a4 4 0 0 1 0 8H7" />

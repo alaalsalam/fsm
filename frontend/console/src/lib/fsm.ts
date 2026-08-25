@@ -1,9 +1,10 @@
 import { client } from "./api";
-import { ContractsApi, InstalledBaseApi } from "@kodlyft/api";
+import { ContractsApi, InstalledBaseApi, MaintenanceApi } from "@kodlyft/api";
 import type { JobSummary, JobStatus, LinkOption } from "@kodlyft/ui";
 
 export const installedBase = new InstalledBaseApi(client);
 export const contracts = new ContractsApi(client);
+export const maintenance = new MaintenanceApi(client);
 
 export interface DashboardStats {
 	open_jobs: number;

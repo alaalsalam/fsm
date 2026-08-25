@@ -26,3 +26,12 @@ export {
 	type CoverageDecision,
 	type CreateContractInput,
 } from "./src/contracts";
+export {
+	MaintenanceApi,
+	type MaintenancePlanStatus,
+	type MaintenanceOccurrenceStatus,
+	type MaintenancePlanSummary,
+	type MaintenanceOccurrence,
+	type MaintenanceSummary,
+	type CreateMaintenancePlanInput,
+} from "./src/maintenance";
