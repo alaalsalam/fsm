@@ -1,0 +1,29 @@
+{
+ "actions": [],
+ "autoname": "hash",
+ "creation": "2026-08-25 20:00:00",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": ["command_id", "user", "action", "entity_type", "entity_id", "state", "result_json", "error_message"],
+ "fields": [
+  {"fieldname":"command_id","fieldtype":"Data","label":"Command ID","read_only":1,"reqd":1,"unique":1},
+  {"fieldname":"user","fieldtype":"Link","label":"User","options":"User","read_only":1,"reqd":1},
+  {"fieldname":"action","fieldtype":"Data","label":"Action","read_only":1,"reqd":1},
+  {"fieldname":"entity_type","fieldtype":"Data","label":"Entity Type","read_only":1,"reqd":1},
+  {"fieldname":"entity_id","fieldtype":"Data","label":"Entity ID","read_only":1,"reqd":1},
+  {"fieldname":"state","fieldtype":"Select","label":"State","options":"Processing\nSynced","read_only":1,"reqd":1},
+  {"fieldname":"result_json","fieldtype":"Long Text","label":"Result JSON","read_only":1},
+  {"fieldname":"error_message","fieldtype":"Small Text","label":"Error","read_only":1}
+ ],
+ "index_web_pages_for_search": 0,
+ "modified": "2026-08-25 20:00:00",
+ "modified_by": "Administrator",
+ "module": "Field Service Management",
+ "name": "Mobile Command Receipt",
+ "owner": "Administrator",
+ "permissions": [{"read":1,"role":"System Manager"}],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 0
+}
