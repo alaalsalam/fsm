@@ -28,7 +28,7 @@ Status: **Binding target proposal**
 | Operational job | FSM Service Job | Canonical aggregate | Repair Order/work order duplicate |
 | Visit execution | FSM Service Visit | Own attendance evidence | ERPNext billing/stock state |
 | Technician operational profile | FSM Technician linked to User/Employee | Skills, duty, dispatch state | Duplicate User/Employee identity |
-| Maintenance recurrence | FSM only if ADR-007 overlap decision is approved | Plan/occurrence idempotency | Duplicate execution Job or ERP accounting |
+| Maintenance recurrence | FSM Maintenance Plan/Occurrence per ADR-007 | Idempotent Installed Equipment scheduling and grouped Service Job release | ERPNext Maintenance Schedule/Visit clone, duplicate execution Job, or ERP accounting |
 
 ## Integration invariant
 

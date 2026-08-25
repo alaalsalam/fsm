@@ -20,6 +20,8 @@ Status: **CORE slice implemented and verified**. Only the named owner authors st
 | Service Contract | Draft, Active, Suspended, Expired, Cancelled | FSM Contracts command service | scoped Manager/System Manager; scheduler may expire | Console, Portal, coverage engine, renewals |
 | Contract coverage | Warranty, Contract Covered, Partially Covered, Chargeable, FOC, Not Covered | FSM coverage engine | deterministic server evaluation; Manager persists Job snapshot | Job, commercial adapter, reports |
 | Contract entitlement | included/used/remaining projection | FSM Contracts consumption service | scoped Manager/System process with unique idempotency key | coverage engine, Portal, renewals |
+| Maintenance Plan | Draft, Active, Paused, Completed, Cancelled | FSM Maintenance command service | scoped Manager/System Manager | Console, scheduler, Occurrence engine |
+| Maintenance Occurrence | Forecast, Due, Released, Completed, Skipped, Cancelled, Overdue | FSM Maintenance engine/commands; Job completion projection | scheduler or scoped Manager; assigned Job is read-only to Technician | Console, Service Job, reports |
 
 ## Projection rules
 
@@ -34,5 +36,7 @@ Status: **CORE slice implemented and verified**. Only the named owner authors st
 - Service Visit does not own or duplicate Job equipment rows.
 - Coverage classification never creates an invoice; ERPNext commercial documents remain authoritative.
 - Entitlement consumption is append-only, row-locked, and retry-safe by unique operation key.
+- Plan revision supersedes open old-revision occurrences; history is retained.
+- Occurrence release creates/reuses one canonical grouped Service Job and never owns Job lifecycle.
 
 Completed and Cancelled Request/Job/Visit states are terminal in CORE. A future reopen design requires a separately approved command/event contract.

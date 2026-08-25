@@ -1,6 +1,6 @@
 # ARCH-001 Target ERD
 
-Status: **CORE, Installed Base, Service Teams, and Service Contracts/AMC implemented; later entities remain design-only**.
+Status: **CORE, Installed Base, Service Teams, Service Contracts/AMC, and Preventive Maintenance implemented; later entities remain design-only**.
 
 ```mermaid
 erDiagram
@@ -49,6 +49,16 @@ erDiagram
     QUOTATION o|--o{ SERVICE_CONTRACT : commercial_reference
     SALES_ORDER o|--o{ SERVICE_CONTRACT : commercial_reference
     SALES_INVOICE o|--o{ SERVICE_CONTRACT : commercial_reference
+    CUSTOMER ||--o{ MAINTENANCE_PLAN : owns
+    CUSTOMER_SITE ||--o{ MAINTENANCE_PLAN : schedules_at
+    SERVICE_CONTRACT o|--o{ MAINTENANCE_PLAN : governs
+    MAINTENANCE_PLAN ||--o{ MAINTENANCE_PLAN_EQUIPMENT : scopes
+    INSTALLED_EQUIPMENT ||--o{ MAINTENANCE_PLAN_EQUIPMENT : scheduled_asset
+    MAINTENANCE_PLAN ||--o{ MAINTENANCE_PLAN_LINE : defines
+    MAINTENANCE_PLAN ||--o{ MAINTENANCE_OCCURRENCE : generates
+    MAINTENANCE_PLAN_LINE ||--o{ MAINTENANCE_OCCURRENCE : schedules
+    INSTALLED_EQUIPMENT ||--o{ MAINTENANCE_OCCURRENCE : becomes_due
+    SERVICE_JOB o|--o{ MAINTENANCE_OCCURRENCE : executes
 ```
 
 ## Ownership and invariants
@@ -71,9 +81,11 @@ erDiagram
 | Service Contract Coverage Rule | Implemented child table | FSM Contracts | deterministic operational coverage classification |
 | Service Contract Entitlement | Implemented child table | FSM Contracts | included/used/remaining operational allowance |
 | Service Entitlement Consumption | Implemented append-only ledger | FSM Contracts | unique retry key prevents double consumption; no accounting or stock state |
+| Maintenance Plan | Implemented | FSM Maintenance | owns recurrence policy and revision; never execution/commercial state |
+| Maintenance Plan Line/Equipment | Implemented child tables | FSM Maintenance | cadence and explicit Installed Equipment scope |
+| Maintenance Occurrence | Implemented durable ledger | FSM Maintenance | unique due obligation; releases only canonical Service Job |
 
-Maintenance Plan/Occurrence and other later-phase concepts remain design-only. Job Equipment, Service Teams,
-and AMC/Service Contracts are implemented.
+Inspection and other later-phase concepts remain design-only.
 
 ## Aggregate boundary
 

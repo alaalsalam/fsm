@@ -1,6 +1,6 @@
 # API authorization matrix
 
-Date: 2026-08-25. Inventory source: Python whitelist decorators at the Contracts gate revision. Total: **116/116 current endpoints classified**. The original 58-row GATE-001 table remains below as an audit baseline; CORE, Installed Base, Teams, and Contracts additions are reconciled in phase deltas. Default is deny; frontend visibility is never an authorization control.
+Date: 2026-08-25. Inventory source: Python whitelist decorators at the PM gate revision. Total: **128/128 current endpoints classified**. The original 58-row GATE-001 table remains below as an audit baseline; CORE, Installed Base, Teams, Contracts, and Preventive Maintenance additions are reconciled in phase deltas. Default is deny; frontend visibility is never an authorization control.
 
 Legend: access `G` = explicit Guest, `A` = authenticated. Scope columns use `C` = Company User Permission, `T` = Service Territory, `O` = current Customer ownership, `A` = assigned Technician, `—` = not applicable. Read/bypass values are `No`, `Scoped` (root IDs or warehouses were authorized first), or the named documented exception. Tests: `AUTH`, `COMP`, `CUST`, `TECH`, `GUEST`, `FIELDS`, `STATE`, `AGG`, `RATE`, `ROLLBACK`, `CHILD`, `E2E`.
 
@@ -153,3 +153,22 @@ Teams positive/negative coverage is in `fsm.tests.test_service_teams`.
 
 Contracts authorization, ownership, lifecycle, coverage, and retry coverage is in
 `fsm.tests.test_service_contracts`.
+
+## Preventive Maintenance endpoint delta (12 additions)
+
+| Endpoint | Access and accepted input | Root guard/scope | Bypass decision |
+|---|---|---|---|
+| `create_plan` | A Manager/System Manager; fixed Plan fields/tables | submitted Company scope plus controller Site/equipment/Contract ownership validation | guarded Plan insert |
+| `update_plan` | A Manager/System Manager; fixed mutable fields | exact Plan write/Company scope; terminal-state and revision guards | none |
+| `transition_plan` | A Manager/System Manager; Plan/status/reason/source | exact Plan write scope plus transition map | event insert only |
+| `generate_plan_occurrences` | A Manager/System Manager; Plan/bounded horizon | exact Plan write scope; active-state guard | guarded engine occurrence inserts |
+| `release_plan_occurrences` | A Manager/System Manager; Plan or occurrence names | exact Plan/each Occurrence write scope; eligible-state filter, row lock, deterministic key | guarded canonical Job insert |
+| `skip_plan_occurrence` | A Manager/System Manager; occurrence/reason | exact Occurrence write scope; open-state guard | none |
+| `reschedule_plan_occurrence` | A Manager/System Manager; occurrence/due date | exact Occurrence write scope; open-state guard and Plan membership | guarded occurrence insert |
+| `list_plans` | A Manager/System Manager or Customer | Company User Permission or exact current Customer ownership | none |
+| `get_plan` | A Manager/System Manager or owning Customer | exact Plan access | none |
+| `list_occurrences` | A FSM actor | DocType query hook scopes Company, Customer, or assigned released Job | none |
+| `get_occurrence` | A Manager/System Manager, owning Customer, or assigned Technician | exact Occurrence access through Company/Customer/released Job | none |
+| `maintenance_summary` | A Manager/System Manager or Customer | explicit Company/current Customer filters | scoped aggregate read |
+
+Preventive Maintenance ownership, authorization, lifecycle, timezone, idempotency, revision, grouping, and retry coverage is in `fsm.tests.test_preventive_maintenance`.
