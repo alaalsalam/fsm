@@ -303,6 +303,10 @@ def service_return_query(user: str | None = None) -> str:
 	return job_child_query("Service Return", user=user)
 
 
+def failure_analysis_query(user: str | None = None) -> str:
+	return job_child_query("Failure Analysis", user=user)
+
+
 def message_query(user: str | None = None) -> str:
 	return job_child_query("Service Job Message", user=user)
 

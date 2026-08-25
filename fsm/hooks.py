@@ -155,6 +155,7 @@ permission_query_conditions = {
 	"Maintenance Occurrence": "fsm.security.permissions.maintenance_occurrence_query",
 	"Inspection Template": "fsm.security.permissions.inspection_template_query",
 	"Equipment Inspection": "fsm.security.permissions.equipment_inspection_query",
+	"Failure Analysis": "fsm.security.permissions.failure_analysis_query",
 }
 
 has_permission = {
@@ -175,6 +176,7 @@ has_permission = {
 	"Maintenance Occurrence": "fsm.security.permissions.maintenance_occurrence_permission",
 	"Inspection Template": "fsm.security.permissions.inspection_template_permission",
 	"Equipment Inspection": "fsm.security.permissions.equipment_inspection_permission",
+	"Failure Analysis": "fsm.security.permissions.job_child_permission",
 }
 
 # Document Events

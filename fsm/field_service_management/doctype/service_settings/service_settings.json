@@ -16,6 +16,9 @@
   "low_stock_threshold"
   ,"installed_base_section"
   ,"warranty_start_basis"
+  ,"failure_analysis_section"
+  ,"repeat_failure_window_days"
+  ,"repeat_failure_escalation_count"
  ],
  "fields": [
   {
@@ -81,6 +84,27 @@
    "fieldtype": "Select",
    "label": "Warranty Start Basis",
    "options": "Delivery Date\nInstallation Date\nCommissioning Date"
+  },
+  {
+   "fieldname": "failure_analysis_section",
+   "fieldtype": "Section Break",
+   "label": "Failure Analysis"
+  },
+  {
+   "default": "90",
+   "description": "Look-back period used to identify repeat failures on the same Installed Equipment.",
+   "fieldname": "repeat_failure_window_days",
+   "fieldtype": "Int",
+   "label": "Repeat Failure Window (Days)",
+   "non_negative": 1
+  },
+  {
+   "default": "2",
+   "description": "Previous failures within the window that trigger escalation.",
+   "fieldname": "repeat_failure_escalation_count",
+   "fieldtype": "Int",
+   "label": "Repeat Failure Escalation Count",
+   "non_negative": 1
   }
  ],
  "index_web_pages_for_search": 1,
