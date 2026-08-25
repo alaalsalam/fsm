@@ -1,0 +1,35 @@
+{
+ "actions": [],
+ "autoname": "naming_series:",
+ "creation": "2026-08-25 18:00:00",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": ["naming_series", "template_name", "company", "status", "active", "revision", "template_signature", "item_group", "description", "items"],
+ "fields": [
+  {"default":"FSM-IT-.YYYY.-","fieldname":"naming_series","fieldtype":"Select","hidden":1,"options":"FSM-IT-.YYYY.-","reqd":1},
+  {"fieldname":"template_name","fieldtype":"Data","in_list_view":1,"label":"Template Name","reqd":1},
+  {"fieldname":"company","fieldtype":"Link","in_standard_filter":1,"label":"Company","options":"Company","reqd":1},
+  {"default":"Draft","fieldname":"status","fieldtype":"Select","in_list_view":1,"in_standard_filter":1,"label":"Status","options":"Draft\nActive\nInactive\nArchived","reqd":1},
+  {"default":"0","fieldname":"active","fieldtype":"Check","label":"Active","read_only":1},
+  {"default":"1","fieldname":"revision","fieldtype":"Int","label":"Revision","read_only":1},
+  {"fieldname":"template_signature","fieldtype":"Data","hidden":1,"label":"Template Signature","read_only":1},
+  {"fieldname":"item_group","fieldtype":"Link","label":"Equipment Item Group","options":"Item Group"},
+  {"fieldname":"description","fieldtype":"Text Editor","label":"Description"},
+  {"fieldname":"items","fieldtype":"Table","label":"Inspection Items","options":"Inspection Template Item","reqd":1}
+ ],
+ "links": [{"group":"Execution","link_doctype":"Equipment Inspection","link_fieldname":"inspection_template"}],
+ "modified": "2026-08-25 18:00:00",
+ "modified_by": "Administrator",
+ "module": "Field Service Management",
+ "name": "Inspection Template",
+ "owner": "Administrator",
+ "permissions": [
+  {"create":1,"delete":1,"email":1,"export":1,"print":1,"read":1,"report":1,"role":"System Manager","share":1,"write":1},
+  {"create":1,"delete":1,"email":1,"export":1,"print":1,"read":1,"report":1,"role":"FSM Manager","share":1,"write":1},
+  {"read":1,"role":"FSM Technician"}
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

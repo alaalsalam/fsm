@@ -1,0 +1,42 @@
+{
+ "actions": [],
+ "autoname": "naming_series:",
+ "creation": "2026-08-25 18:00:00",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": ["naming_series","installed_equipment","service_job","service_visit","inspection_template","template_revision","technician","customer","company","customer_site","status","started_on","completed_on","overall_result","corrective_action_hint","results","notes"],
+ "fields": [
+  {"default":"FSM-INSP-.YYYY.-","fieldname":"naming_series","fieldtype":"Select","hidden":1,"options":"FSM-INSP-.YYYY.-","reqd":1},
+  {"fieldname":"installed_equipment","fieldtype":"Link","in_list_view":1,"in_standard_filter":1,"label":"Installed Equipment","options":"Installed Equipment","reqd":1},
+  {"fieldname":"service_job","fieldtype":"Link","in_list_view":1,"in_standard_filter":1,"label":"Service Job","options":"Service Job","reqd":1},
+  {"fieldname":"service_visit","fieldtype":"Link","label":"Service Visit","options":"Service Visit"},
+  {"fieldname":"inspection_template","fieldtype":"Link","in_standard_filter":1,"label":"Inspection Template","options":"Inspection Template","reqd":1},
+  {"fieldname":"template_revision","fieldtype":"Int","label":"Template Revision","read_only":1,"reqd":1},
+  {"fieldname":"technician","fieldtype":"Link","in_standard_filter":1,"label":"Technician","options":"Technician","reqd":1},
+  {"fieldname":"customer","fieldtype":"Link","label":"Customer","options":"Customer","read_only":1,"reqd":1},
+  {"fieldname":"company","fieldtype":"Link","label":"Company","options":"Company","read_only":1,"reqd":1},
+  {"fieldname":"customer_site","fieldtype":"Link","label":"Customer Site","options":"Customer Site","read_only":1,"reqd":1},
+  {"default":"In Progress","fieldname":"status","fieldtype":"Select","in_list_view":1,"in_standard_filter":1,"label":"Status","options":"In Progress\nCompleted\nCancelled","reqd":1},
+  {"fieldname":"started_on","fieldtype":"Datetime","label":"Started On","read_only":1,"reqd":1},
+  {"fieldname":"completed_on","fieldtype":"Datetime","label":"Completed On","read_only":1},
+  {"default":"Pending","fieldname":"overall_result","fieldtype":"Select","in_list_view":1,"in_standard_filter":1,"label":"Overall Result","options":"Pending\nPass\nFail\nNeeds Refill\nNeeds Repair\nNeeds Replacement\nNot Accessible\nSkipped","read_only":1,"reqd":1},
+  {"fieldname":"corrective_action_hint","fieldtype":"Small Text","label":"Corrective Action Hint","read_only":1},
+  {"fieldname":"results","fieldtype":"Table","label":"Results","options":"Equipment Inspection Result","reqd":1},
+  {"fieldname":"notes","fieldtype":"Text","label":"Notes"}
+ ],
+ "modified": "2026-08-25 18:00:00",
+ "modified_by": "Administrator",
+ "module": "Field Service Management",
+ "name": "Equipment Inspection",
+ "owner": "Administrator",
+ "permissions": [
+  {"create":1,"email":1,"export":1,"print":1,"read":1,"report":1,"role":"System Manager","share":1,"write":1},
+  {"create":1,"email":1,"export":1,"print":1,"read":1,"report":1,"role":"FSM Manager","share":1,"write":1},
+  {"create":1,"read":1,"write":1,"role":"FSM Technician"},
+  {"read":1,"role":"FSM Customer"}
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

@@ -230,6 +230,51 @@ def maintenance_occurrence_permission(doc, user: str | None = None, permission_t
 	return True
 
 
+def inspection_template_query(user: str | None = None) -> str:
+	user = user or frappe.session.user
+	roles = user_roles(user)
+	if SYSTEM_MANAGER in roles:
+		return ""
+	if FSM_MANAGER in roles:
+		return sql_in_condition("`tabInspection Template`.`company`", allowed_companies(user) or set())
+	if FSM_TECHNICIAN in roles:
+		technician = current_technician(user, True)
+		company = frappe.db.get_value("Technician", technician, "company") if technician else "__none__"
+		return (
+			f"`tabInspection Template`.`company` = {frappe.db.escape(company)} "
+			"and `tabInspection Template`.`status` = 'Active'"
+		)
+	return "1=0"
+
+
+def inspection_template_permission(doc, user: str | None = None, permission_type: str | None = None):
+	from fsm.inspections.access import require_template_access
+
+	try:
+		require_template_access(doc, permission_type or "read", user=user)
+	except (frappe.AuthenticationError, frappe.PermissionError):
+		return False
+	return True
+
+
+def equipment_inspection_query(user: str | None = None) -> str:
+	job_scope = service_job_query(user)
+	return (
+		"exists (select 1 from `tabService Job` where `tabService Job`.`name` = "
+		f"`tabEquipment Inspection`.`service_job` and ({job_scope or '1=1'}))"
+	)
+
+
+def equipment_inspection_permission(doc, user: str | None = None, permission_type: str | None = None):
+	from fsm.inspections.access import require_inspection_access
+
+	try:
+		require_inspection_access(doc, permission_type or "read", user=user)
+	except (frappe.AuthenticationError, frappe.PermissionError):
+		return False
+	return True
+
+
 def equipment_location_query(user: str | None = None) -> str:
 	site_scope = customer_site_query(user)
 	return (

@@ -153,6 +153,8 @@ permission_query_conditions = {
 	"Technician Location Log": "fsm.security.permissions.location_log_query",
 	"Maintenance Plan": "fsm.security.permissions.maintenance_plan_query",
 	"Maintenance Occurrence": "fsm.security.permissions.maintenance_occurrence_query",
+	"Inspection Template": "fsm.security.permissions.inspection_template_query",
+	"Equipment Inspection": "fsm.security.permissions.equipment_inspection_query",
 }
 
 has_permission = {
@@ -171,6 +173,8 @@ has_permission = {
 	"Technician Location Log": "fsm.security.permissions.job_child_permission",
 	"Maintenance Plan": "fsm.security.permissions.maintenance_plan_permission",
 	"Maintenance Occurrence": "fsm.security.permissions.maintenance_occurrence_permission",
+	"Inspection Template": "fsm.security.permissions.inspection_template_permission",
+	"Equipment Inspection": "fsm.security.permissions.equipment_inspection_permission",
 }
 
 # Document Events

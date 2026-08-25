@@ -1,0 +1,32 @@
+{
+ "actions": [],
+ "creation": "2026-08-25 18:00:00",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": ["code","label","response_type","required","min_value","max_value","options","measurement_unit","evidence_required","failure_severity","action_on_fail","help_text"],
+ "fields": [
+  {"fieldname":"code","fieldtype":"Data","in_list_view":1,"label":"Code","reqd":1},
+  {"fieldname":"label","fieldtype":"Data","in_list_view":1,"label":"Label","reqd":1},
+  {"default":"Pass/Fail","fieldname":"response_type","fieldtype":"Select","in_list_view":1,"label":"Response Type","options":"Yes/No\nPass/Fail\nNumber\nText\nSelect\nDate\nPhoto\nSignature\nMeasurement","reqd":1},
+  {"default":"1","fieldname":"required","fieldtype":"Check","label":"Required"},
+  {"fieldname":"min_value","fieldtype":"Float","label":"Minimum Value"},
+  {"fieldname":"max_value","fieldtype":"Float","label":"Maximum Value"},
+  {"description":"One allowed value per line for Select responses.","fieldname":"options","fieldtype":"Small Text","label":"Options"},
+  {"fieldname":"measurement_unit","fieldtype":"Data","label":"Measurement Unit"},
+  {"default":"0","fieldname":"evidence_required","fieldtype":"Check","label":"Evidence Required"},
+  {"default":"Major","fieldname":"failure_severity","fieldtype":"Select","label":"Failure Severity","options":"Observation\nMinor\nMajor\nCritical"},
+  {"default":"Repair","fieldname":"action_on_fail","fieldtype":"Select","label":"Action on Fail","options":"None\nFollow Up\nRefill\nRepair\nReplace\nStop Work"},
+  {"fieldname":"help_text","fieldtype":"Small Text","label":"Help Text"}
+ ],
+ "istable": 1,
+ "modified": "2026-08-25 18:00:00",
+ "modified_by": "Administrator",
+ "module": "Field Service Management",
+ "name": "Inspection Template Item",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "idx",
+ "sort_order": "ASC",
+ "states": []
+}
