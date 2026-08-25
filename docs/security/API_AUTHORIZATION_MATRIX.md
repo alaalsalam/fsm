@@ -227,3 +227,17 @@ second mutation path.
 
 RCA command ownership, context isolation, repeat/escalation projection and explicit priority behavior are covered
 in `fsm.tests.test_failure_analysis`.
+
+## Workshop / RMA endpoint delta (7 command paths)
+
+| Endpoint | Access and accepted input | Root guard/scope | Bypass decision |
+|---|---|---|---|
+| `create_workshop_case` / `create_return` | A scoped Job actor; fixed case fields/items | exact Job write; Equipment→Job; company Warehouse/commercial links | guarded canonical Service Return insert |
+| `update_workshop_case` | A scoped Job actor; allowlisted evidence fields | exact parent Job write; terminal case immutable | none |
+| `transition_workshop_case` | A scoped Job actor; target status/reason | exact parent Job write; transition and evidence map | event insert only |
+| `list_returns` | A authenticated FSM actor; bounded Job/customer/status filters | Service Return query hook delegates to Job scope | none |
+| `get_return` | A visible Job actor; exact case | exact parent Job read | none |
+| `process_return` | A Manager; legacy approve/receive/close actions | exact parent Job manager scope; compatibility mapping | guarded Stock Entry only on receipt |
+
+Workshop ownership, evidence guards, cross-company rejection and native Stock Entry coverage are in
+`fsm.tests.test_workshop`.

@@ -83,3 +83,9 @@ The extra rows are post-baseline Phase 6 correlations. They do not store stock b
 
 `Failure Analysis` is an FSM diagnostic root owned by Quality/RCA and correlated to Service Job, Service Visit,
 Installed Equipment and Equipment Inspection. It is not an additional work-order aggregate.
+
+## Post-baseline Phase 8 evolution
+
+The existing `Service Return` root was extended into the canonical pickup/RMA/workshop case. No `Repair Order`
+DocType was added. ERPNext Quotation, Sales Invoice and Stock Entry remain authoritative for estimate, billing and
+stock respectively.

@@ -60,3 +60,13 @@ SwiftService contains 79 DocTypes (21 standalone and 58 child tables), 113 white
 - Its 113-method monolithic API and widespread permission bypass/explicit commits are not an authorization model to inherit.
 - Zero tests means implemented controller depth is not evidence of production correctness.
 - Many child tables reproduce timelines, attachments, taxes, payments, and state history rather than using platform primitives/events.
+## Phase 8 workshop disposition
+
+| Reference capability | Implementation status | Target decision |
+|---|---|---|
+| Pickup and workshop intake | Candidate clean-room → Implemented | Canonical Service Return command lifecycle |
+| Repair approval, testing and QA | Candidate clean-room → Implemented | Evidence-gated Service Return states |
+| Repair order | Duplicate / not suitable | Rejected; Service Job is the sole work order |
+| Estimate, invoice and parts stock | Duplicate of ERPNext | Native Quotation, Sales Invoice and Stock Entry only |
+
+No SwiftService source code was copied.

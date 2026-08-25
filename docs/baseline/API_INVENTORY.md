@@ -123,3 +123,9 @@ priority suggestion, list and get. `frontend/api` exposes the single typed `Fail
 - Limit parameters are not uniformly bounded.
 - Guest registration/booking lacks documented rate limiting, anti-abuse controls, and idempotency.
 - Mobile token provisioning stores long-lived API key/secret credentials; ADR-009 requires a safer device session design.
+## Post-baseline Phase 8 delta
+
+Workshop/RMA extends the existing returns module with `create_workshop_case`, `update_workshop_case` and
+`transition_workshop_case`; `create_return` and `process_return` remain compatibility paths into the same aggregate.
+The shared `WorkshopApi` is the typed consumer contract. No generic CRUD endpoint or parallel Repair Order API was
+introduced.

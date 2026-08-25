@@ -35,3 +35,10 @@ No new screen is approved unless it has one domain owner, one primary aggregate,
 - Console may expose organization-wide views only to authorized roles.
 - Portal may expose only the authenticated customer scope or explicitly public booking data.
 - Mobile may expose only assigned work plus approved lookup data, with offline commands governed by ADR-009.
+## Phase 8 workshop decision
+
+| Capability | Canonical target | Surface decision | Domain owner |
+|---|---|---|---|
+| Returns / RMA / workshop | One Service Return lifecycle linked to Service Job | Shared `WorkshopApi`; Console evidence-rich presentation completed in the later UX screen pass | FSM Workshop/RMA |
+| Repair work | Existing Service Job plus Service Time Log | No Repair Order screen or DocType | FSM Operations |
+| Estimate / billing / stock | ERPNext Quotation / Sales Invoice / Stock Entry | Link and project native documents only | ERPNext Selling/Accounts/Stock |
