@@ -53,3 +53,9 @@ export {
 	type MaterialPlanRow,
 	type MaterialPlan,
 } from "./src/materials";
+export {
+	FailureAnalysisApi,
+	type FailureAnalysisStatus,
+	type FailureSeverity,
+	type FailureAnalysis,
+} from "./src/failure-analysis";
