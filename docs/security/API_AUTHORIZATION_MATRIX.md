@@ -268,3 +268,12 @@ Internal costs, stock, staff notes and cross-customer rows are excluded and test
 | `domain_dashboard` | FSM Manager/System Manager; bounded 1–730 day window | server-resolved Manager Company; every operational root is Company scoped before child projections | none; read-only aggregation |
 
 Cross-company isolation and non-manager denial are covered in `fsm.tests.test_analytics_completion`.
+
+## Mobile offline endpoint delta (2 additions)
+
+| Endpoint | Access and accepted input | Root guard/scope | Bypass decision |
+|---|---|---|---|
+| `sync_commands` | Technician/Manager; ≤50 UUID command envelopes; allowlisted actions only | invoked domain command performs exact Job/Visit/Inspection/Report scope guard; optional optimistic version | guarded immutable receipt insert after successful authorization and command execution |
+| `command_status` | Technician/Manager; ≤100 UUIDs | receipt user must equal session user | none |
+
+Idempotency, conflict, customer denial and cross-company failure are covered in `fsm.tests.test_offline`.

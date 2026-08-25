@@ -149,3 +149,9 @@ It exposes fixed operational/commercial projections only after Contact→Custome
 `fsm.analytics.domain_dashboard` adds the company-scoped executive, operations, maintenance, team, contract and
 equipment scorecard. Current whitelist decorator count: **172**. The endpoint is read-only and the shared
 `DomainDashboard` client contract is consumed by Console.
+
+## Post-baseline Phase 13 delta
+
+`fsm.offline.sync_commands` and `fsm.offline.command_status` add two bounded mobile synchronization endpoints.
+Current whitelist decorator count: **174**. They expose an action allowlist over existing guarded commands, not
+generic CRUD. Successful UUIDs are durably idempotent through `Mobile Command Receipt`.
