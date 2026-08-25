@@ -14,6 +14,7 @@ import {
 import { Network } from "@capacitor/network";
 import { useRouter } from "vue-router";
 import { JobCard, type JobSummary } from "@kodlyft/ui";
+import { formatNumber, locale, t, toggleLocale } from "@kodlyft/ui";
 import { getDispatchJobs, getVanStock, type StockRow } from "@/lib/fsm";
 import { useDuty } from "@/lib/duty";
 import { cacheGet, cachePut, listCommands, syncQueued, type OfflineCommand } from "@/lib/offline";
@@ -41,8 +42,10 @@ async function load() {
 	} catch {
 		jobs.value = (await cacheGet<JobSummary[]>("assigned-jobs")) || [];
 		if (!jobs.value.length)
-			loadError.value =
-				"Couldn't load assigned jobs. Check your connection and sign in again.";
+			loadError.value = t(
+				"تعذر تحميل الأعمال المسندة. تحقق من الاتصال وسجل الدخول مجددًا.",
+				"Couldn't load assigned jobs. Check your connection and sign in again.",
+			);
 	} finally {
 		loading.value = false;
 	}
@@ -87,9 +90,21 @@ async function refresh(event: RefresherCustomEvent) {
 	<IonPage>
 		<IonHeader class="ion-no-border">
 			<IonToolbar>
-				<IonTitle>My jobs</IonTitle>
-				<RouterLink to="/equipment" slot="end" class="mr-4 text-sm font-semibold text-brand"
-					>Equipment</RouterLink
+				<IonTitle>{{ t("أعمالي", "My jobs") }}</IonTitle>
+				<button
+					slot="end"
+					type="button"
+					class="me-2 text-sm font-semibold text-brand"
+					:aria-label="t('تغيير اللغة إلى الإنجليزية', 'Switch language to Arabic')"
+					@click="toggleLocale"
+				>
+					{{ locale === "ar" ? "EN" : "ع" }}
+				</button>
+				<RouterLink
+					to="/equipment"
+					slot="end"
+					class="me-4 text-sm font-semibold text-brand"
+					>{{ t("المعدات", "Equipment") }}</RouterLink
 				>
 			</IonToolbar>
 		</IonHeader>
@@ -105,7 +120,13 @@ async function refresh(event: RefresherCustomEvent) {
 					class="mt-2 w-full rounded-xl border border-brand/30 bg-brand/10 px-3 py-2 text-sm text-brand"
 					@click="synchronize"
 				>
-					{{ pendingCount }} change(s) waiting to sync · Tap to retry
+					{{ formatNumber(pendingCount) }}
+					{{
+						t(
+							"تغييرات بانتظار المزامنة · اضغط لإعادة المحاولة",
+							"change(s) waiting to sync · Tap to retry",
+						)
+					}}
 				</button>
 				<div
 					v-if="!online"
@@ -123,7 +144,12 @@ async function refresh(event: RefresherCustomEvent) {
 					>
 						<path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM12 8v4M12 16h.01" />
 					</svg>
-					Offline — showing saved jobs. Changes sync when you reconnect.
+					{{
+						t(
+							"غير متصل — تُعرض الأعمال المحفوظة وستتم المزامنة عند عودة الاتصال.",
+							"Offline — showing saved jobs. Changes sync when you reconnect.",
+						)
+					}}
 				</div>
 
 				<div class="kl-glass mt-3 flex items-center justify-between gap-3 rounded-2xl p-4">
@@ -135,10 +161,18 @@ async function refresh(event: RefresherCustomEvent) {
 						/>
 						<div>
 							<p class="text-sm font-medium text-cmd-fg">
-								{{ onDuty ? "On duty" : "Off duty" }}
+								{{
+									onDuty
+										? t("في الدوام", "On duty")
+										: t("خارج الدوام", "Off duty")
+								}}
 							</p>
 							<p class="text-xs text-cmd-fg-muted">
-								{{ onDuty ? "Sharing your location" : "Clock in to take jobs" }}
+								{{
+									onDuty
+										? t("تتم مشاركة موقعك", "Sharing your location")
+										: t("ابدأ الدوام لاستلام الأعمال", "Clock in to take jobs")
+								}}
 							</p>
 						</div>
 					</div>
@@ -154,22 +188,26 @@ async function refresh(event: RefresherCustomEvent) {
 						@click="toggle"
 					>
 						<IonSpinner v-if="dutyBusy" name="crescent" class="size-4" />
-						{{ onDuty ? "Clock out" : "Clock in" }}
+						{{ onDuty ? t("إنهاء الدوام", "Clock out") : t("بدء الدوام", "Clock in") }}
 					</button>
 				</div>
 				<p v-if="dutyError" class="mt-2 text-xs text-danger">{{ dutyError }}</p>
 
 				<div class="kl-glass mt-3 flex items-center justify-between rounded-2xl p-5">
 					<div>
-						<p class="text-sm text-cmd-fg-muted">Assigned today</p>
+						<p class="text-sm text-cmd-fg-muted">
+							{{ t("المسند اليوم", "Assigned today") }}
+						</p>
 						<p class="mt-1 font-mono text-4xl tabular-nums text-cmd-fg">
-							{{ todayCount }}
+							{{ formatNumber(todayCount) }}
 						</p>
 					</div>
-					<div class="text-right">
-						<p class="text-sm text-cmd-fg-muted">In progress</p>
+					<div class="text-end">
+						<p class="text-sm text-cmd-fg-muted">
+							{{ t("قيد التنفيذ", "In progress") }}
+						</p>
 						<p class="mt-1 font-mono text-4xl tabular-nums text-brand">
-							{{ activeCount }}
+							{{ formatNumber(activeCount) }}
 						</p>
 					</div>
 				</div>
@@ -180,11 +218,11 @@ async function refresh(event: RefresherCustomEvent) {
 						@click="showStock = !showStock"
 					>
 						<span class="text-sm font-medium text-cmd-fg">
-							Van stock
+							{{ t("مخزون المركبة", "Van stock") }}
 							<span class="text-cmd-fg-muted">({{ vanStock.length }})</span>
 						</span>
 						<span class="text-xs text-cmd-fg-muted">{{
-							showStock ? "Hide" : "Show"
+							showStock ? t("إخفاء", "Hide") : t("عرض", "Show")
 						}}</span>
 					</button>
 					<ul v-if="showStock" class="mt-3 divide-y divide-white/10">
@@ -197,10 +235,11 @@ async function refresh(event: RefresherCustomEvent) {
 								s.item_name || s.item_code
 							}}</span>
 							<span
-								class="ml-3 shrink-0 font-mono tabular-nums"
+								class="ms-3 shrink-0 font-mono tabular-nums"
 								:class="s.low ? 'text-danger' : 'text-cmd-fg-muted'"
 							>
-								{{ s.actual_qty }}<span v-if="s.low" class="ml-1">· low</span>
+								{{ formatNumber(s.actual_qty)
+								}}<span v-if="s.low" class="ms-1">· {{ t("منخفض", "low") }}</span>
 							</span>
 						</li>
 					</ul>

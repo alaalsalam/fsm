@@ -7,6 +7,7 @@
 import { ref } from "vue";
 import { Geolocation } from "@capacitor/geolocation";
 import { clockIn, clockOut, updateLocation } from "./fsm";
+import { t } from "@kodlyft/ui";
 
 const onDuty = ref(false);
 const busy = ref(false);
@@ -46,7 +47,10 @@ export function useDuty() {
 			await startWatch();
 			onDuty.value = true;
 		} catch {
-			error.value = "Couldn't clock in. Check your connection.";
+			error.value = t(
+				"تعذر بدء الدوام. تحقق من الاتصال.",
+				"Couldn't clock in. Check your connection.",
+			);
 		} finally {
 			busy.value = false;
 		}
@@ -60,7 +64,10 @@ export function useDuty() {
 			await clockOut();
 			onDuty.value = false;
 		} catch {
-			error.value = "Couldn't clock out. Check your connection.";
+			error.value = t(
+				"تعذر إنهاء الدوام. تحقق من الاتصال.",
+				"Couldn't clock out. Check your connection.",
+			);
 		} finally {
 			busy.value = false;
 		}

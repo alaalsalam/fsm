@@ -2,6 +2,7 @@ import { createApp } from "vue";
 import { IonicVue } from "@ionic/vue";
 import { createPinia } from "pinia";
 import App from "./App.vue";
+import { initializeLocale } from "@kodlyft/ui";
 import router from "./router";
 
 /* Ionic core CSS */
@@ -16,6 +17,8 @@ import "@ionic/vue/css/display.css";
 /* KodLyft theme (Ionic vars) + tokens + Tailwind utilities */
 import "./theme/variables.css";
 import "./style.css";
+
+initializeLocale("ar");
 
 const app = createApp(App).use(IonicVue).use(createPinia()).use(router);
 

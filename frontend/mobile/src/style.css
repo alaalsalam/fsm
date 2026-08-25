@@ -25,3 +25,13 @@ ion-toolbar {
 ion-title {
 	font-weight: 700;
 }
+
+html[dir="rtl"] ion-back-button {
+	transform: scaleX(-1);
+}
+html[dir="rtl"] input[type="email"],
+html[dir="rtl"] input[type="tel"],
+html[dir="rtl"] input[type="password"] {
+	direction: ltr;
+	text-align: start;
+}

@@ -19,6 +19,7 @@ import {
 } from "@ionic/vue";
 import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
 import { ChecklistItem, KlButton } from "@kodlyft/ui";
+import { formatNumber, statusLabel, t } from "@kodlyft/ui";
 import {
 	startTimer,
 	stopTimer,
@@ -67,6 +68,18 @@ const clock = (s: number) => {
 		.padStart(2, "0");
 	return `${h}:${m}:${sec}`;
 };
+const responseTypeLabel = (value: string) =>
+	({
+		"Yes/No": t("نعم / لا", "Yes / No"),
+		"Pass/Fail": t("ناجح / فاشل", "Pass / Fail"),
+		Number: t("رقم", "Number"),
+		Text: t("نص", "Text"),
+		Select: t("اختيار", "Select"),
+		Date: t("تاريخ", "Date"),
+		Photo: t("صورة", "Photo"),
+		Signature: t("توقيع", "Signature"),
+		Measurement: t("قياس", "Measurement"),
+	})[value] || value;
 
 async function toggleTimer() {
 	timerBusy.value = true;
@@ -85,7 +98,10 @@ async function toggleTimer() {
 			tick = setInterval(() => (elapsed.value = (Date.now() - startedAt) / 1000), 1000);
 		}
 	} catch {
-		timerError.value = "Couldn't update the timer. Check your connection.";
+		timerError.value = t(
+			"تعذر تحديث المؤقت. تحقق من الاتصال.",
+			"Couldn't update the timer. Check your connection.",
+		);
 	} finally {
 		timerBusy.value = false;
 	}
@@ -120,7 +136,11 @@ onMounted(async () => {
 			job.value = cached.job;
 			visits.value = cached.visits;
 			equipment.value = cached.equipment;
-		} else actionError.value = "Couldn't load this job from the server.";
+		} else
+			actionError.value = t(
+				"تعذر تحميل هذا العمل من الخادم.",
+				"Couldn't load this job from the server.",
+			);
 	} finally {
 		loading.value = false;
 	}
@@ -147,8 +167,10 @@ async function advance(visit: MobileVisit) {
 		job.value = await getJob(props.id);
 	} catch {
 		if (connected) {
-			actionError.value =
-				"The server rejected this change. Refresh the job and check your assignment.";
+			actionError.value = t(
+				"رفض الخادم هذا التغيير. حدّث العمل وتحقق من الإسناد.",
+				"The server rejected this change. Refresh the job and check your assignment.",
+			);
 			return;
 		}
 		const actionByCommand: Record<string, string> = {
@@ -167,7 +189,10 @@ async function advance(visit: MobileVisit) {
 				payload: {},
 			}),
 		);
-		actionError.value = "Saved offline. This visit change will sync automatically.";
+		actionError.value = t(
+			"حُفظ دون اتصال وستتم مزامنة تغيير الزيارة تلقائيًا.",
+			"Saved offline. This visit change will sync automatically.",
+		);
 	} finally {
 		actionBusy.value = false;
 	}
@@ -213,7 +238,10 @@ async function saveSignature() {
 	const report = reports.value.find((row) => row.status === "Customer Review");
 	const data = signatureCanvas.value?.toDataURL("image/png");
 	if (!report || !data) {
-		workflowMessage.value = "Prepare the report and capture the signature first.";
+		workflowMessage.value = t(
+			"جهّز التقرير والتقط التوقيع أولًا.",
+			"Prepare the report and capture the signature first.",
+		);
 		return;
 	}
 	await mediaPut(`signature:${report.name}`, data);
@@ -235,21 +263,27 @@ async function saveSignature() {
 				payload: { status: "Customer Signed" },
 			}),
 		);
-		workflowMessage.value = "Signature saved locally and queued for sync.";
+		workflowMessage.value = t(
+			"حُفظ التوقيع محليًا وأضيف إلى طابور المزامنة.",
+			"Signature saved locally and queued for sync.",
+		);
 		return;
 	}
 	try {
 		await reportingApi.update(report.name, { customer_signature: data });
 		await reportingApi.transition(report.name, "Customer Signed");
-		workflowMessage.value = "Customer signature captured.";
+		workflowMessage.value = t("تم التقاط توقيع العميل.", "Customer signature captured.");
 	} catch {
-		workflowMessage.value = "Signature could not be submitted.";
+		workflowMessage.value = t("تعذر إرسال التوقيع.", "Signature could not be submitted.");
 	}
 }
 
 async function beginInspection(row: JobEquipmentRow) {
 	if (!templates.value.length) {
-		workflowMessage.value = "No active inspection template is available.";
+		workflowMessage.value = t(
+			"لا يوجد نموذج فحص نشط.",
+			"No active inspection template is available.",
+		);
 		return;
 	}
 	actionBusy.value = true;
@@ -262,8 +296,10 @@ async function beginInspection(row: JobEquipmentRow) {
 		});
 		inspections.value.unshift(created);
 	} catch {
-		workflowMessage.value =
-			"Inspection could not be started. Check assignment and template scope.";
+		workflowMessage.value = t(
+			"تعذر بدء الفحص. تحقق من الإسناد ونطاق النموذج.",
+			"Inspection could not be started. Check assignment and template scope.",
+		);
 	} finally {
 		actionBusy.value = false;
 	}
@@ -300,15 +336,20 @@ async function saveInspection(inspection: EquipmentInspection, complete = false)
 						payload: {},
 					}),
 				);
-			workflowMessage.value = "Inspection saved offline and queued for sync.";
+			workflowMessage.value = t(
+				"حُفظ الفحص دون اتصال وأضيف إلى طابور المزامنة.",
+				"Inspection saved offline and queued for sync.",
+			);
 			return;
 		}
 		await inspectionsApi.save(inspection.name, responses);
 		if (complete) await inspectionsApi.complete(inspection.name);
 		inspections.value = await inspectionsApi.list({ service_job: props.id });
 	} catch {
-		workflowMessage.value =
-			"Inspection validation failed. Complete required responses and evidence.";
+		workflowMessage.value = t(
+			"فشل التحقق من الفحص. أكمل الإجابات والأدلة المطلوبة.",
+			"Inspection validation failed. Complete required responses and evidence.",
+		);
 	} finally {
 		actionBusy.value = false;
 	}
@@ -333,8 +374,10 @@ async function consume(row: MaterialPlan["items"][number]) {
 		);
 		materialPlan.value = await materialsApi.plan(props.id);
 	} catch {
-		workflowMessage.value =
-			"Material consumption was rejected; verify issued quantity and van warehouse.";
+		workflowMessage.value = t(
+			"رُفض استهلاك المواد؛ تحقق من الكمية المصروفة ومستودع المركبة.",
+			"Material consumption was rejected; verify issued quantity and van warehouse.",
+		);
 	}
 }
 
@@ -347,9 +390,12 @@ async function prepareSignatureReport() {
 			report = await reportingApi.transition(report.name, "Customer Review");
 			reports.value.unshift(report);
 		}
-		workflowMessage.value = `Report ${report.name} is ready for customer signature.`;
+		workflowMessage.value = `${t("التقرير", "Report")} ${report.name} ${t("جاهز لتوقيع العميل.", "is ready for customer signature.")}`;
 	} catch {
-		workflowMessage.value = "The customer report could not be prepared.";
+		workflowMessage.value = t(
+			"تعذر تجهيز تقرير العميل.",
+			"The customer report could not be prepared.",
+		);
 	}
 }
 
@@ -386,12 +432,14 @@ async function addPhoto() {
 				<section v-if="job" class="rounded-lg border border-border bg-bg p-4">
 					<h2 class="text-lg font-bold">{{ job.customer_name || job.customer }}</h2>
 					<p class="text-sm text-fg-muted">
-						{{ job.status }} · {{ job.phase || "Planning" }}
+						{{ statusLabel(job.status) }} · {{ statusLabel(job.phase || "Planning") }}
 					</p>
 					<p class="mt-2 text-sm">{{ job.address_display }}</p>
 				</section>
 				<section v-if="visits.length">
-					<h2 class="mb-2 text-lg font-bold">Service visits</h2>
+					<h2 class="mb-2 text-lg font-bold">
+						{{ t("زيارات الخدمة", "Service visits") }}
+					</h2>
 					<div
 						v-for="visit in visits"
 						:key="visit.name"
@@ -399,8 +447,10 @@ async function addPhoto() {
 					>
 						<div class="flex items-center justify-between">
 							<div>
-								<p class="font-semibold">Visit {{ visit.visit_number }}</p>
-								<p class="text-sm text-fg-muted">{{ visit.status }}</p>
+								<p class="font-semibold">
+									{{ t("زيارة", "Visit") }} {{ formatNumber(visit.visit_number) }}
+								</p>
+								<p class="text-sm text-fg-muted">{{ statusLabel(visit.status) }}</p>
 							</div>
 							<button
 								v-if="commandByStatus[visit.status]"
@@ -408,18 +458,25 @@ async function addPhoto() {
 								:disabled="actionBusy"
 								@click="advance(visit)"
 							>
-								Continue
+								{{ t("متابعة", "Continue") }}
 							</button>
 						</div>
 					</div>
 				</section>
 				<section>
-					<h2 class="mb-2 text-lg font-bold">Linked equipment</h2>
+					<h2 class="mb-2 text-lg font-bold">
+						{{ t("المعدات المرتبطة", "Linked equipment") }}
+					</h2>
 					<p
 						v-if="!equipment.length"
 						class="rounded-lg border border-dashed border-border p-4 text-sm text-fg-muted"
 					>
-						No installed equipment linked to this job.
+						{{
+							t(
+								"لا توجد معدات مركبة مرتبطة بهذا العمل.",
+								"No installed equipment linked to this job.",
+							)
+						}}
 					</p>
 					<RouterLink
 						v-for="row in equipment"
@@ -435,7 +492,9 @@ async function addPhoto() {
 									}}<span v-if="row.serial_no"> · {{ row.serial_no }}</span>
 								</p>
 							</div>
-							<span class="text-xs text-brand">{{ row.equipment_status }}</span>
+							<span class="text-xs text-brand">{{
+								statusLabel(row.equipment_status)
+							}}</span>
 						</div>
 					</RouterLink>
 					<button
@@ -445,18 +504,19 @@ async function addPhoto() {
 						class="mb-2 w-full rounded-lg border border-brand/40 px-3 py-2 text-sm text-brand"
 						@click="beginInspection(row)"
 					>
-						Start inspection
+						{{ t("بدء الفحص", "Start inspection") }}
 					</button>
 				</section>
 				<section v-if="inspections.length">
-					<h2 class="mb-2 text-lg font-bold">Inspections</h2>
+					<h2 class="mb-2 text-lg font-bold">{{ t("الفحوصات", "Inspections") }}</h2>
 					<div
 						v-for="inspection in inspections"
 						:key="inspection.name"
 						class="mb-3 rounded-lg border border-border bg-bg p-4"
 					>
 						<p class="font-semibold">
-							{{ inspection.installed_equipment }} · {{ inspection.overall_result }}
+							{{ inspection.installed_equipment }} ·
+							{{ statusLabel(inspection.overall_result) }}
 						</p>
 						<label
 							v-for="result in inspection.results"
@@ -479,7 +539,7 @@ async function addPhoto() {
 								v-else
 								v-model="result.response_value"
 								class="w-full rounded-lg border border-border bg-transparent p-2"
-								:placeholder="result.response_type"
+								:placeholder="responseTypeLabel(result.response_type)"
 							/>
 						</label>
 						<div v-if="inspection.status === 'In Progress'" class="mt-3 flex gap-2">
@@ -487,18 +547,18 @@ async function addPhoto() {
 								class="rounded-lg border border-brand px-3 py-2 text-sm text-brand"
 								@click="saveInspection(inspection)"
 							>
-								Save</button
+								{{ t("حفظ", "Save") }}</button
 							><button
 								class="rounded-lg bg-brand px-3 py-2 text-sm font-semibold text-white"
 								@click="saveInspection(inspection, true)"
 							>
-								Complete
+								{{ t("إكمال", "Complete") }}
 							</button>
 						</div>
 					</div>
 				</section>
 				<section v-if="materialPlan?.items?.length">
-					<h2 class="mb-2 text-lg font-bold">Materials</h2>
+					<h2 class="mb-2 text-lg font-bold">{{ t("المواد", "Materials") }}</h2>
 					<div
 						v-for="row in materialPlan.items"
 						:key="row.requirement_row"
@@ -507,8 +567,10 @@ async function addPhoto() {
 						<div>
 							<p>{{ row.item_name || row.item_code }}</p>
 							<p class="text-xs text-fg-muted">
-								Available {{ row.available_qty }} · Used {{ row.consumed_qty }}/{{
-									row.required_qty
+								{{ t("المتاح", "Available") }}
+								{{ formatNumber(row.available_qty) }} · {{ t("المستخدم", "Used") }}
+								{{ formatNumber(row.consumed_qty) }}/{{
+									formatNumber(row.required_qty)
 								}}
 							</p>
 						</div>
@@ -516,14 +578,14 @@ async function addPhoto() {
 							class="rounded-lg border border-brand px-3 py-2 text-xs text-brand"
 							@click="consume(row)"
 						>
-							Consume
+							{{ t("استهلاك", "Consume") }}
 						</button>
 					</div>
 				</section>
 				<section class="rounded-lg border border-border bg-bg p-4">
 					<div class="flex items-center justify-between">
 						<div>
-							<h2 class="text-lg font-bold">Labour timer</h2>
+							<h2 class="text-lg font-bold">{{ t("مؤقت العمل", "Labour timer") }}</h2>
 							<p
 								class="font-mono text-2xl tabular-nums"
 								:class="timerRunning ? 'text-brand' : 'text-fg-muted'"
@@ -532,7 +594,7 @@ async function addPhoto() {
 									timerRunning
 										? clock(elapsed)
 										: lastHours != null
-											? `${lastHours.toFixed(2)} h logged`
+											? `${formatNumber(lastHours)} ${t("ساعة مسجلة", "hours logged")}`
 											: "00:00:00"
 								}}
 							</p>
@@ -549,14 +611,14 @@ async function addPhoto() {
 							@click="toggleTimer"
 						>
 							<IonSpinner v-if="timerBusy" name="crescent" class="size-4" />
-							{{ timerRunning ? "Stop" : "Start" }}
+							{{ timerRunning ? t("إيقاف", "Stop") : t("بدء", "Start") }}
 						</button>
 					</div>
 					<p v-if="timerError" class="mt-2 text-xs text-danger">{{ timerError }}</p>
 				</section>
 
 				<section>
-					<h2 class="mb-2 text-lg font-bold">Checklist</h2>
+					<h2 class="mb-2 text-lg font-bold">{{ t("قائمة التحقق", "Checklist") }}</h2>
 					<div class="rounded-lg border border-border bg-bg">
 						<ChecklistItem
 							v-for="(item, i) in job?.tasks || []"
@@ -570,7 +632,7 @@ async function addPhoto() {
 				</section>
 
 				<section>
-					<h2 class="mb-2 text-lg font-bold">Photos</h2>
+					<h2 class="mb-2 text-lg font-bold">{{ t("الصور", "Photos") }}</h2>
 					<div class="grid grid-cols-3 gap-2">
 						<img
 							v-for="(src, i) in photos"
@@ -583,19 +645,19 @@ async function addPhoto() {
 							class="flex aspect-square items-center justify-center rounded-md border border-dashed border-border text-fg-muted"
 							@click="addPhoto"
 						>
-							+ Add
+							+ {{ t("إضافة", "Add") }}
 						</button>
 					</div>
 				</section>
 
 				<section>
-					<h2 class="mb-2 text-lg font-bold">Signature</h2>
+					<h2 class="mb-2 text-lg font-bold">{{ t("التوقيع", "Signature") }}</h2>
 					<button
 						type="button"
 						class="w-full rounded-lg border border-brand px-3 py-3 text-brand"
 						@click="prepareSignatureReport"
 					>
-						Prepare customer signature report
+						{{ t("تجهيز تقرير توقيع العميل", "Prepare customer signature report") }}
 					</button>
 					<canvas
 						ref="signatureCanvas"
@@ -612,7 +674,7 @@ async function addPhoto() {
 						class="mt-2 w-full rounded-lg bg-brand px-3 py-3 font-semibold text-white"
 						@click="saveSignature"
 					>
-						Save signature
+						{{ t("حفظ التوقيع", "Save signature") }}
 					</button>
 				</section>
 				<p
@@ -622,7 +684,7 @@ async function addPhoto() {
 					{{ workflowMessage }}
 				</p>
 
-				<KlButton block>Complete job</KlButton>
+				<KlButton block>{{ t("إكمال العمل", "Complete job") }}</KlButton>
 			</div>
 		</IonContent>
 	</IonPage>
