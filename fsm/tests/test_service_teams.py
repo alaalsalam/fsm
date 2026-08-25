@@ -214,9 +214,10 @@ class TestServiceTeamDispatch(FrappeTestCase, ServiceTeamMixin):
 			assign_team(job, self.skilled_team.name)
 
 	def test_capacity_blocks_assignment(self):
+		capacity_tech = self._make_technician(f"STM Capacity {_hash()}", self.company)
 		small_team = self._make_team(
 			self.company,
-			[{"technician": self.plain, "role_in_team": "Technician"}],
+			[{"technician": capacity_tech, "role_in_team": "Technician"}],
 			capacity=1,
 		)
 		job1 = self._make_job()
@@ -227,9 +228,10 @@ class TestServiceTeamDispatch(FrappeTestCase, ServiceTeamMixin):
 			assign_team(job2, small_team.name)
 
 	def test_inactive_team_not_suggested(self):
+		inactive_tech = self._make_technician(f"STM Inactive {_hash()}", self.company)
 		self._make_team(
 			self.company,
-			[{"technician": self.plain, "role_in_team": "Technician"}],
+			[{"technician": inactive_tech, "role_in_team": "Technician"}],
 			status="Suspended",
 		)
 		job = self._make_job(service_type="HVAC")
