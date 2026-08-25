@@ -3,6 +3,11 @@ import { expect, test, type Page, type Route } from "@playwright/test";
 const json = (route: Route, body: unknown) =>
 	route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(body) });
 
+test.beforeEach(async ({ page }) => {
+	// Console defaults to Arabic. Keep English assertions deterministic across clean browsers.
+	await page.addInitScript(() => localStorage.setItem("kl-lang", "en"));
+});
+
 async function mockConsoleSession(page: Page) {
 	await page.route(/\/api\/(method|resource)\//, (route) => {
 		const url = decodeURIComponent(route.request().url());
