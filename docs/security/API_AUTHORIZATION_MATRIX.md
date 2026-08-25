@@ -1,6 +1,6 @@
 # API authorization matrix
 
-Date: 2026-08-25. Inventory source: Python whitelist decorators at the PM gate revision. Total: **128/128 current endpoints classified**. The original 58-row GATE-001 table remains below as an audit baseline; CORE, Installed Base, Teams, Contracts, and Preventive Maintenance additions are reconciled in phase deltas. Default is deny; frontend visibility is never an authorization control.
+Date: 2026-08-25. Inventory source: Python whitelist decorators at the Inspection gate revision. Total: **139/139 current endpoints classified**. The original 58-row GATE-001 table remains below as an audit baseline; later gate additions are reconciled in phase deltas. Default is deny; frontend visibility is never an authorization control.
 
 Legend: access `G` = explicit Guest, `A` = authenticated. Scope columns use `C` = Company User Permission, `T` = Service Territory, `O` = current Customer ownership, `A` = assigned Technician, `—` = not applicable. Read/bypass values are `No`, `Scoped` (root IDs or warehouses were authorized first), or the named documented exception. Tests: `AUTH`, `COMP`, `CUST`, `TECH`, `GUEST`, `FIELDS`, `STATE`, `AGG`, `RATE`, `ROLLBACK`, `CHILD`, `E2E`.
 
@@ -172,3 +172,21 @@ Contracts authorization, ownership, lifecycle, coverage, and retry coverage is i
 | `maintenance_summary` | A Manager/System Manager or Customer | explicit Company/current Customer filters | scoped aggregate read |
 
 Preventive Maintenance ownership, authorization, lifecycle, timezone, idempotency, revision, grouping, and retry coverage is in `fsm.tests.test_preventive_maintenance`.
+
+## Inspection Engine endpoint delta (11 additions)
+
+| Endpoint | Access and accepted input | Root guard/scope | Bypass decision |
+|---|---|---|---|
+| `create_template` | A Manager/System Manager; fixed template fields/items | Manager Company scope plus typed controller validation | none |
+| `update_template` | A Manager/System Manager; fixed mutable fields | exact Template Company write scope and archived guard | none |
+| `transition_template` | A Manager/System Manager; Template/status | exact Template scope plus lifecycle map | none |
+| `start_inspection` | A Manager or assigned Technician; Job/equipment/template/optional Visit | Job write/assignment; active same-company Template; equipment/Visit root relation | guarded Inspection insert |
+| `save_inspection_responses` | A Manager or assigned Technician; Inspection and allowlisted response fields | parent Job write/assignment; in-progress guard; server-owned fields rejected | none |
+| `complete_inspection` | A Manager or assigned Technician; Inspection | parent Job write/assignment; server outcome/evidence validation | none |
+| `close_inspection_without_access` | A Manager or assigned Technician; Inspection/result/reason | parent Job write/assignment; fixed dispositions and required reason | none |
+| `list_templates` | A Manager or Technician | Template query hook: Company scope; Technician sees active own-company | none |
+| `get_template` | A Manager or Technician | exact Template access | none |
+| `list_inspections` | A FSM actor | parent Job query hook: Company, Customer or assigned Technician | none |
+| `get_inspection` | A Manager, assigned Technician or owning Customer | exact parent Job/customer access | none |
+
+Inspection positive/negative authorization and server outcome coverage is in `fsm.tests.test_inspection_engine`.

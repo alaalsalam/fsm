@@ -1,6 +1,6 @@
 # ARCH-001 Target ERD
 
-Status: **CORE, Installed Base, Service Teams, Service Contracts/AMC, and Preventive Maintenance implemented; later entities remain design-only**.
+Status: **CORE, Installed Base, Service Teams, Service Contracts/AMC, Preventive Maintenance, and typed Inspections implemented; later entities remain design-only**.
 
 ```mermaid
 erDiagram
@@ -59,6 +59,13 @@ erDiagram
     MAINTENANCE_PLAN_LINE ||--o{ MAINTENANCE_OCCURRENCE : schedules
     INSTALLED_EQUIPMENT ||--o{ MAINTENANCE_OCCURRENCE : becomes_due
     SERVICE_JOB o|--o{ MAINTENANCE_OCCURRENCE : executes
+    INSPECTION_TEMPLATE ||--o{ INSPECTION_TEMPLATE_ITEM : defines
+    INSPECTION_TEMPLATE ||--o{ EQUIPMENT_INSPECTION : instantiates
+    INSTALLED_EQUIPMENT ||--o{ EQUIPMENT_INSPECTION : inspected
+    SERVICE_JOB ||--o{ EQUIPMENT_INSPECTION : owns_execution
+    SERVICE_VISIT o|--o{ EQUIPMENT_INSPECTION : records_during
+    TECHNICIAN ||--o{ EQUIPMENT_INSPECTION : performs
+    EQUIPMENT_INSPECTION ||--o{ EQUIPMENT_INSPECTION_RESULT : records
 ```
 
 ## Ownership and invariants
@@ -84,8 +91,10 @@ erDiagram
 | Maintenance Plan | Implemented | FSM Maintenance | owns recurrence policy and revision; never execution/commercial state |
 | Maintenance Plan Line/Equipment | Implemented child tables | FSM Maintenance | cadence and explicit Installed Equipment scope |
 | Maintenance Occurrence | Implemented durable ledger | FSM Maintenance | unique due obligation; releases only canonical Service Job |
+| Inspection Template/Item | Implemented root/child | FSM Inspections | versioned typed definition; not a Job task checklist duplicate |
+| Equipment Inspection/Result | Implemented durable root/child | FSM Inspections | per-equipment evidence and server outcome within authorized Job |
 
-Inspection and other later-phase concepts remain design-only.
+Failure Analysis, workshop and other later-phase concepts remain design-only.
 
 ## Aggregate boundary
 

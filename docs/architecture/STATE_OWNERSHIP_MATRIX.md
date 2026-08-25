@@ -22,6 +22,8 @@ Status: **CORE slice implemented and verified**. Only the named owner authors st
 | Contract entitlement | included/used/remaining projection | FSM Contracts consumption service | scoped Manager/System process with unique idempotency key | coverage engine, Portal, renewals |
 | Maintenance Plan | Draft, Active, Paused, Completed, Cancelled | FSM Maintenance command service | scoped Manager/System Manager | Console, scheduler, Occurrence engine |
 | Maintenance Occurrence | Forecast, Due, Released, Completed, Skipped, Cancelled, Overdue | FSM Maintenance engine/commands; Job completion projection | scheduler or scoped Manager; assigned Job is read-only to Technician | Console, Service Job, reports |
+| Inspection Template | Draft, Active, Inactive, Archived | FSM Inspections command service | scoped Manager/System Manager | Mobile, Console, Equipment Inspection |
+| Equipment Inspection | In Progress, Completed, Cancelled; result Pending/Pass/Fail/Needs Refill/Needs Repair/Needs Replacement/Not Accessible/Skipped | FSM Inspections commands and server outcome engine | scoped Manager or assigned Job Technician | Job/equipment history, reports, later RCA |
 
 ## Projection rules
 
@@ -38,5 +40,6 @@ Status: **CORE slice implemented and verified**. Only the named owner authors st
 - Entitlement consumption is append-only, row-locked, and retry-safe by unique operation key.
 - Plan revision supersedes open old-revision occurrences; history is retained.
 - Occurrence release creates/reuses one canonical grouped Service Job and never owns Job lifecycle.
+- Inspection results never author Job status; the server computes outcomes from typed responses and evidence.
 
 Completed and Cancelled Request/Job/Visit states are terminal in CORE. A future reopen design requires a separately approved command/event contract.

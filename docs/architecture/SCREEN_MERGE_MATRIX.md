@@ -20,6 +20,7 @@ No new screen is approved unless it has one domain owner, one primary aggregate,
 | Account/login | All surfaces | Shared console session | Keep Frappe identity; share auth contract | Frappe Identity | User/session |
 | Visit execution | Mobile job detail | Engineer Visit/GPS panels | CORE baseline implemented within Mobile job flow—not a second app | FSM Work Execution | Service Visit |
 | Preventive Maintenance | None | PM visit/AMC pages | Implemented Console `/maintenance`: Plans, Schedule, Due, Overdue, Occurrences, Generated Jobs | FSM Maintenance | Maintenance Plan/Occurrence; execution links to Service Job |
+| Equipment Inspection | Mobile Job detail extension | Engineer checklist/evidence | Typed shared API implemented; render within assigned Mobile Job in Mobile completion phase, never as a second work-order screen | FSM Inspections | Equipment Inspection/Result within Service Job |
 | Workshop repair | None | Repair Order | Merge into Job type/detail sections; no separate work-order screen | FSM Operations | Service Job |
 | Billing/estimate/payment | Job detail links | Service Billing/Estimate | Link/open ERPNext native screens or scoped projections | ERPNext Selling/Accounts | Quotation/Invoice/Payment |
 | Data import | None | `/data-import` | Use native Frappe Data Import; no FSM clone | Frappe Platform | Data Import |
