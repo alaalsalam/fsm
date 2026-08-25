@@ -2,31 +2,49 @@
 
 **Date:** 2026-08-25  
 **Branch:** `develop`  
-**Pre-phase HEAD:** `b2b48eb`  
+**Implementation base:** `a2830098289346d5f0d4b7df47562344a93d09d7`
 **Evidence site:** `digit16.digit-erp.com`  
-**Verdict:** **UX-RTL-GATE: FAIL**
+**Verdict:** **UX-RTL-GATE: PASS**
 
-## Blocking evidence
+## Delivered
 
-The Console has an Arabic-first language state and applies `lang=ar` / `dir=rtl`, but the requirement covers all three surfaces. Portal and Mobile do not yet have a locale state or translation catalogue, and both entry documents currently declare `lang="en"`.
+- Console, Portal and Mobile share one reactive Arabic/English locale contract and the `kl-lang`
+  preference.
+- Arabic is the clean-browser default; every surface applies the selected locale to the document
+  `lang` and `dir` attributes.
+- Portal and Mobile visible labels, navigation, errors, placeholders and accessibility names are
+  bilingual. Brand names, document identifiers and server-owned business data intentionally remain
+  literal.
+- Statuses, dates, numbers and monetary values use locale-aware shared formatters.
+- Direction-dependent spacing uses logical start/end behavior. The Ionic Mobile back affordance is
+  mirrored in RTL.
+- Forms retain appropriate input direction for email, telephone and technical identifiers while their
+  surrounding layout follows the document direction.
 
-A static visible-text audit found:
+## Verification evidence
 
-| Surface | Visible hardcoded Latin-text candidates |
-|---|---:|
-| Portal Vue views | 60 |
-| Mobile Vue views | 23 |
+| Check | Result |
+|---|---|
+| Frontend unit/component tests | **13/13 PASS** |
+| Responsive E2E | **28/28 PASS** |
+| E2E viewports | **390px and 1440px** |
+| Arabic/English `lang` + `dir` switch | **PASS** |
+| Portal/Mobile horizontal overflow assertion | **PASS** |
+| TypeScript workspace typecheck | **PASS** |
+| ESLint | **PASS** |
+| Prettier check | **PASS** |
+| Console production build | **PASS** |
+| Portal production build | **PASS** |
+| Mobile Web production build | **PASS** |
+| Visible hardcoded-string audit | **PASS** — brand/technical/dynamic values only |
+| Direction-specific utility audit | **PASS** |
 
-There are also 7 direction-specific layout utility occurrences (`ml`/`mr`/`left`/`right`) in Portal/Mobile that require logical-direction review. Status labels, validation feedback, dates, number formatting and accessibility labels need Arabic/English coverage at 390px, tablet and 1440px.
+The Mobile Web build emits Vite's advisory that one Ionic bundle is larger than 500 kB. This is a
+non-blocking performance warning, not a build failure; bundle profiling remains part of Phase 15.
 
-## Consequence
+## Scope and release consequence
 
-The binding acceptance condition “no visible untranslated hardcoded strings” is not met. Per PROJECT-COMPLETE stop policy, Phase 15 hardening, Phase 16 final UAT and Phase 17 final signed Android release are locked and were not started.
-
-## Required closure work
-
-1. Add one shared locale contract/catalogue used by Console, Portal and Mobile.
-2. Convert all visible labels, errors, placeholders and accessibility strings.
-3. Replace directional spacing/icons with logical RTL-safe behavior.
-4. Add Arabic and English E2E assertions at 390px, tablet and 1440px.
-5. Re-run full frontend/backend/E2E/build/migrate gate evidence.
+This gate changes frontend localization and presentation only. The last passing backend evidence remains
+**141/141** from Phase 13; no backend schema or production environment was changed. Phase 15 is now
+unlocked, but hardening, final UAT and signed Android release are separate gates and were not started by
+this phase.

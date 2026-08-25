@@ -3,7 +3,7 @@
 **Date:** 2026-08-25  
 **Development site:** `digit16.digit-erp.com`  
 **Branch:** `develop`  
-**Phase 14 evaluated HEAD:** `b2b48eb3cee1867ea49d96cd0af9a2e78a8ca7a0`  
+**Phase 14 implementation base:** `a2830098289346d5f0d4b7df47562344a93d09d7`
 **Verdict:** **PROJECT-GATE: FAIL**
 
 ## Gate status
@@ -24,9 +24,9 @@
 | 11 | PORTAL | PASS |
 | 12 | ANALYTICS | PASS |
 | 13 | MOBILE-FUNCTIONAL | PASS |
-| 14 | UX-RTL | **FAIL** — untranslated Portal/Mobile content |
-| 15 | HARDENING | NOT STARTED — locked by Phase 14 |
-| 16 | UAT | NOT STARTED — locked by Phase 14 |
+| 14 | UX-RTL | **PASS** — shared bilingual locale, responsive RTL evidence |
+| 15 | HARDENING | NOT STARTED — unlocked |
+| 16 | UAT | NOT STARTED — locked by hardening |
 | 17 | FINAL MOBILE RELEASE | NOT STARTED — locked by hardening/UAT |
 
 ## Last passing evidence
@@ -34,8 +34,8 @@
 - DocTypes: **44** JSON definitions (including child tables).
 - Whitelisted API decorators: **174**.
 - Backend: **141/141** (`54 + 87`).
-- Frontend: **11/11**.
-- E2E: **24/24** at 390px and 1440px after fixing a Phase 13 render defect.
+- Frontend: **13/13**.
+- E2E: **28/28** at 390px and 1440px, including Arabic/English direction switching and overflow checks.
 - Console, Portal and Mobile Web production builds: PASS.
 - Typecheck, ESLint and Prettier: PASS.
 - Development migrate twice after Phase 13: PASS/PASS; no pending migration observed.
@@ -49,9 +49,9 @@ No final Release APK or AAB was built because Phase 17 is explicitly locked unti
 
 ## Exact remaining scope
 
-1. Close the documented UX/RTL translation and responsive audit.
-2. Execute Phase 15 full regression, realistic-volume performance profiling and renewed security audit.
-3. Execute the two complete Phase 16 UAT lifecycles with recorded evidence.
-4. Only then clean/package/sign/test Android Release APK+AAB and record their SHA256 values.
+1. Execute Phase 15 full regression, realistic-volume performance profiling and renewed security audit.
+2. Execute the two complete Phase 16 UAT lifecycles with recorded evidence.
+3. Only then clean/package/sign/test Android Release APK+AAB and record their SHA256 values.
 
-This repository is a strong functional development candidate through Phase 13, but it is **not yet production/release ready** under the binding acceptance criteria.
+This repository has passed the functional and UX/RTL gates through Phase 14, but it is **not yet
+production/release ready** until Phases 15–17 pass.
