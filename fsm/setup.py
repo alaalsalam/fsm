@@ -175,6 +175,26 @@ FSM_CUSTOM_FIELDS = {
 			"read_only": 1,
 		},
 	],
+	"Quotation": [
+		{
+			"fieldname": "fsm_service_job",
+			"label": "Service Job",
+			"fieldtype": "Link",
+			"options": "Service Job",
+			"insert_after": "company",
+			"read_only": 1,
+		}
+	],
+	"Sales Invoice": [
+		{
+			"fieldname": "fsm_service_job",
+			"label": "Service Job",
+			"fieldtype": "Link",
+			"options": "Service Job",
+			"insert_after": "company",
+			"read_only": 1,
+		}
+	],
 }
 
 

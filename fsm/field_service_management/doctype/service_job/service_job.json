@@ -67,6 +67,7 @@
   "column_break_costing",
   "labor_cost",
   "materials_cost",
+  "travel_cost",
   "overhead_cost",
   "total_cost",
   "section_break_notes",
@@ -469,6 +470,11 @@
    "fieldtype": "Currency",
    "label": "Materials Cost",
    "read_only": 1
+  },
+  {
+   "fieldname": "travel_cost",
+   "fieldtype": "Currency",
+   "label": "Travel Cost"
   },
   {
    "fieldname": "overhead_cost",

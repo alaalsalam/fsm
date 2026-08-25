@@ -24,11 +24,13 @@ def compute_costs(doc) -> dict:
 		consumed = consumed_material_cost(doc.name)
 	materials = consumed if consumed is not None else sum((i.amount or 0) for i in doc.items)
 	labor = (actual or 0) * (doc.labor_rate or 0)
-	total = labor + materials + (doc.overhead_cost or 0)
+	travel = doc.get("travel_cost") or 0
+	total = labor + materials + travel + (doc.overhead_cost or 0)
 	return {
 		"actual_hours": actual,
 		"materials_cost": materials,
 		"labor_cost": labor,
+		"travel_cost": travel,
 		"total_cost": total,
 	}
 

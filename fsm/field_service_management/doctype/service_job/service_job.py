@@ -323,14 +323,18 @@ def make_invoice_from_job(job: str, *, system_operation: bool = False) -> str:
 		return doc.sales_invoice
 	if not doc.customer:
 		frappe.throw("This job has no customer to invoice.")
-	if not doc.items:
-		frappe.throw("This job has no parts or services to invoice.")
+	from fsm.commercial import billable_item_rows
+
+	rows = billable_item_rows(doc.name)
+	if not rows:
+		frappe.throw("This job has no billable parts or services to invoice.")
 
 	invoice = frappe.new_doc("Sales Invoice")
 	invoice.customer = doc.customer
 	invoice.company = doc.company
+	invoice.fsm_service_job = doc.name
 	invoice.po_no = doc.name
-	for row in doc.items:
+	for row in rows:
 		invoice.append(
 			"items",
 			{
@@ -340,10 +344,9 @@ def make_invoice_from_job(job: str, *, system_operation: bool = False) -> str:
 				"uom": row.uom or None,
 			},
 		)
-	if system_operation:
-		invoice.insert(ignore_permissions=True)
-	else:
-		invoice.insert()
+	# The FSM Manager has already passed exact Job/Company authorization above;
+	# native ERPNext role permissions are intentionally not broadened.
+	invoice.insert(ignore_permissions=True)
 
 	doc.db_set("sales_invoice", invoice.name)
 	return invoice.name

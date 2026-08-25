@@ -43,7 +43,7 @@
    "fieldname": "material_type",
    "fieldtype": "Select",
    "label": "Material Type",
-   "options": "Spare\nConsumable\nRefill"
+   "options": "Service\nSpare\nConsumable\nRefill"
   },
   {
    "columns": 1,
