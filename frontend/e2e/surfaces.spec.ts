@@ -205,6 +205,63 @@ test("console lists contract coverage and remaining entitlements", async ({ page
 	await expect(page.getByText("2 / 2")).toBeVisible();
 });
 
+test("console presents preventive plans, occurrences, and generated jobs", async ({ page }) => {
+	await mockConsoleSession(page);
+	await page.route(/\/api\/(method|resource)\//, (route) => {
+		const url = route.request().url();
+		if (url.includes("list_plans"))
+			return json(route, {
+				message: [
+					{
+						name: "FSM-MP-2026-00001",
+						plan_title: "Annual fire safety",
+						customer: "Customer A",
+						company: "Company A",
+						customer_site: "SITE-A",
+						status: "Active",
+						active: 1,
+						start_date: "2026-01-01",
+						revision: 1,
+					},
+				],
+			});
+		if (url.includes("list_occurrences"))
+			return json(route, {
+				message: [
+					{
+						name: "FSM-MO-00001",
+						maintenance_plan: "FSM-MP-2026-00001",
+						installed_equipment: "FSM-EQ-000001",
+						customer_site: "SITE-A",
+						service_type: "Preventive Maintenance",
+						due_date: "2026-08-25",
+						release_on: "2026-08-18",
+						status: "Released",
+						released_job: "FSM-JOB-00042",
+					},
+				],
+			});
+		if (url.includes("maintenance_summary"))
+			return json(route, {
+				message: {
+					forecast: 0,
+					due: 0,
+					overdue: 0,
+					released: 1,
+					completed: 0,
+					skipped: 0,
+					due_today: 1,
+				},
+			});
+		return route.fallback();
+	});
+	await page.goto("http://127.0.0.1:4174/fsm-console/maintenance");
+	await expect(page.getByRole("heading", { name: "Preventive Maintenance" })).toBeVisible();
+	await expect(page.getByText("Annual fire safety")).toBeVisible();
+	await page.getByRole("button", { name: /Generated Jobs/ }).click();
+	await expect(page.getByText("FSM-JOB-00042")).toBeVisible();
+});
+
 test("portal account shows requests and their related active job", async ({ page }) => {
 	await page.route(/\/api\/(method|resource)\//, (route) => {
 		const url = route.request().url();
