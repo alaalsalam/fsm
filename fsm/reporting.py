@@ -35,13 +35,13 @@ def _snapshot(job):
 	return {
 		"schema_version": 1,
 		"captured_on": str(now_datetime()),
-		"job": {key: job.get(key) for key in ("name", "customer", "customer_name", "company", "service_address", "service_type", "status", "phase", "priority", "assigned_service_team", "team_leader", "primary_technician", "completed_on", "service_contract", "coverage_status", "quotation", "sales_invoice", "actual_hours", "labor_cost", "materials_cost", "total_cost", "notes")},
+		"job": {key: job.get(key) for key in ("name", "customer", "customer_name", "company", "service_address", "service_type", "status", "phase", "priority", "assigned_service_team", "team_leader", "primary_technician", "completed_on", "service_contract", "coverage_status", "quotation", "sales_invoice", "actual_hours", "notes")},
 		"equipment": [row.as_dict() for row in job.equipment],
 		"visits": _rows("Service Visit", job.name, ["name", "status", "service_team", "primary_technician", "actual_check_in", "actual_completion", "visit_notes"]),
 		"inspections": _rows("Equipment Inspection", job.name, ["name", "installed_equipment", "inspection_template", "technician", "overall_result", "completed_on", "notes"]),
 		"failures": _rows("Failure Analysis", job.name, ["name", "installed_equipment", "failure_code", "symptom", "root_cause", "severity", "corrective_action", "verification", "status"]),
-		"materials": _rows("Stock Entry", job.name, ["name", "stock_entry_type", "docstatus", "posting_date", "fsm_material_action", "total_outgoing_value", "total_incoming_value"], "fsm_service_job"),
-		"workshop": _rows("Service Return", job.name, ["name", "status", "installed_equipment", "quotation", "sales_invoice", "repair_notes", "testing_result", "quality_result", "final_outcome"]),
+		"materials": _rows("Stock Entry", job.name, ["name", "stock_entry_type", "docstatus", "posting_date", "fsm_material_action"], "fsm_service_job"),
+		"workshop": _rows("Service Return", job.name, ["name", "status", "installed_equipment", "quotation", "sales_invoice", "testing_result", "quality_result", "final_outcome"]),
 	}
 
 
