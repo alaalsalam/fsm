@@ -44,3 +44,4 @@ export {
 	type InspectionTemplateSummary,
 	type InspectionResponseInput,
 } from "./src/inspections";
+export { FireSafetyApi, type FireExtinguisherProfileInput } from "./src/fire-safety";
