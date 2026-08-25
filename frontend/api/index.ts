@@ -45,3 +45,11 @@ export {
 	type InspectionResponseInput,
 } from "./src/inspections";
 export { FireSafetyApi, type FireExtinguisherProfileInput } from "./src/fire-safety";
+export {
+	MaterialsApi,
+	type MaterialType,
+	type MaterialAction,
+	type MaterialInput,
+	type MaterialPlanRow,
+	type MaterialPlan,
+} from "./src/materials";
