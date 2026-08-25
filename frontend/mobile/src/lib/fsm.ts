@@ -1,8 +1,11 @@
 import { client } from "./api";
-import { InstalledBaseApi } from "@kodlyft/api";
+import { InstalledBaseApi, InspectionsApi, MaterialsApi, ReportingApi } from "@kodlyft/api";
 import type { JobSummary, JobStatus } from "@kodlyft/ui";
 
 export const installedBase = new InstalledBaseApi(client);
+export const inspectionsApi = new InspectionsApi(client);
+export const materialsApi = new MaterialsApi(client);
+export const reportingApi = new ReportingApi(client);
 
 interface DispatchRow {
 	name: string;
@@ -22,6 +25,7 @@ export interface MobileJob {
 	phase?: string;
 	address_display?: string;
 	tasks?: { idx: number; task: string; status: string; note?: string }[];
+	modified?: string;
 }
 
 export interface MobileVisit {
@@ -29,6 +33,7 @@ export interface MobileVisit {
 	visit_number: number;
 	status: string;
 	scheduled_start?: string;
+	modified?: string;
 }
 
 export function getJob(name: string): Promise<MobileJob> {

@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from "vue";
-import type { JobEquipmentRow } from "@kodlyft/api";
+import type {
+	EquipmentInspection,
+	InspectionTemplateSummary,
+	JobEquipmentRow,
+	MaterialPlan,
+	ServiceReport,
+} from "@kodlyft/api";
 import {
 	IonPage,
 	IonHeader,
@@ -20,9 +26,14 @@ import {
 	getJobVisits,
 	runVisitCommand,
 	installedBase,
+	inspectionsApi,
+	materialsApi,
+	reportingApi,
 	type MobileJob,
 	type MobileVisit,
 } from "@/lib/fsm";
+import { Network } from "@capacitor/network";
+import { cacheGet, cachePut, createOfflineCommand, enqueue, mediaPut } from "@/lib/offline";
 
 const props = defineProps<{ id: string }>();
 
@@ -34,6 +45,10 @@ const timerError = ref("");
 const job = ref<MobileJob>();
 const visits = ref<MobileVisit[]>([]);
 const equipment = ref<JobEquipmentRow[]>([]);
+const templates = ref<InspectionTemplateSummary[]>([]);
+const inspections = ref<EquipmentInspection[]>([]);
+const materialPlan = ref<MaterialPlan>();
+const reports = ref<ServiceReport[]>([]);
 const loading = ref(true);
 const actionBusy = ref(false);
 const actionError = ref("");
@@ -78,13 +93,34 @@ async function toggleTimer() {
 
 onMounted(async () => {
 	try {
-		[job.value, visits.value, equipment.value] = await Promise.all([
-			getJob(props.id),
-			getJobVisits(props.id),
-			installedBase.getJobEquipment(props.id),
-		]);
+		[job.value, visits.value, equipment.value, templates.value, inspections.value] =
+			await Promise.all([
+				getJob(props.id),
+				getJobVisits(props.id),
+				installedBase.getJobEquipment(props.id),
+				inspectionsApi.listTemplates({ status: "Active" }),
+				inspectionsApi.list({ service_job: props.id }),
+			]);
+		materialPlan.value = await materialsApi.plan(props.id).catch(() => undefined);
+		reports.value = (
+			await reportingApi.list(props.id).catch(() => ({ reports: [], certificates: [] }))
+		).reports;
+		await cachePut(`job:${props.id}`, {
+			job: job.value,
+			visits: visits.value,
+			equipment: equipment.value,
+		});
 	} catch {
-		actionError.value = "Couldn't load this job from the server.";
+		const cached = await cacheGet<{
+			job: MobileJob;
+			visits: MobileVisit[];
+			equipment: JobEquipmentRow[];
+		}>(`job:${props.id}`);
+		if (cached) {
+			job.value = cached.job;
+			visits.value = cached.visits;
+			equipment.value = cached.equipment;
+		} else actionError.value = "Couldn't load this job from the server.";
 	} finally {
 		loading.value = false;
 	}
@@ -103,18 +139,219 @@ async function advance(visit: MobileVisit) {
 	if (!command) return;
 	actionBusy.value = true;
 	actionError.value = "";
+	const connected = (await Network.getStatus()).connected;
 	try {
+		if (!connected) throw new TypeError("offline");
 		await runVisitCommand(command, visit.name);
 		visits.value = await getJobVisits(props.id);
 		job.value = await getJob(props.id);
 	} catch {
-		actionError.value = "Couldn't update the visit. Check assignment and connection.";
+		if (connected) {
+			actionError.value =
+				"The server rejected this change. Refresh the job and check your assignment.";
+			return;
+		}
+		const actionByCommand: Record<string, string> = {
+			start_travel: "visit.start_travel",
+			check_in_visit: "visit.check_in",
+			start_visit_work: "visit.start_work",
+			check_out_visit: "visit.check_out",
+			complete_visit: "visit.complete",
+		};
+		await enqueue(
+			createOfflineCommand({
+				entity_type: "Service Visit",
+				entity_id: visit.name,
+				expected_version: visit.modified,
+				action: actionByCommand[command]!,
+				payload: {},
+			}),
+		);
+		actionError.value = "Saved offline. This visit change will sync automatically.";
 	} finally {
 		actionBusy.value = false;
 	}
 }
 
 const photos = ref<string[]>([]);
+const workflowMessage = ref("");
+const signatureCanvas = ref<HTMLCanvasElement>();
+let drawing = false;
+
+function signaturePoint(event: PointerEvent) {
+	const canvas = signatureCanvas.value;
+	if (!canvas) return;
+	const rect = canvas.getBoundingClientRect();
+	return {
+		x: (event.clientX - rect.left) * (canvas.width / rect.width),
+		y: (event.clientY - rect.top) * (canvas.height / rect.height),
+	};
+}
+
+function startSignature(event: PointerEvent) {
+	const point = signaturePoint(event);
+	const context = signatureCanvas.value?.getContext("2d");
+	if (!point || !context) return;
+	drawing = true;
+	context.beginPath();
+	context.moveTo(point.x, point.y);
+}
+
+function drawSignature(event: PointerEvent) {
+	if (!drawing) return;
+	const point = signaturePoint(event);
+	const context = signatureCanvas.value?.getContext("2d");
+	if (!point || !context) return;
+	context.strokeStyle = "#e8fff7";
+	context.lineWidth = 3;
+	context.lineCap = "round";
+	context.lineTo(point.x, point.y);
+	context.stroke();
+}
+
+async function saveSignature() {
+	const report = reports.value.find((row) => row.status === "Customer Review");
+	const data = signatureCanvas.value?.toDataURL("image/png");
+	if (!report || !data) {
+		workflowMessage.value = "Prepare the report and capture the signature first.";
+		return;
+	}
+	await mediaPut(`signature:${report.name}`, data);
+	const connected = (await Network.getStatus()).connected;
+	if (!connected) {
+		await enqueue(
+			createOfflineCommand({
+				entity_type: "Service Report",
+				entity_id: report.name,
+				action: "report.update",
+				payload: { customer_signature: data },
+			}),
+		);
+		await enqueue(
+			createOfflineCommand({
+				entity_type: "Service Report",
+				entity_id: report.name,
+				action: "report.transition",
+				payload: { status: "Customer Signed" },
+			}),
+		);
+		workflowMessage.value = "Signature saved locally and queued for sync.";
+		return;
+	}
+	try {
+		await reportingApi.update(report.name, { customer_signature: data });
+		await reportingApi.transition(report.name, "Customer Signed");
+		workflowMessage.value = "Customer signature captured.";
+	} catch {
+		workflowMessage.value = "Signature could not be submitted.";
+	}
+}
+
+async function beginInspection(row: JobEquipmentRow) {
+	if (!templates.value.length) {
+		workflowMessage.value = "No active inspection template is available.";
+		return;
+	}
+	actionBusy.value = true;
+	try {
+		const created = await inspectionsApi.start({
+			service_job: props.id,
+			installed_equipment: row.installed_equipment,
+			inspection_template: templates.value[0]!.name,
+			service_visit: visits.value[0]?.name,
+		});
+		inspections.value.unshift(created);
+	} catch {
+		workflowMessage.value =
+			"Inspection could not be started. Check assignment and template scope.";
+	} finally {
+		actionBusy.value = false;
+	}
+}
+
+async function saveInspection(inspection: EquipmentInspection, complete = false) {
+	actionBusy.value = true;
+	try {
+		const responses = inspection.results.map((row) => ({
+			item_code: row.item_code,
+			response_value: row.response_value,
+			numeric_value: row.numeric_value,
+			date_value: row.date_value,
+			attachment: row.attachment,
+			signature: row.signature,
+			evidence: row.evidence,
+		}));
+		const connected = (await Network.getStatus()).connected;
+		if (!connected) {
+			await enqueue(
+				createOfflineCommand({
+					entity_type: "Equipment Inspection",
+					entity_id: inspection.name,
+					action: "inspection.save",
+					payload: { responses },
+				}),
+			);
+			if (complete)
+				await enqueue(
+					createOfflineCommand({
+						entity_type: "Equipment Inspection",
+						entity_id: inspection.name,
+						action: "inspection.complete",
+						payload: {},
+					}),
+				);
+			workflowMessage.value = "Inspection saved offline and queued for sync.";
+			return;
+		}
+		await inspectionsApi.save(inspection.name, responses);
+		if (complete) await inspectionsApi.complete(inspection.name);
+		inspections.value = await inspectionsApi.list({ service_job: props.id });
+	} catch {
+		workflowMessage.value =
+			"Inspection validation failed. Complete required responses and evidence.";
+	} finally {
+		actionBusy.value = false;
+	}
+}
+
+async function consume(row: MaterialPlan["items"][number]) {
+	try {
+		await materialsApi.move(
+			props.id,
+			"Consume",
+			[
+				{
+					item_code: row.item_code,
+					qty: Math.max(row.required_qty - row.consumed_qty, 1),
+					installed_equipment: row.installed_equipment,
+				},
+			],
+			{
+				service_visit: visits.value[0]?.name,
+				source_warehouse: materialPlan.value?.warehouse,
+			},
+		);
+		materialPlan.value = await materialsApi.plan(props.id);
+	} catch {
+		workflowMessage.value =
+			"Material consumption was rejected; verify issued quantity and van warehouse.";
+	}
+}
+
+async function prepareSignatureReport() {
+	try {
+		let report = reports.value.find((row) => row.status === "Customer Review");
+		if (!report) {
+			report = await reportingApi.generate(props.id, "Service Report", crypto.randomUUID());
+			report = await reportingApi.transition(report.name, "Generated");
+			report = await reportingApi.transition(report.name, "Customer Review");
+			reports.value.unshift(report);
+		}
+		workflowMessage.value = `Report ${report.name} is ready for customer signature.`;
+	} catch {
+		workflowMessage.value = "The customer report could not be prepared.";
+	}
+}
 
 async function addPhoto() {
 	try {
@@ -124,6 +361,8 @@ async function addPhoto() {
 			source: CameraSource.Camera,
 		});
 		if (photo.dataUrl) photos.value.push(photo.dataUrl);
+		if (photo.dataUrl)
+			await mediaPut(`photo:${props.id}:${crypto.randomUUID()}`, photo.dataUrl);
 	} catch {
 		// User cancelled or no camera (e.g. browser dev) — ignore.
 	}
@@ -199,6 +438,87 @@ async function addPhoto() {
 							<span class="text-xs text-brand">{{ row.equipment_status }}</span>
 						</div>
 					</RouterLink>
+					<button
+						v-for="row in equipment"
+						:key="`inspect-${row.installed_equipment}`"
+						type="button"
+						class="mb-2 w-full rounded-lg border border-brand/40 px-3 py-2 text-sm text-brand"
+						@click="beginInspection(row)"
+					>
+						Start inspection
+					</button>
+				</section>
+				<section v-if="inspections.length">
+					<h2 class="mb-2 text-lg font-bold">Inspections</h2>
+					<div
+						v-for="inspection in inspections"
+						:key="inspection.name"
+						class="mb-3 rounded-lg border border-border bg-bg p-4"
+					>
+						<p class="font-semibold">
+							{{ inspection.installed_equipment }} · {{ inspection.overall_result }}
+						</p>
+						<label
+							v-for="result in inspection.results"
+							:key="result.item_code"
+							class="mt-3 block text-sm"
+						>
+							<span class="mb-1 block text-fg-muted"
+								>{{ result.label }}{{ result.required ? " *" : "" }}</span
+							>
+							<input
+								v-if="
+									result.response_type === 'Number' ||
+									result.response_type === 'Measurement'
+								"
+								v-model.number="result.numeric_value"
+								type="number"
+								class="w-full rounded-lg border border-border bg-transparent p-2"
+							/>
+							<input
+								v-else
+								v-model="result.response_value"
+								class="w-full rounded-lg border border-border bg-transparent p-2"
+								:placeholder="result.response_type"
+							/>
+						</label>
+						<div v-if="inspection.status === 'In Progress'" class="mt-3 flex gap-2">
+							<button
+								class="rounded-lg border border-brand px-3 py-2 text-sm text-brand"
+								@click="saveInspection(inspection)"
+							>
+								Save</button
+							><button
+								class="rounded-lg bg-brand px-3 py-2 text-sm font-semibold text-white"
+								@click="saveInspection(inspection, true)"
+							>
+								Complete
+							</button>
+						</div>
+					</div>
+				</section>
+				<section v-if="materialPlan?.items?.length">
+					<h2 class="mb-2 text-lg font-bold">Materials</h2>
+					<div
+						v-for="row in materialPlan.items"
+						:key="row.requirement_row"
+						class="mb-2 flex items-center justify-between rounded-lg border border-border p-3"
+					>
+						<div>
+							<p>{{ row.item_name || row.item_code }}</p>
+							<p class="text-xs text-fg-muted">
+								Available {{ row.available_qty }} · Used {{ row.consumed_qty }}/{{
+									row.required_qty
+								}}
+							</p>
+						</div>
+						<button
+							class="rounded-lg border border-brand px-3 py-2 text-xs text-brand"
+							@click="consume(row)"
+						>
+							Consume
+						</button>
+					</div>
 				</section>
 				<section class="rounded-lg border border-border bg-bg p-4">
 					<div class="flex items-center justify-between">
@@ -270,12 +590,37 @@ async function addPhoto() {
 
 				<section>
 					<h2 class="mb-2 text-lg font-bold">Signature</h2>
-					<div
-						class="flex h-32 items-center justify-center rounded-lg border border-dashed border-border text-fg-muted"
+					<button
+						type="button"
+						class="w-full rounded-lg border border-brand px-3 py-3 text-brand"
+						@click="prepareSignatureReport"
 					>
-						Tap to capture customer signature
-					</div>
+						Prepare customer signature report
+					</button>
+					<canvas
+						ref="signatureCanvas"
+						width="640"
+						height="240"
+						class="mt-2 h-32 w-full touch-none rounded-lg border border-dashed border-border bg-black/20"
+						@pointerdown="startSignature"
+						@pointermove="drawSignature"
+						@pointerup="drawing = false"
+						@pointerleave="drawing = false"
+					/>
+					<button
+						type="button"
+						class="mt-2 w-full rounded-lg bg-brand px-3 py-3 font-semibold text-white"
+						@click="saveSignature"
+					>
+						Save signature
+					</button>
 				</section>
+				<p
+					v-if="workflowMessage"
+					class="rounded-lg border border-border p-3 text-sm text-fg-muted"
+				>
+					{{ workflowMessage }}
+				</p>
 
 				<KlButton block>Complete job</KlButton>
 			</div>

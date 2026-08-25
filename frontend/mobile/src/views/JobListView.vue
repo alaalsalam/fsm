@@ -16,6 +16,7 @@ import { useRouter } from "vue-router";
 import { JobCard, type JobSummary } from "@kodlyft/ui";
 import { getDispatchJobs, getVanStock, type StockRow } from "@/lib/fsm";
 import { useDuty } from "@/lib/duty";
+import { cacheGet, cachePut, listCommands, syncQueued, type OfflineCommand } from "@/lib/offline";
 
 const router = useRouter();
 const { onDuty, busy: dutyBusy, error: dutyError, toggle } = useDuty();
@@ -25,6 +26,7 @@ const jobs = ref<JobSummary[]>([]);
 const vanStock = ref<StockRow[]>([]);
 const showStock = ref(false);
 const loadError = ref("");
+const commands = ref<OfflineCommand[]>([]);
 let stop: (() => void) | undefined;
 
 const todayCount = computed(() => jobs.value.length);
@@ -35,9 +37,12 @@ async function load() {
 	loadError.value = "";
 	try {
 		jobs.value = await getDispatchJobs({ limit: 100 });
+		await cachePut("assigned-jobs", jobs.value);
 	} catch {
-		jobs.value = [];
-		loadError.value = "Couldn't load assigned jobs. Check your connection and sign in again.";
+		jobs.value = (await cacheGet<JobSummary[]>("assigned-jobs")) || [];
+		if (!jobs.value.length)
+			loadError.value =
+				"Couldn't load assigned jobs. Check your connection and sign in again.";
 	} finally {
 		loading.value = false;
 	}
@@ -52,9 +57,11 @@ onMounted(async () => {
 	online.value = (await Network.getStatus()).connected;
 	const handle = await Network.addListener("networkStatusChange", (s) => {
 		online.value = s.connected;
+		if (s.connected) void synchronize();
 	});
 	stop = () => handle.remove();
 	await load();
+	commands.value = await listCommands();
 });
 
 onUnmounted(() => stop?.());
@@ -62,6 +69,13 @@ onUnmounted(() => stop?.());
 function open(name: string) {
 	router.push(`/jobs/${name}`);
 }
+
+async function synchronize() {
+	commands.value = await syncQueued();
+	await load();
+}
+
+const pendingCount = computed(() => commands.value.filter((row) => row.state !== "Synced").length);
 
 async function refresh(event: RefresherCustomEvent) {
 	await load();
@@ -85,6 +99,14 @@ async function refresh(event: RefresherCustomEvent) {
 			</IonRefresher>
 
 			<div class="kl-command min-h-full px-4 pb-8">
+				<button
+					v-if="pendingCount"
+					type="button"
+					class="mt-2 w-full rounded-xl border border-brand/30 bg-brand/10 px-3 py-2 text-sm text-brand"
+					@click="synchronize"
+				>
+					{{ pendingCount }} change(s) waiting to sync · Tap to retry
+				</button>
 				<div
 					v-if="!online"
 					class="mt-2 flex items-center gap-2 rounded-xl border border-warning/30 bg-warning/15 px-3 py-2 text-sm text-warning"
