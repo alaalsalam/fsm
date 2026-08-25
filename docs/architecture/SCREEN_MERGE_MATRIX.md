@@ -44,3 +44,4 @@ No new screen is approved unless it has one domain owner, one primary aggregate,
 | Estimate / billing / stock | ERPNext Quotation / Sales Invoice / Stock Entry | Link and project native documents only | ERPNext Selling/Accounts/Stock |
 | Reports and certificates | Service Report / Service Certificate | Shared `ReportingApi`; Console/Portal/Mobile presentation in their completion phases | FSM Reporting |
 | Commercial integration | Job commercial panel plus native ERPNext links | Shared `CommercialApi`; no FSM accounting screens | FSM classification / ERPNext financial authority |
+| Customer self-service | One Portal dashboard plus Sites/Equipment/Track flows | Customer-safe hub for maintenance, documents, contracts and ERPNext commercial projections | FSM Portal / ERPNext referenced facts |

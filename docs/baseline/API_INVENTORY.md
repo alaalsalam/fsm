@@ -139,3 +139,7 @@ certificate issue/revocation, and authorized list/get projections. Current white
 `fsm.commercial` adds six scoped endpoints for classification, native Quotation/Sales Invoice creation, payment
 projection and profitability. Current whitelist decorator count: **170**. `fsm.api.create_invoice_from_job` remains
 a compatibility route into the same billable-only native invoice implementation.
+## Post-baseline Phase 11 delta
+
+`fsm.portal.get_my_portal_hub` is the customer-safe dashboard contract. Current whitelist decorator count: **171**.
+It exposes fixed operational/commercial projections only after Contact→Customer ownership is established.

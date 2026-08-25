@@ -254,3 +254,9 @@ Classification and payment views authorize exact Job read scope. Native Quotatio
 profitability require exact Manager Job/Company scope. Guarded native-document inserts are necessary because FSM
 Manager does not receive broad ERPNext Accounts/Selling roles. Coverage chooses billable rows server-side and no
 generic document fields are accepted. Coverage is in `fsm.tests.test_commercial`.
+## Portal completion endpoint delta (1 addition)
+
+`get_my_portal_hub` requires an authenticated FSM Customer and derives Customer identity server-side. Native
+Quotation/Sales Invoice rows are filtered by already-authorized owned Job names and a fixed public field list.
+Internal costs, stock, staff notes and cross-customer rows are excluded and tested in
+`fsm.tests.test_portal_completion`.
