@@ -1,0 +1,438 @@
+{
+ "charts": [],
+ "content": "[{\"id\":\"fsmhdrmain1\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Field Service</b></span>\",\"col\":12}},{\"id\":\"fsmscreq001\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Service Request\",\"col\":3}},{\"id\":\"fsmscjob001\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Service Job\",\"col\":3}},{\"id\":\"fsmscvis001\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Service Visit\",\"col\":3}},{\"id\":\"fsmsceqp001\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Installed Equipment\",\"col\":3}},{\"id\":\"fsmscocc001\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Maintenance Occurrence\",\"col\":3}},{\"id\":\"fsmscins001\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Equipment Inspection\",\"col\":3}},{\"id\":\"fsmscrep001\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Service Report\",\"col\":3}},{\"id\":\"fsmscset001\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Service Settings\",\"col\":3}},{\"id\":\"fsmspacer01\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"fsmhdrmast1\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h5\\\"><b>Masters & Transactions</b></span>\",\"col\":12}},{\"id\":\"fsmcdops001\",\"type\":\"card\",\"data\":{\"card_name\":\"Service Operations\",\"col\":4}},{\"id\":\"fsmcdinb001\",\"type\":\"card\",\"data\":{\"card_name\":\"Installed Base\",\"col\":4}},{\"id\":\"fsmcdcon001\",\"type\":\"card\",\"data\":{\"card_name\":\"Contracts & Maintenance\",\"col\":4}},{\"id\":\"fsmcdqty001\",\"type\":\"card\",\"data\":{\"card_name\":\"Inspections & Quality\",\"col\":4}},{\"id\":\"fsmcddoc001\",\"type\":\"card\",\"data\":{\"card_name\":\"Workshop & Documents\",\"col\":4}},{\"id\":\"fsmcdwrk001\",\"type\":\"card\",\"data\":{\"card_name\":\"Workforce\",\"col\":4}},{\"id\":\"fsmcdcfg001\",\"type\":\"card\",\"data\":{\"card_name\":\"Configuration\",\"col\":4}}]",
+ "creation": "2026-08-26 01:00:00.000000",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "tool",
+ "idx": 0,
+ "indicator_color": "green",
+ "is_hidden": 0,
+ "label": "Field Service",
+ "links": [
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Service Operations",
+   "link_count": 8,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Service Request",
+   "link_count": 0,
+   "link_to": "Service Request",
+   "link_type": "DocType",
+   "onboard": 1,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Service Job",
+   "link_count": 0,
+   "link_to": "Service Job",
+   "link_type": "DocType",
+   "onboard": 1,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Service Visit",
+   "link_count": 0,
+   "link_to": "Service Visit",
+   "link_type": "DocType",
+   "onboard": 1,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Service Event Log",
+   "link_count": 0,
+   "link_to": "Service Event Log",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Service Feedback",
+   "link_count": 0,
+   "link_to": "Service Feedback",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Service Time Log",
+   "link_count": 0,
+   "link_to": "Service Time Log",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Service Job Message",
+   "link_count": 0,
+   "link_to": "Service Job Message",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Customer Field Note",
+   "link_count": 0,
+   "link_to": "Customer Field Note",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Installed Base",
+   "link_count": 3,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Customer Site",
+   "link_count": 0,
+   "link_to": "Customer Site",
+   "link_type": "DocType",
+   "onboard": 1,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Equipment Location",
+   "link_count": 0,
+   "link_to": "Equipment Location",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Installed Equipment",
+   "link_count": 0,
+   "link_to": "Installed Equipment",
+   "link_type": "DocType",
+   "onboard": 1,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Contracts & Maintenance",
+   "link_count": 4,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Service Contract",
+   "link_count": 0,
+   "link_to": "Service Contract",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Entitlement Consumption",
+   "link_count": 0,
+   "link_to": "Service Entitlement Consumption",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Maintenance Plan",
+   "link_count": 0,
+   "link_to": "Maintenance Plan",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Maintenance Occurrence",
+   "link_count": 0,
+   "link_to": "Maintenance Occurrence",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Inspections & Quality",
+   "link_count": 3,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Inspection Template",
+   "link_count": 0,
+   "link_to": "Inspection Template",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Equipment Inspection",
+   "link_count": 0,
+   "link_to": "Equipment Inspection",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Failure Analysis",
+   "link_count": 0,
+   "link_to": "Failure Analysis",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Workshop & Documents",
+   "link_count": 3,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Service Return (Workshop / RMA)",
+   "link_count": 0,
+   "link_to": "Service Return",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Service Report",
+   "link_count": 0,
+   "link_to": "Service Report",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Service Certificate",
+   "link_count": 0,
+   "link_to": "Service Certificate",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Workforce",
+   "link_count": 5,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Technician",
+   "link_count": 0,
+   "link_to": "Technician",
+   "link_type": "DocType",
+   "onboard": 1,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Service Team",
+   "link_count": 0,
+   "link_to": "Service Team",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Subcontractor",
+   "link_count": 0,
+   "link_to": "Subcontractor",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Service Territory",
+   "link_count": 0,
+   "link_to": "Service Territory",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Technician Location Log",
+   "link_count": 0,
+   "link_to": "Technician Location Log",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Configuration",
+   "link_count": 3,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Service Settings",
+   "link_count": 0,
+   "link_to": "Service Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Checklist Template",
+   "link_count": 0,
+   "link_to": "Checklist Template",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Mobile Command Receipt",
+   "link_count": 0,
+   "link_to": "Mobile Command Receipt",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2026-08-26 01:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Field Service Management",
+ "name": "Field Service",
+ "number_cards": [],
+ "owner": "Administrator",
+ "parent_page": "",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [],
+ "sequence_id": 4.0,
+ "shortcuts": [
+  {
+   "color": "Blue",
+   "label": "Service Request",
+   "link_to": "Service Request",
+   "stats_filter": "[[\"Service Request\",\"status\",\"=\",\"Open\",false]]",
+   "format": "{} Open",
+   "type": "DocType"
+  },
+  {
+   "color": "Green",
+   "label": "Service Job",
+   "link_to": "Service Job",
+   "stats_filter": "[[\"Service Job\",\"status\",\"in\",[\"Scheduled\",\"Dispatched\",\"In Progress\"],false]]",
+   "format": "{} Active",
+   "type": "DocType"
+  },
+  {
+   "color": "Orange",
+   "label": "Service Visit",
+   "link_to": "Service Visit",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "label": "Installed Equipment",
+   "link_to": "Installed Equipment",
+   "type": "DocType"
+  },
+  {
+   "color": "Yellow",
+   "label": "Maintenance Occurrence",
+   "link_to": "Maintenance Occurrence",
+   "stats_filter": "[[\"Maintenance Occurrence\",\"status\",\"in\",[\"Due\",\"Overdue\"],false]]",
+   "format": "{} Due",
+   "type": "DocType"
+  },
+  {
+   "color": "Cyan",
+   "label": "Equipment Inspection",
+   "link_to": "Equipment Inspection",
+   "type": "DocType"
+  },
+  {
+   "color": "Purple",
+   "label": "Service Report",
+   "link_to": "Service Report",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "label": "Service Settings",
+   "link_to": "Service Settings",
+   "type": "DocType"
+  }
+ ],
+ "title": "Field Service"
+}
