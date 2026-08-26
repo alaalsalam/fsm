@@ -10,6 +10,16 @@ app_license = "mit"
 
 required_apps = ["erpnext"]
 
+add_to_apps_screen = [
+	{
+		"name": app_name,
+		"logo": "/assets/fsm/images/fsm-logo.svg",
+		"title": "Field Service",
+		"route": "/app/field-service",
+		"has_permission": "fsm.check_app_permission",
+	}
+]
+
 # Each item in the list will be shown as an app in the apps page
 # add_to_apps_screen = [
 # 	{
