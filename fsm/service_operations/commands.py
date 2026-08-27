@@ -83,7 +83,7 @@ def create_job_from_request(request: str, idempotency_key: str | None = None, so
 		{
 			"doctype": "Service Job", "service_request": req.name,
 			"request_idempotency_key": idempotency_key, "request_operation_key": operation_key,
-			"company": req.company, "customer": req.customer, "contact": req.contact,
+			"company": req.company, "project": req.project, "customer": req.customer, "contact": req.contact,
 			"priority": req.priority, "service_type": req.service_type, "territory": req.territory,
 			"service_address": req.service_address if req.service_address and frappe.db.exists("Address", req.service_address) else None, "service_latitude": req.latitude,
 			"service_longitude": req.longitude, "notes": req.description, "status": "Draft",
@@ -216,7 +216,7 @@ def create_visit(job: str, scheduled_start: str | None = None, scheduled_end: st
 		if not tech.active or (tech.company and tech.company != job_doc.company):
 			frappe.throw(_("Select an active technician in the job company."), frappe.PermissionError)
 	count = frappe.db.count("Service Visit", {"service_job": job})
-	visit = frappe.get_doc({"doctype": "Service Visit", "service_job": job,
+	visit = frappe.get_doc({"doctype": "Service Visit", "service_job": job, "project": job_doc.project,
 		"visit_number": count + 1, "scheduled_start": scheduled_start, "scheduled_end": scheduled_end,
 		"primary_technician": primary_technician or job_doc.primary_technician,
 		"service_address": job_doc.service_address, "latitude": job_doc.service_latitude,

@@ -17,6 +17,9 @@ class ServiceRequest(Document):
 			self.opened_on = now_datetime()
 
 	def validate(self):
+		from fsm.process.project import validate_project_company
+
+		validate_project_company(self.project, self.company)
 		before = self.get_doc_before_save()
 		if before and before.status != self.status and not self.flags.fsm_command:
 			frappe.throw(_("Service Request status can only change through a command API."))

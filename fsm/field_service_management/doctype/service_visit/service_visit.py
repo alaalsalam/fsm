@@ -9,6 +9,10 @@ class ServiceVisit(Document):
 			frappe.throw(_("Service Visits must be created through create_visit."), frappe.PermissionError)
 
 	def validate(self):
+		job = frappe.get_cached_doc("Service Job", self.service_job)
+		if self.project and self.project != job.project:
+			frappe.throw(_("Visit Project must be inherited from its Service Job."), frappe.ValidationError)
+		self.project = job.project
 		before = self.get_doc_before_save()
 		if before and before.status != self.status and not self.flags.fsm_command:
 			frappe.throw(_("Service Visit status can only change through a command API."))

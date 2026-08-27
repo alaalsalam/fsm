@@ -11,6 +11,12 @@ class MaintenanceOccurrence(Document):
 			)
 
 	def validate(self):
+		plan_project = frappe.db.get_value("Maintenance Plan", self.maintenance_plan, "project")
+		if self.project and self.project != plan_project:
+			frappe.throw(
+				_("Occurrence Project must be inherited from its Maintenance Plan."), frappe.ValidationError
+			)
+		self.project = plan_project
 		before = self.get_doc_before_save()
 		if before and before.status != self.status and not self.flags.fsm_occurrence_command:
 			frappe.throw(_("Occurrence status can only change through a PM command."), frappe.PermissionError)

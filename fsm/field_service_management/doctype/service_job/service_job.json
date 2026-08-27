@@ -14,6 +14,7 @@
   "customer_name",
   "contact",
   "company",
+  "project",
   "column_break_head",
   "status",
   "phase",
@@ -143,6 +144,14 @@
    "label": "Company",
    "options": "Company",
    "reqd": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "project",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "Project",
+   "options": "Project",
    "search_index": 1
   },
   {

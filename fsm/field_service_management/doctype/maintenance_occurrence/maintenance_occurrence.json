@@ -4,7 +4,7 @@
  "creation": "2026-08-25 14:00:00",
  "doctype": "DocType",
  "engine": "InnoDB",
- "field_order": ["identity_key","maintenance_plan","plan_revision","plan_line","plan_line_code","installed_equipment","customer","company","customer_site","service_contract","service_type","due_date","due_at_utc","due_timezone","due_offset_minutes","release_on","grace_days","auto_release_job","status","generated_on","released_job","grouping_key","rescheduled_from","skip_reason"],
+ "field_order": ["identity_key","maintenance_plan","plan_revision","plan_line","plan_line_code","installed_equipment","customer","company","project","customer_site","service_contract","service_type","due_date","due_at_utc","due_timezone","due_offset_minutes","release_on","grace_days","auto_release_job","status","generated_on","released_job","grouping_key","rescheduled_from","skip_reason"],
  "fields": [
   {"fieldname":"identity_key","fieldtype":"Data","hidden":1,"label":"Identity Key","read_only":1,"reqd":1,"unique":1},
   {"fieldname":"maintenance_plan","fieldtype":"Link","in_list_view":1,"in_standard_filter":1,"label":"Maintenance Plan","options":"Maintenance Plan","read_only":1,"reqd":1,"search_index":1},
@@ -14,6 +14,7 @@
   {"fieldname":"installed_equipment","fieldtype":"Link","in_list_view":1,"label":"Installed Equipment","options":"Installed Equipment","read_only":1,"reqd":1,"search_index":1},
   {"fieldname":"customer","fieldtype":"Link","label":"Customer","options":"Customer","read_only":1,"reqd":1,"search_index":1},
   {"fieldname":"company","fieldtype":"Link","label":"Company","options":"Company","read_only":1,"reqd":1,"search_index":1},
+  {"fieldname":"project","fieldtype":"Link","label":"Project","options":"Project","read_only":1,"search_index":1},
   {"fieldname":"customer_site","fieldtype":"Link","in_standard_filter":1,"label":"Customer Site","options":"Customer Site","read_only":1,"reqd":1,"search_index":1},
   {"fieldname":"service_contract","fieldtype":"Link","label":"Service Contract","options":"Service Contract","read_only":1},
   {"fieldname":"service_type","fieldtype":"Data","label":"Service Type","read_only":1,"reqd":1},

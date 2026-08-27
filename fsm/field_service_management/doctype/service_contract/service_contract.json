@@ -6,7 +6,7 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "identity_section", "naming_series", "contract_no", "customer", "company", "status", "column_break_identity", "start_date", "end_date",
+  "identity_section", "naming_series", "contract_no", "customer", "company", "project", "status", "column_break_identity", "start_date", "end_date",
   "service_section", "included_visits", "emergency_visits", "response_sla_hours", "resolution_sla_hours",
   "scope_section", "covered_equipment", "coverage_section", "coverage_rules", "entitlement_section", "entitlements",
   "commercial_section", "quotation", "sales_order", "sales_invoice",
@@ -19,6 +19,7 @@
   {"fieldname":"contract_no","fieldtype":"Data","in_list_view":1,"label":"Contract No","read_only":1,"unique":1},
   {"fieldname":"customer","fieldtype":"Link","in_list_view":1,"in_standard_filter":1,"label":"Customer","options":"Customer","reqd":1,"search_index":1},
   {"fieldname":"company","fieldtype":"Link","in_standard_filter":1,"label":"Company","options":"Company","reqd":1,"search_index":1},
+  {"fieldname":"project","fieldtype":"Link","in_standard_filter":1,"label":"Project","options":"Project","search_index":1},
   {"default":"Draft","fieldname":"status","fieldtype":"Select","in_list_view":1,"in_standard_filter":1,"label":"Status","options":"Draft\nActive\nSuspended\nExpired\nCancelled","reqd":1},
   {"fieldname":"column_break_identity","fieldtype":"Column Break"},
   {"fieldname":"start_date","fieldtype":"Date","in_list_view":1,"label":"Start Date","reqd":1},

@@ -17,6 +17,7 @@ PLAN_FIELDS = {
 	"plan_title",
 	"customer",
 	"company",
+	"project",
 	"customer_site",
 	"service_contract",
 	"start_date",

@@ -22,7 +22,10 @@ class MaintenancePlan(Document):
 		self.revision = max(cint(self.revision), 1)
 
 	def validate(self):
+		from fsm.process.project import validate_project_company
+
 		self._guard_status_change()
+		validate_project_company(self.project, self.company)
 		self._validate_period_and_timezone()
 		self._validate_site_and_contract()
 		self._validate_equipment()

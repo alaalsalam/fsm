@@ -5,7 +5,7 @@
  "creation": "2026-08-25 00:00:00.000000",
  "doctype": "DocType",
  "engine": "InnoDB",
- "field_order": ["service_job","report_type","revision","supersedes","generation_key","status","customer","company","customer_site","generated_on","verified_on","submitted_on","snapshot","work_performed","recommendations","customer_name","customer_signature","signature_timestamp","signature_refused","refusal_reason"],
+ "field_order": ["service_job","report_type","revision","supersedes","generation_key","status","customer","company","project","customer_site","generated_on","verified_on","submitted_on","snapshot","work_performed","recommendations","customer_name","customer_signature","signature_timestamp","signature_refused","refusal_reason"],
  "fields": [
   {"fieldname":"service_job","fieldtype":"Link","label":"Service Job","options":"Service Job","reqd":1},
   {"fieldname":"report_type","fieldtype":"Select","label":"Report Type","options":"Service Report\nInspection Report\nPreventive Maintenance Report","reqd":1},
@@ -15,6 +15,7 @@
   {"default":"Draft","fieldname":"status","fieldtype":"Select","label":"Status","options":"Draft\nGenerated\nCustomer Review\nCustomer Signed\nVerified\nSubmitted","reqd":1},
   {"fieldname":"customer","fieldtype":"Link","label":"Customer","options":"Customer","read_only":1,"reqd":1},
   {"fieldname":"company","fieldtype":"Link","label":"Company","options":"Company","read_only":1,"reqd":1},
+  {"fieldname":"project","fieldtype":"Link","label":"Project","options":"Project","read_only":1},
   {"fieldname":"customer_site","fieldtype":"Link","label":"Customer Site","options":"Customer Site","read_only":1},
   {"fieldname":"generated_on","fieldtype":"Datetime","label":"Generated On","read_only":1},
   {"fieldname":"verified_on","fieldtype":"Datetime","label":"Verified On","read_only":1},

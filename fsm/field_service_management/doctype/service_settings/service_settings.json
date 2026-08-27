@@ -19,6 +19,10 @@
   ,"failure_analysis_section"
   ,"repeat_failure_window_days"
   ,"repeat_failure_escalation_count"
+  ,"completion_policy_section"
+  ,"inspection_required_service_types"
+  ,"report_required_service_types"
+  ,"certificate_required_service_types"
  ],
  "fields": [
   {
@@ -105,6 +109,29 @@
    "fieldtype": "Int",
    "label": "Repeat Failure Escalation Count",
    "non_negative": 1
+  },
+  {
+   "fieldname": "completion_policy_section",
+   "fieldtype": "Section Break",
+   "label": "Completion Policy"
+  },
+  {
+   "description": "One Service Type per line. Matching jobs require a completed inspection for every linked equipment item.",
+   "fieldname": "inspection_required_service_types",
+   "fieldtype": "Small Text",
+   "label": "Service Types Requiring Equipment Inspection"
+  },
+  {
+   "description": "One Service Type per line. Matching jobs require a Submitted Service Report before completion.",
+   "fieldname": "report_required_service_types",
+   "fieldtype": "Small Text",
+   "label": "Service Types Requiring a Report"
+  },
+  {
+   "description": "One Service Type per line. Matching jobs require an active issued certificate before completion.",
+   "fieldname": "certificate_required_service_types",
+   "fieldtype": "Small Text",
+   "label": "Service Types Requiring a Certificate"
   }
  ],
  "index_web_pages_for_search": 1,

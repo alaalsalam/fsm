@@ -21,7 +21,10 @@ class ServiceContract(Document):
 			)
 
 	def validate(self):
+		from fsm.process.project import validate_project_company
+
 		self._guard_status_change()
+		validate_project_company(self.project, self.company)
 		self._validate_period()
 		self._validate_scope()
 		self._validate_coverage_rules()
@@ -33,7 +36,9 @@ class ServiceContract(Document):
 		if frappe.db.exists("Service Job", {"service_contract": self.name}) or frappe.db.exists(
 			"Service Entitlement Consumption", {"service_contract": self.name}
 		):
-			frappe.throw(_("A Service Contract used by operations cannot be deleted."), frappe.LinkExistsError)
+			frappe.throw(
+				_("A Service Contract used by operations cannot be deleted."), frappe.LinkExistsError
+			)
 
 	def _guard_status_change(self):
 		before = self.get_doc_before_save()
@@ -93,7 +98,7 @@ class ServiceContract(Document):
 			if row.limits_json:
 				try:
 					value = json.loads(row.limits_json)
-				except (TypeError, ValueError):
+				except TypeError, ValueError:
 					frappe.throw(_("Coverage limits must be a valid JSON object."), frappe.ValidationError)
 				if not isinstance(value, dict):
 					frappe.throw(_("Coverage limits must be a JSON object."), frappe.ValidationError)
@@ -102,9 +107,13 @@ class ServiceContract(Document):
 		seen: set[tuple[str, str, str, str]] = set()
 		for row in self.entitlements:
 			if flt(row.used_quantity) > flt(row.included_quantity):
-				frappe.throw(_("Used entitlement cannot exceed the included quantity."), frappe.ValidationError)
+				frappe.throw(
+					_("Used entitlement cannot exceed the included quantity."), frappe.ValidationError
+				)
 			if row.period_start and row.period_end and getdate(row.period_start) > getdate(row.period_end):
-				frappe.throw(_("Entitlement Period Start cannot be after Period End."), frappe.ValidationError)
+				frappe.throw(
+					_("Entitlement Period Start cannot be after Period End."), frappe.ValidationError
+				)
 			row.remaining_quantity = max(flt(row.included_quantity) - flt(row.used_quantity), 0)
 			key = (
 				row.entitlement_type or "",
@@ -127,10 +136,14 @@ class ServiceContract(Document):
 			name = self.get(fieldname)
 			if not name:
 				continue
-			company, customer = frappe.db.get_value(doctype, name, ["company", "party_name" if doctype == "Quotation" else "customer"])
+			company, customer = frappe.db.get_value(
+				doctype, name, ["company", "party_name" if doctype == "Quotation" else "customer"]
+			)
 			if company != self.company or customer != self.customer:
 				frappe.throw(
-					_("{0} must belong to the Contract Customer and Company.").format(self.meta.get_label(fieldname)),
+					_("{0} must belong to the Contract Customer and Company.").format(
+						self.meta.get_label(fieldname)
+					),
 					frappe.ValidationError,
 				)
 

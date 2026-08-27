@@ -12,6 +12,7 @@ from fsm.service_operations.events import append_event
 CONTRACT_FIELDS = {
 	"customer",
 	"company",
+	"project",
 	"start_date",
 	"end_date",
 	"included_visits",

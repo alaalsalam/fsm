@@ -35,7 +35,7 @@ def _snapshot(job):
 	return {
 		"schema_version": 1,
 		"captured_on": str(now_datetime()),
-		"job": {key: job.get(key) for key in ("name", "customer", "customer_name", "company", "service_address", "service_type", "status", "phase", "priority", "assigned_service_team", "team_leader", "primary_technician", "completed_on", "service_contract", "coverage_status", "quotation", "sales_invoice", "actual_hours", "notes")},
+		"job": {key: job.get(key) for key in ("name", "customer", "customer_name", "company", "project", "service_address", "service_type", "status", "phase", "priority", "assigned_service_team", "team_leader", "primary_technician", "completed_on", "service_contract", "coverage_status", "quotation", "sales_invoice", "actual_hours", "notes")},
 		"equipment": [row.as_dict() for row in job.equipment],
 		"visits": _rows("Service Visit", job.name, ["name", "status", "service_team", "primary_technician", "actual_check_in", "actual_completion", "visit_notes"]),
 		"inspections": _rows("Equipment Inspection", job.name, ["name", "installed_equipment", "inspection_template", "technician", "overall_result", "completed_on", "notes"]),
@@ -61,7 +61,7 @@ def generate_service_report(service_job: str, report_type: str = "Service Report
 			order_by="revision desc",
 		)
 	) + 1
-	doc = frappe.get_doc({"doctype": "Service Report", "service_job": job.name, "report_type": report_type, "revision": revision, "generation_key": key, "status": "Draft", "customer": job.customer, "company": job.company, "customer_site": job.equipment[0].customer_site if job.equipment else None, "snapshot": json.dumps(_snapshot(job), default=str, ensure_ascii=False, sort_keys=True)})
+	doc = frappe.get_doc({"doctype": "Service Report", "service_job": job.name, "report_type": report_type, "revision": revision, "generation_key": key, "status": "Draft", "customer": job.customer, "company": job.company, "project": job.project, "customer_site": job.equipment[0].customer_site if job.equipment else None, "snapshot": json.dumps(_snapshot(job), default=str, ensure_ascii=False, sort_keys=True)})
 	doc.flags.fsm_command = True
 	doc.insert(ignore_permissions=True)
 	append_event("ServiceReportCreated", doc, to_status="Draft", source="Console", metadata={"type": report_type, "revision": revision})

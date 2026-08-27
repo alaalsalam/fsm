@@ -6,9 +6,15 @@ from frappe.model.document import Document
 class ServiceReport(Document):
 	def before_insert(self):
 		if not self.flags.fsm_command:
-			frappe.throw(_("Service Reports must be created through the command API."), frappe.PermissionError)
+			frappe.throw(
+				_("Service Reports must be created through the command API."), frappe.PermissionError
+			)
 
 	def validate(self):
+		job = frappe.get_cached_doc("Service Job", self.service_job)
+		if self.project and self.project != job.project:
+			frappe.throw(_("Report Project must be inherited from its Service Job."), frappe.ValidationError)
+		self.project = job.project
 		before = self.get_doc_before_save()
 		if before and before.status == "Submitted":
 			frappe.throw(_("Submitted Service Reports are immutable."), frappe.PermissionError)

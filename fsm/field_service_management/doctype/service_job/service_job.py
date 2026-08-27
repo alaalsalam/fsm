@@ -28,9 +28,12 @@ class ServiceJob(Document):
 		completed_on: DF.Datetime | None
 		contact: DF.Link | None
 		coverage_reason: DF.SmallText | None
-		coverage_status: DF.Literal[
-			"Warranty", "Contract Covered", "Partially Covered", "Chargeable", "FOC", "Not Covered"
-		] | None
+		coverage_status: (
+			DF.Literal[
+				"Warranty", "Contract Covered", "Partially Covered", "Chargeable", "FOC", "Not Covered"
+			]
+			| None
+		)
 		covered_labour: DF.Check
 		covered_parts: DF.Check
 		covered_travel: DF.Check
@@ -68,7 +71,10 @@ class ServiceJob(Document):
 			frappe.throw(_("Service Jobs must enter the lifecycle in Draft through an application command."))
 
 	def validate(self):
+		from fsm.process.project import validate_project_company
+
 		self.guard_lifecycle_changes()
+		validate_project_company(self.project, self.company)
 		self.apply_settings_defaults()
 		self.apply_checklist_template()
 		self.set_address_display()

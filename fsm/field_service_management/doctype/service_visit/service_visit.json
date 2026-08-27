@@ -1,9 +1,10 @@
 {
  "actions":[],"autoname":"naming_series:","creation":"2026-08-24 00:00:00","doctype":"DocType","engine":"InnoDB",
- "field_order":["naming_series","service_job","visit_number","status","schedule_section","scheduled_start","scheduled_end","execution_section","service_team","primary_technician","actual_departure","actual_check_in","actual_start","actual_check_out","actual_completion","location_section","service_address","latitude","longitude","gps_section","check_in_latitude","check_in_longitude","check_in_accuracy","gps_column","check_out_latitude","check_out_longitude","check_out_accuracy","notes_section","visit_notes"],
+ "field_order":["naming_series","service_job","project","visit_number","status","schedule_section","scheduled_start","scheduled_end","execution_section","service_team","primary_technician","actual_departure","actual_check_in","actual_start","actual_check_out","actual_completion","location_section","service_address","latitude","longitude","gps_section","check_in_latitude","check_in_longitude","check_in_accuracy","gps_column","check_out_latitude","check_out_longitude","check_out_accuracy","notes_section","visit_notes"],
  "fields":[
   {"default":"FSM-VIS-.YYYY.-","fieldname":"naming_series","fieldtype":"Select","label":"Series","options":"FSM-VIS-.YYYY.-","reqd":1},
   {"fieldname":"service_job","fieldtype":"Link","in_list_view":1,"in_standard_filter":1,"label":"Service Job","options":"Service Job","reqd":1,"search_index":1},
+  {"fetch_from":"service_job.project","fieldname":"project","fieldtype":"Link","label":"Project","options":"Project","read_only":1,"search_index":1},
   {"fieldname":"visit_number","fieldtype":"Int","in_list_view":1,"label":"Visit Number","read_only":1,"reqd":1},
   {"default":"Planned","fieldname":"status","fieldtype":"Select","in_list_view":1,"in_standard_filter":1,"label":"Status","options":"Planned\nDispatched\nEn Route\nChecked In\nIn Progress\nChecked Out\nCompleted\nCancelled","read_only":1},
   {"fieldname":"schedule_section","fieldtype":"Section Break","label":"Schedule"},{"fieldname":"scheduled_start","fieldtype":"Datetime","label":"Scheduled Start"},{"fieldname":"scheduled_end","fieldtype":"Datetime","label":"Scheduled End"},
