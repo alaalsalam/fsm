@@ -9,10 +9,25 @@ const store = useAuthStore();
 const router = useRouter();
 
 const nav = computed(() => [
-	{ name: "dispatch", label: t("لوحة التوزيع", "Dispatch"), to: "/", exact: true },
+	{ name: "operations", label: t("مركز العمليات", "Operations"), to: "/", exact: true },
+	{ name: "dispatch", label: t("لوحة التوزيع", "Dispatch"), to: "/dispatch", exact: true },
 	{ name: "requests", label: t("الطلبات", "Requests"), to: "/requests", exact: false },
 	{ name: "jobs", label: t("أوامر العمل", "Jobs"), to: "/jobs", exact: false },
+	{ name: "visits", label: t("الزيارات", "Visits"), to: "/visits", exact: false },
+	{ name: "exceptions", label: t("الاستثناءات", "Exceptions"), to: "/exceptions", exact: false },
+	{
+		name: "after-sales",
+		label: t("إعداد ما بعد البيع", "After-sales setup"),
+		to: "/after-sales",
+		exact: false,
+	},
 	{ name: "equipment", label: t("المعدات", "Equipment"), to: "/equipment", exact: false },
+	{
+		name: "customer-360",
+		label: t("العميل 360", "Customer 360"),
+		to: "/customers",
+		exact: false,
+	},
 	{ name: "sites", label: t("المواقع", "Sites"), to: "/sites", exact: false },
 	{ name: "contracts", label: t("العقود", "Contracts"), to: "/contracts", exact: false },
 	{
@@ -90,7 +105,7 @@ async function signOut() {
 					</div>
 				</div>
 
-				<nav class="flex flex-col gap-1.5">
+				<nav class="flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto pe-1">
 					<RouterLink
 						v-for="item in nav"
 						:key="item.name"
@@ -163,7 +178,7 @@ async function signOut() {
 					</RouterLink>
 				</nav>
 
-				<div class="mt-auto space-y-2">
+				<div class="mt-3 space-y-2">
 					<!-- Language toggle -->
 					<button
 						type="button"

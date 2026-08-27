@@ -14,8 +14,30 @@ const routes: RouteRecordRaw[] = [
 		children: [
 			{
 				path: "/",
+				name: "operations",
+				component: () => import("@/views/OperationsHomeView.vue"),
+			},
+			{
+				path: "/dispatch",
 				name: "dispatch",
 				component: () => import("@/views/DispatchBoardView.vue"),
+			},
+			{ path: "/visits", name: "visits", component: () => import("@/views/VisitsView.vue") },
+			{
+				path: "/exceptions",
+				name: "exceptions",
+				component: () => import("@/views/ExceptionsView.vue"),
+			},
+			{
+				path: "/after-sales",
+				name: "after-sales",
+				component: () => import("@/views/AfterSalesSetupView.vue"),
+			},
+			{
+				path: "/customers/:name?",
+				name: "customer-360",
+				component: () => import("@/views/Customer360View.vue"),
+				props: true,
 			},
 			{ path: "/jobs", name: "jobs", component: () => import("@/views/JobsView.vue") },
 			{

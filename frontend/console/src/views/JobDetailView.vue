@@ -23,6 +23,7 @@ import {
 	addFieldNote,
 	getJobVisits,
 	createVisit,
+	getJobHub,
 	type JobDoc,
 	type TechnicianSuggestion,
 	type TeamSuggestion,
@@ -32,6 +33,7 @@ import {
 	type JobFeedback,
 	type FieldNote,
 	type ServiceVisitRow,
+	type JobHub,
 } from "@/lib/fsm";
 import { realtime, JOB_MESSAGE_EVENT, type JobMessageEvent } from "@/lib/realtime";
 
@@ -46,6 +48,7 @@ const invoicing = ref(false);
 const note = ref("");
 const visits = ref<ServiceVisitRow[]>([]);
 const creatingVisit = ref(false);
+const hub = ref<JobHub | null>(null);
 
 async function loadVisits() {
 	try {
@@ -290,6 +293,12 @@ async function load() {
 	error.value = "";
 	try {
 		job.value = await getJob(props.name);
+		try {
+			const projection = await getJobHub(props.name);
+			hub.value = projection?.next_action ? projection : null;
+		} catch {
+			hub.value = null;
+		}
 		syncCostForm();
 		loadLogistics();
 		loadMessages();
@@ -393,9 +402,12 @@ onBeforeUnmount(() => offMessage?.());
 			<div class="flex flex-wrap items-start justify-between gap-3">
 				<div>
 					<div class="flex flex-wrap items-center gap-3">
-						<h1 class="text-2xl font-bold text-fg">
+						<RouterLink
+							:to="`/customers/${job.customer}`"
+							class="text-2xl font-bold text-fg hover:text-primary"
+						>
 							{{ job.customer_name || job.customer }}
-						</h1>
+						</RouterLink>
 						<StatusPill :status="job.status" />
 					</div>
 					<p class="mt-0.5 font-mono text-sm text-fg-muted">{{ job.name }}</p>
@@ -403,6 +415,53 @@ onBeforeUnmount(() => offMessage?.());
 			</div>
 
 			<p v-if="error" class="text-sm text-danger">{{ error }}</p>
+
+			<section v-if="hub" class="rounded-2xl border border-border bg-bg p-5 shadow-card">
+				<div class="flex flex-wrap items-start justify-between gap-4">
+					<div>
+						<p class="text-xs uppercase tracking-wide text-fg-muted">Next Action</p>
+						<p class="mt-1 text-lg font-semibold">
+							{{ hub.next_action.message || hub.next_action.action }}
+						</p>
+						<p class="mt-1 text-xs text-fg-muted">
+							{{ hub.next_action.responsible_actor }}
+						</p>
+					</div>
+					<div class="text-sm text-fg-muted">
+						<span v-if="job.project">Project: {{ job.project }} · </span
+						><span>Phase: {{ job.phase || "—" }}</span>
+					</div>
+				</div>
+				<div v-if="hub.completion_blockers.length" class="mt-4 grid gap-2 md:grid-cols-2">
+					<RouterLink
+						v-for="blocker in hub.completion_blockers"
+						:key="blocker.code"
+						:to="blocker.route || `/jobs/${job.name}`"
+						class="rounded-xl border border-warning/30 bg-warning/10 p-3"
+						><p class="font-medium">{{ blocker.message }}</p>
+						<p class="mt-1 text-xs text-fg-muted">
+							{{ blocker.action }} · {{ blocker.responsible_actor }}
+						</p></RouterLink
+					>
+				</div>
+				<div class="mt-4 grid grid-cols-3 gap-2 text-center text-xs sm:grid-cols-6">
+					<div
+						v-for="item in [
+							{ label: 'Visits', value: hub.visits.length },
+							{ label: 'Inspections', value: hub.inspections.length },
+							{ label: 'Failures', value: hub.failures.length },
+							{ label: 'Workshop', value: hub.workshop.length },
+							{ label: 'Reports', value: hub.reports.length },
+							{ label: 'Certificates', value: hub.certificates.length },
+						]"
+						:key="item.label"
+						class="rounded-xl bg-white/3 p-3"
+					>
+						<p class="text-lg font-bold">{{ item.value }}</p>
+						<p class="text-fg-muted">{{ item.label }}</p>
+					</div>
+				</div>
+			</section>
 
 			<div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
 				<div class="space-y-6 lg:col-span-2">

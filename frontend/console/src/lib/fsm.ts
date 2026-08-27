@@ -50,6 +50,7 @@ export interface JobDoc {
 	customer: string;
 	customer_name?: string;
 	contact?: string;
+	project?: string;
 	status: JobStatus;
 	phase?: string;
 	service_request?: string;
@@ -80,6 +81,93 @@ export interface JobDoc {
 	total_cost?: number;
 	tasks?: JobTask[];
 	items?: { item_code: string; item_name?: string; qty: number; rate: number; amount?: number }[];
+}
+
+export interface OperationsHome {
+	company: string;
+	visits_today: number;
+	unassigned_jobs: number;
+	in_progress: number;
+	on_hold: number;
+	overdue_pm: number;
+	reports_awaiting_signature: number;
+	contracts_expiring_30_days: number;
+}
+
+export interface ProcessVisit {
+	name: string;
+	service_job: string;
+	status: JobStatus;
+	scheduled_start?: string;
+	scheduled_end?: string;
+	primary_technician?: string;
+	service_team?: string;
+	customer_name?: string;
+	service_type?: string;
+	project?: string;
+	equipment_count: number;
+}
+
+export interface ProcessException {
+	type: string;
+	severity: string;
+	reference_doctype: string;
+	reference: string;
+	customer?: string;
+	site?: string;
+	reason: string;
+	action: string;
+	parent?: string;
+}
+
+export function getOperationsHome(): Promise<OperationsHome> {
+	return client.call("fsm.process.api.get_operations_home", {}, "GET");
+}
+
+export interface CompletionBlocker {
+	code: string;
+	message: string;
+	action: string;
+	route?: string;
+	responsible_actor: string;
+}
+
+export interface JobHub {
+	job: JobDoc;
+	next_action: {
+		code: string;
+		message: string;
+		action: string;
+		route?: string;
+		responsible_actor: string;
+	};
+	completion_blockers: CompletionBlocker[];
+	visits: unknown[];
+	inspections: unknown[];
+	failures: unknown[];
+	workshop: unknown[];
+	reports: unknown[];
+	certificates: unknown[];
+}
+
+export function getJobHub(service_job: string): Promise<JobHub> {
+	return client.call("fsm.process.api.get_job_hub", { service_job }, "GET");
+}
+
+export function getCustomer360(customer: string): Promise<Record<string, unknown>> {
+	return client.call("fsm.process.api.get_customer_360", { customer }, "GET");
+}
+
+export function listProcessVisits(params: Record<string, unknown> = {}): Promise<ProcessVisit[]> {
+	return client.call("fsm.process.api.list_visits", params, "GET");
+}
+
+export function listProcessExceptions(): Promise<ProcessException[]> {
+	return client.call("fsm.process.api.list_exceptions", {}, "GET");
+}
+
+export function getAfterSalesSetup(delivery_note: string): Promise<Record<string, unknown>> {
+	return client.call("fsm.process.after_sales.get_after_sales_setup", { delivery_note }, "GET");
 }
 
 export interface ServiceRequestRow {
