@@ -307,3 +307,15 @@ New non-endpoint authorization surface registered this phase:
 All other rows and deltas in this file were confirmed accurate at the Phase 15 revision, including the
 QR path (auth → token→name → `require_equipment_access` before any field), the offline ingress
 allowlist/receipt binding, and all raw-SQL parametrization.
+
+## FLOW-GATE orchestration endpoints
+
+| Endpoint | Access | Scope/guard | Mutation |
+|---|---|---|---|
+| `fsm.process.after_sales.get_after_sales_setup` | FSM/System Manager | Delivery Note read plus explicit company scope | none |
+| `fsm.process.maintenance_flow.create_maintenance_plans_from_contract` | FSM/System Manager | Contract root access plus company scope through existing command | preview none; execute uses Maintenance command |
+| `fsm.process.api.get_operations_home` | FSM/System Manager | resolved manager company | none |
+| `fsm.process.api.list_visits` | FSM/System Manager | parameterized Job-company join and bounded limit | none |
+| `fsm.process.api.list_exceptions` | FSM/System Manager | company filters on every source | none |
+| `fsm.process.api.get_customer_360` | FSM/System Manager | resolved company on every projection | none |
+| `fsm.process.api.get_job_hub` / `get_next_action` | permitted Job/root actor | exact root authorization before child reads | none |

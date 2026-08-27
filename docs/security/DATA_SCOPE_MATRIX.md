@@ -46,6 +46,8 @@ row-locks/assignment probes with server-side inputs — plus one static-fragment
 
 CORE adds no unscoped `get_all`. Request→Job and Job→Visit reads remain permission-aware `get_list` calls. The sole Visit projection write targets its already-authorized parent Job; no Visit→Request mutation exists.
 
+FLOW-GATE adds no guest endpoint. Operations/Visits/Exceptions/Customer 360 are Manager/System-Manager company projections. After-Sales requires both Delivery Note read permission and company scope. Contract→PM is rooted in an authorized contract and creates only same-customer/company/site equipment rows through the existing validated Maintenance command.
+
 ## Phase 15 HARDENING delta (2026-08-26)
 
 | Data/read path | Query form | Scope applied before/inside query | Fields/output control | Leakage decision |

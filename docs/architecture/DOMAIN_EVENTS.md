@@ -24,6 +24,10 @@ Rejected commands write no lifecycle fact. Read access to timelines is authorize
 ERPNext Material Request, Pick List, Stock Entry and Stock Ledger Entry remain the transaction authority; these
 events are correlations for the Service Job timeline, not a replacement stock ledger.
 
+## FLOW-GATE orchestration
+
+The process layer reuses existing transactional events; it introduces no broker or second event store. Contract-to-plan creation emits the existing `MaintenancePlanCreated`; Delivery Note provisioning, grouped PM release, team/visit, inspection, materials, workshop, reporting, commercial and completion continue to emit their owning-domain events. Project is included as document correlation, not a new event lifecycle.
+
 ## Not claimed by CORE
 
 This table is a durable audit log, not an integration outbox. External delivery, optimistic aggregate versions, causation IDs, event schema versioning, offline replay, maintenance occurrence events, and ERPNext integration events remain future contracts. ERPNext documents themselves remain authoritative for stock, sales, invoices, and payments.

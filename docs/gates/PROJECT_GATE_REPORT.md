@@ -25,6 +25,7 @@
 | 12 | ANALYTICS | PASS |
 | 13 | MOBILE-FUNCTIONAL | PASS |
 | 14 | UX-RTL | **PASS** — shared bilingual locale, responsive RTL evidence |
+| 14.5 | FLOW INTEGRATION | **PASS** (2026-08-27) — 44 DocTypes, 182 guarded APIs, Project references, After-Sales/Contract→PM orchestration, Operations/Visits/Exceptions/Customer/Job hubs, 145/145 backend, 17/17 frontend and 28/28 E2E. See `FLOW_GATE_FINAL_REPORT.md`. |
 | 15 | HARDENING | **PASS** (2026-08-26) — 143/143 backend, 17/17 frontend, 28/28 E2E, 0 unresolved critical/high security findings (1 high + 3 medium found and fixed), N+1 fixed 201→2 queries, PM 500-unit campaign idempotent, migrate ×2 no-op, bundle split + LOW residual. See `HARDENING_GATE_REPORT.md`. |
 | 16 | UAT | NOT STARTED — locked by hardening |
 | 17 | FINAL MOBILE RELEASE | NOT STARTED — locked by hardening/UAT |

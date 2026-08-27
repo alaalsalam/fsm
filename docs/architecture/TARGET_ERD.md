@@ -104,3 +104,5 @@ Other later-phase concepts remain design-only.
 ## Aggregate boundary
 
 Service Request owns intake, source, contact details, problem description, triage, and conversion. Service Job owns operational priority, schedule, assigned primary technician, phase, status, checklist evidence, and ERPNext links. Service Visit owns its planned/actual timestamps, assigned primary technician, travel/check-in/work/check-out evidence, and coordinates. Event Log owns immutable history only.
+
+ERPNext `Project` now has optional 1:N reference links to Service Contract, Maintenance Plan, Maintenance Occurrence, Service Request, Service Job, Service Visit and Service Report. Visit/Occurrence/Report inherit the reference from their operational parent. Customer Site and Installed Equipment deliberately have no permanent Project ownership link.

@@ -49,3 +49,7 @@ Status: **CORE slice implemented and verified**. Only the named owner authors st
 - Service Return owns custody/workshop state only; Service Job, ERPNext commercial documents and Stock Entry keep their respective authority.
 
 Completed and Cancelled Request/Job/Visit states are terminal in CORE. A future reopen design requires a separately approved command/event contract.
+
+## FLOW-GATE clarification
+
+ERPNext Project owns project status and commercial grouping only. FSM records store an optional reference and never project Project state into Customer Site or Installed Equipment. `Next Action` and completion blockers are computed projections, not lifecycle owners. Service-type completion requirements live in Service Settings; Report and Certificate retain their own statuses.
