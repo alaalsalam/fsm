@@ -21,6 +21,8 @@ from fsm.service_operations.commands import (
 
 SCENARIO_KEY = "الخدمة-الرياض"
 SITE_CODE = "مركز-الأعمال-الرياض-01"
+PRESENTATION_COMPANY = "شركة الرواد للخدمات الفنية"
+PRESENTATION_ITEM = "مستلزمات-الصيانة-الميدانية"
 
 
 def _get_or_create(doctype, filters, values):
@@ -94,7 +96,8 @@ def seed_presentation_data():
 	frappe.set_user("Administrator")
 	_migrate_legacy_labels()
 
-	company = _first("Company")
+	_rename_if_needed("Company", "Digit Basic", PRESENTATION_COMPANY)
+	company = _first("Company", {"name": PRESENTATION_COMPANY}) or _first("Company")
 	if not company:
 		frappe.throw("A Company is required before FSM demo data can be created.")
 
@@ -111,22 +114,20 @@ def seed_presentation_data():
 			},
 		)
 
-	item = _first("Item", {"disabled": 0, "fsm_serviceable": 1}, "item_code")
-	if not item:
-		item = _get_or_create(
-			"Item",
-			{"item_code": "معدات-خدمات-ميدانية-01"},
-			{
-				"item_code": "معدات-خدمات-ميدانية-01",
-				"item_name": "جهاز تحكم للخدمات الميدانية",
-				"item_group": _first("Item Group") or "All Item Groups",
-				"stock_uom": _first("UOM") or "Nos",
-				"is_stock_item": 0,
-				"fsm_serviceable": 1,
-				"fsm_tracking_mode": "None",
-				"fsm_create_installed_equipment": 1,
-			},
-		)
+	item = _get_or_create(
+		"Item",
+		{"item_code": PRESENTATION_ITEM},
+		{
+			"item_code": PRESENTATION_ITEM,
+			"item_name": "مستلزمات الصيانة الميدانية",
+			"item_group": _first("Item Group") or "All Item Groups",
+			"stock_uom": _first("UOM") or "Nos",
+			"is_stock_item": 0,
+			"fsm_serviceable": 1,
+			"fsm_tracking_mode": "None",
+			"fsm_create_installed_equipment": 1,
+		},
+	)
 
 	_rename_if_needed("Customer Site", "DIGIT-DEMO-FSM-RUH-01", SITE_CODE)
 	site = frappe.db.exists("Customer Site", {"site_code": SITE_CODE})
@@ -168,6 +169,12 @@ def seed_presentation_data():
 				notes="معدات مسجلة ضمن خطة الصيانة والفحص للموقع.",
 			)["name"]
 			confirm_installation(equipment_name, site, installation_date=add_days(today(), -180))
+		else:
+			equipment_doc = frappe.get_doc("Installed Equipment", equipment_name)
+			if equipment_doc.item_code != item:
+				equipment_doc.item_code = item
+				equipment_doc.flags.fsm_command = True
+				equipment_doc.save()
 		equipment.append(equipment_name)
 
 	technician = _get_or_create(
