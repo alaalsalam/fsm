@@ -8,6 +8,14 @@ import frappe
 from frappe.utils import add_days, now_datetime, today
 
 from fsm.installed_base.commands import confirm_installation, create_customer_site, create_installed_equipment
+from fsm.service_operations.commands import (
+	create_job_from_request,
+	create_visit,
+	dispatch_visit,
+	open_request,
+	plan_job,
+	schedule_job,
+)
 
 
 DEMO_PREFIX = "DIGIT-DEMO-FSM"
@@ -134,7 +142,6 @@ def seed_presentation_data():
 		{"subject": "طلب عرض: فحص إنذار الحريق في مركز DIGIT"},
 		{
 			"source": "Phone",
-			"status": "Open",
 			"priority": "High",
 			"service_type": "Inspection",
 			"company": company,
@@ -143,58 +150,48 @@ def seed_presentation_data():
 			"installed_equipment": equipment[1],
 			"subject": "طلب عرض: فحص إنذار الحريق في مركز DIGIT",
 			"description": "فحص وقائي للوحة الإنذار مع توثيق النتيجة وإصدار تقرير خدمة.",
-			"opened_on": now_datetime(),
 		},
 	)
-	job = _get_or_create(
-		"Service Job",
-		{"request_idempotency_key": f"{DEMO_PREFIX}-JOB-01"},
-		{
-			"request_idempotency_key": f"{DEMO_PREFIX}-JOB-01",
-			"service_request": request,
-			"customer": customer,
-			"company": company,
-			"status": "Scheduled",
-			"phase": "Planning",
-			"priority": "High",
-			"service_type": "Inspection",
-			"scheduled_date": add_days(now_datetime(), 1),
-			"scheduled_end": add_days(now_datetime(), 1),
-			"assigned_service_team": team,
-			"team_leader": technician,
-			"primary_technician": technician,
-			"coverage_status": "Contract Covered",
-			"covered_labour": 1,
-			"covered_travel": 1,
-			"notes": "أمر عرض مترابط مع طلب خدمة وموقع ومعدات وفريق تنفيذ.",
-			"equipment": [
-				{"installed_equipment": equipment[1], "customer_site": site, "item_code": item},
-				{"installed_equipment": equipment[2], "customer_site": site, "item_code": item},
-			],
-		},
-	)
-
-	visits = []
-	for visit_number, status, offset, note in (
-		(1, "Completed", -2, "زيارة تشخيص مكتملة مع ملاحظة تحتاج متابعة."),
-		(2, "Dispatched", 1, "زيارة مجدولة للفريق مع المعدات المرتبطة."),
-	):
-		visits.append(
-			_get_or_create(
-				"Service Visit",
-				{"service_job": job, "visit_number": visit_number},
-				{
-					"service_job": job,
-					"visit_number": visit_number,
-					"status": status,
-					"scheduled_start": add_days(now_datetime(), offset),
-					"scheduled_end": add_days(now_datetime(), offset),
-					"service_team": team,
-					"primary_technician": technician,
-					"visit_notes": note,
-				},
-			)
+	request_doc = frappe.get_doc("Service Request", request)
+	if request_doc.status == "Draft":
+		open_request(request, source="System", correlation_id=f"{DEMO_PREFIX}-REQUEST-OPEN")
+	job = frappe.db.get_value("Service Job", {"request_idempotency_key": f"{DEMO_PREFIX}-JOB-01"})
+	if not job:
+		job = create_job_from_request(request, idempotency_key=f"{DEMO_PREFIX}-JOB-01", source="System")["name"]
+		job_doc = frappe.get_doc("Service Job", job)
+		job_doc.update(
+			{
+				"assigned_service_team": team,
+				"team_leader": technician,
+				"primary_technician": technician,
+				"coverage_status": "Contract Covered",
+				"covered_labour": 1,
+				"covered_travel": 1,
+				"notes": "أمر عرض مترابط مع طلب خدمة وموقع ومعدات وفريق تنفيذ.",
+			}
 		)
+		job_doc.save()
+		plan_job(job, source="System", correlation_id=f"{DEMO_PREFIX}-JOB-PLAN")
+		schedule_job(
+			job,
+			scheduled_start=add_days(now_datetime(), 1),
+			scheduled_end=add_days(now_datetime(), 2),
+			source="System",
+			correlation_id=f"{DEMO_PREFIX}-JOB-SCHEDULE",
+		)
+
+	visits = frappe.get_all("Service Visit", filters={"service_job": job}, pluck="name")
+	if not visits:
+		visit = create_visit(
+			job,
+			scheduled_start=add_days(now_datetime(), 1),
+			scheduled_end=add_days(now_datetime(), 2),
+			primary_technician=technician,
+			source="System",
+			correlation_id=f"{DEMO_PREFIX}-VISIT-01",
+		)["name"]
+		dispatch_visit(visit, source="System", correlation_id=f"{DEMO_PREFIX}-VISIT-DISPATCH")
+		visits = [visit]
 
 	frappe.db.commit()
 	return {
