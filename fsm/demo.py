@@ -52,9 +52,7 @@ def seed_presentation_data():
 			},
 		)
 
-	item = _first("Item", {"disabled": 0, "is_stock_item": 1}, "item_code") or _first(
-		"Item", {"disabled": 0}, "item_code"
-	)
+	item = _first("Item", {"disabled": 0, "fsm_serviceable": 1}, "item_code")
 	if not item:
 		item = _get_or_create(
 			"Item",
@@ -65,6 +63,9 @@ def seed_presentation_data():
 				"item_group": _first("Item Group") or "All Item Groups",
 				"stock_uom": _first("UOM") or "Nos",
 				"is_stock_item": 0,
+				"fsm_serviceable": 1,
+				"fsm_tracking_mode": "None",
+				"fsm_create_installed_equipment": 1,
 			},
 		)
 
