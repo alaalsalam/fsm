@@ -22,6 +22,7 @@ This gate aligns Frappe Desk, Console, Portal, Mobile Web, and the existing Andr
 | Console build | PASS |
 | Portal build | PASS |
 | Mobile Web build | PASS — existing Ionic vendor chunk warning remains non-blocking |
+| Frappe v16 asset build | PASS — Node 24 bench toolchain |
 | TypeScript / ESLint / Prettier | PASS / PASS / PASS |
 | Frontend tests | PASS — 17/17 |
 | E2E at 390px and 1440px | PASS — 30/30 |
