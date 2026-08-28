@@ -9,6 +9,7 @@ export { default as KpiCard } from "./src/KpiCard.vue";
 export { default as EmptyState } from "./src/EmptyState.vue";
 export { default as Spinner } from "./src/Spinner.vue";
 export { default as LinkField } from "./src/LinkField.vue";
+export { default as DigitBrand } from "./src/DigitBrand.vue";
 
 export * from "./src/types";
 export * from "./src/i18n";

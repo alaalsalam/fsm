@@ -13,7 +13,7 @@ import {
 } from "@ionic/vue";
 import { Network } from "@capacitor/network";
 import { useRouter } from "vue-router";
-import { JobCard, type JobSummary } from "@kodlyft/ui";
+import { DigitBrand, JobCard, type JobSummary } from "@kodlyft/ui";
 import { formatNumber, locale, t, toggleLocale } from "@kodlyft/ui";
 import { getDispatchJobs, getVanStock, type StockRow } from "@/lib/fsm";
 import { useDuty } from "@/lib/duty";
@@ -90,7 +90,7 @@ async function refresh(event: RefresherCustomEvent) {
 	<IonPage>
 		<IonHeader class="ion-no-border">
 			<IonToolbar>
-				<IonTitle>{{ t("أعمالي", "My jobs") }}</IonTitle>
+				<IonTitle><DigitBrand compact tone="light" :locale="locale" /></IonTitle>
 				<button
 					slot="end"
 					type="button"
@@ -114,6 +114,14 @@ async function refresh(event: RefresherCustomEvent) {
 			</IonRefresher>
 
 			<div class="kl-command min-h-full px-4 pb-8">
+				<div class="pt-3">
+					<p class="text-xs font-semibold uppercase tracking-[0.12em] text-brand">
+						{{ t("التطبيق الميداني", "Field app") }}
+					</p>
+					<h1 class="mt-1 text-2xl font-bold text-cmd-fg">
+						{{ t("أعمالي", "My jobs") }}
+					</h1>
+				</div>
 				<button
 					v-if="pendingCount"
 					type="button"

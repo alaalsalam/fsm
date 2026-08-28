@@ -1,4 +1,4 @@
-/* KodLyft FSM — command theme (dark glass) (generated from tokens.json — do not edit by hand). */
+/* DIGIT Field Service — command theme (dark glass) (generated from tokens.json — do not edit by hand). */
 
 /* Apply `.kl-command` to a root element (console #app, mobile content). It remaps the
    semantic token roles to the command palette — so existing components styled with
@@ -26,7 +26,7 @@
 	background-color: var(--kl-cmd-bg);
 	background-image:
 		radial-gradient(120% 85% at 100% 0%, var(--kl-cmd-glow) 0%, transparent 55%),
-		radial-gradient(95% 70% at 0% 100%, rgba(24, 95, 165, 0.1) 0%, transparent 60%),
+		radial-gradient(95% 70% at 0% 100%, rgba(52, 211, 153, 0.08) 0%, transparent 60%),
 		linear-gradient(180deg, var(--kl-cmd-bg) 0%, var(--kl-cmd-bg-2) 100%);
 }
 
@@ -80,7 +80,7 @@ html.kl-theme-light {
 /* Fallback where backdrop-filter is unsupported — keep glass legible */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
 	.kl-glass {
-		background-color: rgba(20, 28, 42, 0.92);
+		background-color: rgba(6, 64, 47, 0.94);
 	}
 	html.kl-theme-light .kl-glass {
 		background-color: rgba(255, 255, 255, 0.92);

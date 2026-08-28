@@ -14,7 +14,7 @@ import "@ionic/vue/css/padding.css";
 import "@ionic/vue/css/flex-utils.css";
 import "@ionic/vue/css/display.css";
 
-/* KodLyft theme (Ionic vars) + tokens + Tailwind utilities */
+/* DIGIT theme (Ionic vars) + tokens + Tailwind utilities */
 import "./theme/variables.css";
 import "./style.css";
 

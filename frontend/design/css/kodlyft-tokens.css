@@ -1,31 +1,32 @@
-/* KodLyft FSM — CSS custom properties (generated from tokens.json — do not edit by hand). */
+/* DIGIT Field Service — CSS custom properties (generated from tokens.json — do not edit by hand). */
 
 :root {
 	/* Brand */
-	--kl-brand-50: #E1F5EE;
-	--kl-brand-100: #9FE1CB;
-	--kl-brand: #1D9E75; /* primary accent */
-	--kl-brand-500: #0F6E56;
-	--kl-brand-700: #085041;
-	--kl-brand-900: #04342C;
+	--kl-brand-50: #E6F3EC;
+	--kl-brand-100: #C7E5D5;
+	--kl-brand: #34D399; /* primary accent */
+	--kl-brand-500: #0A8754;
+	--kl-brand-700: #064E3B;
+	--kl-brand-900: #032D23;
 
 	/* Surfaces (light) */
-	--kl-bg: #FFFFFF;
-	--kl-bg-subtle: #F7F6F2;
-	--kl-surface: #F1EFE8;
-	--kl-border: #D3D1C7;
-	--kl-text: #1A1A19;
-	--kl-text-muted: #5F5E5A;
+	--kl-bg: #F4F3EE;
+	--kl-bg-subtle: #F7F9F7;
+	--kl-surface: #FFFFFF;
+	--kl-border: #D6DFDA;
+	--kl-text: #0B1F17;
+	--kl-text-muted: #71807A;
 
 	/* Status */
-	--kl-success: #1D9E75;
-	--kl-warning: #BA7517;
-	--kl-danger: #A32D2D;
-	--kl-info: #185FA5;
+	--kl-success: #067647;
+	--kl-warning: #B54708;
+	--kl-danger: #B42318;
+	--kl-info: #175CD3;
 
 	/* Type */
-	--kl-font-ui: 'Plus Jakarta Sans', system-ui, sans-serif;
-	--kl-font-mono: 'JetBrains Mono', monospace;
+	--kl-font-ui: 'IBM Plex Sans Arabic', 'Archivo', Tahoma, system-ui, sans-serif;
+	--kl-font-mono: 'Archivo', 'IBM Plex Sans Arabic', system-ui, sans-serif;
+	--kl-font-currency: 'SaudiRiyal', 'IBM Plex Sans Arabic', system-ui, sans-serif;
 	--kl-text-xs: 12px;
 	--kl-text-sm: 14px;
 	--kl-text-base: 16px;
@@ -51,13 +52,13 @@
 	--kl-space-12: 48px;
 
 	/* Radius + elevation */
-	--kl-radius-sm: 6px;
-	--kl-radius-md: 10px;
-	--kl-radius-lg: 14px;
+	--kl-radius-sm: 8px;
+	--kl-radius-md: 12px;
+	--kl-radius-lg: 16px;
 	--kl-radius-full: 999px;
-	--kl-elevation-card: 0 1px 2px rgba(26,26,25,0.06), 0 1px 1px rgba(26,26,25,0.04);
+	--kl-elevation-card: 0 1px 2px rgba(6,78,59,0.08), 0 1px 1px rgba(6,78,59,0.05);
 	--kl-elevation-sheet: 0 -2px 16px rgba(26,26,25,0.10);
-	--kl-elevation-focus: 0 0 0 3px rgba(52,214,170,0.40);
+	--kl-elevation-focus: 0 0 0 3px rgba(52,211,153,0.34);
 	--kl-elevation-e1: 0 1px 2px rgba(2,6,16,0.40);
 	--kl-elevation-e2: 0 6px 16px -8px rgba(2,6,16,0.55);
 	--kl-elevation-e3: 0 18px 40px -16px rgba(2,6,16,0.65);
@@ -68,34 +69,34 @@
 	--kl-elevation-glass-lg-light: 0 24px 50px -18px rgba(15,23,42,0.22), inset 0 1px 0 rgba(255,255,255,0.7);
 
 	/* Command theme (dark glass) — raw values; .kl-command opts in */
-	--kl-cmd-bg: #0B1220;
-	--kl-cmd-bg-2: #070C16;
-	--kl-cmd-glow: rgba(34,201,160,0.16);
-	--kl-cmd-glass: rgba(255,255,255,0.055);
+	--kl-cmd-bg: #06402F;
+	--kl-cmd-bg-2: #032D23;
+	--kl-cmd-glow: rgba(52,211,153,0.16);
+	--kl-cmd-glass: rgba(255,255,255,0.065);
 	--kl-cmd-glass-strong: rgba(255,255,255,0.085);
 	--kl-cmd-glass-border: rgba(255,255,255,0.10);
 	--kl-cmd-glass-border-strong: rgba(255,255,255,0.18);
-	--kl-cmd-text: #EEF2F8;
-	--kl-cmd-text-muted: #93A0B4;
-	--kl-cmd-brand: #34D6AA;
-	--kl-cmd-blur: 18px;
+	--kl-cmd-text: #F4F3EE;
+	--kl-cmd-text-muted: #B8C8C0;
+	--kl-cmd-brand: #34D399;
+	--kl-cmd-blur: 14px;
 
 	/* Command theme — light variant (html.kl-theme-light) */
-	--kl-cmdl-bg: #EEF2F8;
-	--kl-cmdl-bg-2: #E2E8F2;
-	--kl-cmdl-glow: rgba(29,158,117,0.10);
-	--kl-cmdl-glass: rgba(255,255,255,0.72);
-	--kl-cmdl-glass-strong: rgba(255,255,255,0.88);
-	--kl-cmdl-glass-border: rgba(15,23,42,0.08);
-	--kl-cmdl-glass-border-strong: rgba(15,23,42,0.16);
-	--kl-cmdl-text: #0F172A;
-	--kl-cmdl-text-muted: #475569;
-	--kl-cmdl-brand: #0F6E56;
-	--kl-cmdl-blur: 16px;
+	--kl-cmdl-bg: #F4F3EE;
+	--kl-cmdl-bg-2: #E6F3EC;
+	--kl-cmdl-glow: rgba(10,135,84,0.10);
+	--kl-cmdl-glass: rgba(255,255,255,0.82);
+	--kl-cmdl-glass-strong: rgba(255,255,255,0.94);
+	--kl-cmdl-glass-border: rgba(6,78,59,0.14);
+	--kl-cmdl-glass-border-strong: rgba(6,78,59,0.26);
+	--kl-cmdl-text: #0B1F17;
+	--kl-cmdl-text-muted: #71807A;
+	--kl-cmdl-brand: #0A8754;
+	--kl-cmdl-blur: 14px;
 
 	/* Brand gradients */
-	--kl-grad-brand: linear-gradient(135deg, #34D6AA 0%, #1D9E75 52%, #0F6E56 100%);
-	--kl-grad-brand-soft: linear-gradient(135deg, rgba(52,214,170,0.18) 0%, rgba(15,110,86,0.06) 100%);
+	--kl-grad-brand: linear-gradient(135deg, #34D399 0%, #0A8754 52%, #064E3B 100%);
+	--kl-grad-brand-soft: linear-gradient(135deg, rgba(52,211,153,0.18) 0%, rgba(10,135,84,0.06) 100%);
 	--kl-grad-surface: linear-gradient(160deg, rgba(255,255,255,0.09) 0%, rgba(255,255,255,0.015) 100%);
 
 	--kl-touch-min: 44px;
@@ -103,13 +104,13 @@
 
 @media (prefers-color-scheme: dark) {
 	:root {
-		--kl-bg: #1A1A19;
-		--kl-bg-subtle: #222220;
-		--kl-surface: #2C2C2A;
-		--kl-border: #44443F;
-		--kl-text: #F1EFE8;
-		--kl-text-muted: #B4B2A9;
-		--kl-brand: #5DCAA5;
+		--kl-bg: #0C100E;
+		--kl-bg-subtle: #161B18;
+		--kl-surface: #1C2320;
+		--kl-border: #3E4B45;
+		--kl-text: #EEF3F1;
+		--kl-text-muted: #869389;
+		--kl-brand: #34D399;
 		--kl-elevation-card: 0 1px 2px rgba(0,0,0,0.4);
 	}
 }

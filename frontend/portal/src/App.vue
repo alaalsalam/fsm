@@ -3,7 +3,7 @@ import { onMounted } from "vue";
 import { RouterView, RouterLink, useRouter } from "vue-router";
 import { session, loadSession, signOut } from "@/lib/session";
 import { theme, toggleTheme } from "@/lib/theme";
-import { locale, t, toggleLocale } from "@kodlyft/ui";
+import { DigitBrand, locale, t, toggleLocale } from "@kodlyft/ui";
 
 const router = useRouter();
 
@@ -22,21 +22,12 @@ async function handleSignOut() {
 				class="kl-glass mx-auto mt-3 flex max-w-3xl items-center justify-between rounded-2xl px-4 py-3"
 			>
 				<RouterLink to="/" class="flex items-center gap-2.5">
-					<span class="kl-grad-brand flex size-8 items-center justify-center rounded-lg">
-						<svg
-							viewBox="0 0 24 24"
-							class="size-4 text-white"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2.2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							aria-hidden="true"
-						>
-							<path d="M13 2 3 14h8l-1 8 10-12h-8z" />
-						</svg>
-					</span>
-					<span class="text-lg font-bold text-cmd-fg">KodLyft</span>
+					<DigitBrand
+						:locale="locale"
+						:tone="theme === 'light' ? 'dark' : 'light'"
+						product-ar="بوابة الخدمة"
+						product-en="Service Portal"
+					/>
 				</RouterLink>
 
 				<nav class="flex items-center gap-1 text-sm sm:gap-2">
@@ -133,7 +124,7 @@ async function handleSignOut() {
 		<footer
 			class="mx-auto flex w-full max-w-3xl flex-col items-center justify-between gap-2 px-4 py-6 text-sm text-cmd-fg-muted sm:flex-row"
 		>
-			<span>© KodLyft</span>
+			<span dir="ltr">© DIGIT</span>
 			<span>{{ t("خدمة ميدانية سريعة وموثوقة.", "Fast, friendly field service.") }}</span>
 		</footer>
 	</div>

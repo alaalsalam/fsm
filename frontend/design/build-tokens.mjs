@@ -1,5 +1,5 @@
 /**
- * KodLyft FSM token build.
+ * DIGIT Field Service token build.
  * Reads tokens.json (the single source of truth) and generates:
  *   css/kodlyft-tokens.css  — CSS custom properties for the Vue console & portal
  *   css/ionic-variables.css — Ionic variable contract for the mobile app
@@ -30,7 +30,7 @@ const hexToRgb = (hex) => {
 	return `${(n >> 16) & 255},${(n >> 8) & 255},${n & 255}`;
 };
 const BANNER = (what) =>
-	`/* KodLyft FSM — ${what} (generated from tokens.json — do not edit by hand). */\n`;
+	`/* DIGIT Field Service — ${what} (generated from tokens.json — do not edit by hand). */\n`;
 
 function buildWebCss() {
 	const c = tokens.color;
@@ -58,6 +58,7 @@ function buildWebCss() {
 	lines.push("\t/* Type */");
 	lines.push(`\t--kl-font-ui: ${raw(tokens.font.family.ui)};`);
 	lines.push(`\t--kl-font-mono: ${raw(tokens.font.family.mono)};`);
+	lines.push(`\t--kl-font-currency: ${raw(tokens.font.family.currency)};`);
 	for (const [k, v] of Object.entries(tokens.font.size))
 		lines.push(`\t--kl-text-${k}: ${raw(v)};`);
 	for (const [k, v] of Object.entries(tokens.font.weight))
@@ -125,14 +126,14 @@ function buildIonicCss() {
 	const bg = get("semantic.light.bg");
 	const text = get("semantic.light.text");
 	const border = get("semantic.light.border");
-	const header = `/* KodLyft FSM — Ionic theme (generated from tokens.json — do not edit by hand).
- * Place at mobile/src/theme/variables.css and import in main.ts. Maps KodLyft tokens
+	const header = `/* DIGIT Field Service — Ionic theme (generated from tokens.json — do not edit by hand).
+ * Place at mobile/src/theme/variables.css and import in main.ts. Maps DIGIT tokens
  * onto Ionic's CSS variable contract so Ionic's adaptive iOS/Android components render
- * in the KodLyft visual language. */`;
+ * in the DIGIT visual language. */`;
 	const out = `${header}
 
 :root {
-	/* Primary = KodLyft brand */
+	/* Primary = DIGIT brand */
 	--ion-color-primary: ${brand};
 	--ion-color-primary-rgb: ${hexToRgb(brand)};
 	--ion-color-primary-contrast: #ffffff;
@@ -218,7 +219,7 @@ function buildTailwindTheme() {
 	lines.push("\t--font-sans: var(--kl-font-ui);");
 	lines.push("\t--font-mono: var(--kl-font-mono);");
 	for (const [k, v] of Object.entries(tokens.font.size)) lines.push(`\t--text-${k}: ${raw(v)};`);
-	lines.push("\t/* Radius (sm/md/lg overridden to KodLyft values) */");
+	lines.push("\t/* Radius (sm/md/lg overridden to DIGIT values) */");
 	lines.push(`\t--radius-sm: ${get("radius.sm")};`);
 	lines.push(`\t--radius-md: ${get("radius.md")};`);
 	lines.push(`\t--radius-lg: ${get("radius.lg")};`);
@@ -265,7 +266,7 @@ function buildCommandCss() {
 	background-color: var(--kl-cmd-bg);
 	background-image:
 		radial-gradient(120% 85% at 100% 0%, var(--kl-cmd-glow) 0%, transparent 55%),
-		radial-gradient(95% 70% at 0% 100%, rgba(24, 95, 165, 0.1) 0%, transparent 60%),
+		radial-gradient(95% 70% at 0% 100%, rgba(52, 211, 153, 0.08) 0%, transparent 60%),
 		linear-gradient(180deg, var(--kl-cmd-bg) 0%, var(--kl-cmd-bg-2) 100%);
 }
 
@@ -319,7 +320,7 @@ html.kl-theme-light {
 /* Fallback where backdrop-filter is unsupported — keep glass legible */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
 	.kl-glass {
-		background-color: rgba(20, 28, 42, 0.92);
+		background-color: rgba(6, 64, 47, 0.94);
 	}
 	html.kl-theme-light .kl-glass {
 		background-color: rgba(255, 255, 255, 0.92);
@@ -355,6 +356,7 @@ async function buildTs() {
 		font: {
 			ui: raw(tokens.font.family.ui),
 			mono: raw(tokens.font.family.mono),
+			currency: raw(tokens.font.family.currency),
 			size: Object.fromEntries(Object.entries(tokens.font.size).map(([k, v]) => [k, raw(v)])),
 		},
 		radius: Object.fromEntries(Object.entries(tokens.radius).map(([k, v]) => [k, raw(v)])),
@@ -371,7 +373,7 @@ async function buildTs() {
 		touchMin: raw(tokens.touchTarget.min),
 	};
 	const source =
-		"// KodLyft FSM design tokens — generated from tokens.json. Do not edit by hand.\n" +
+		"// DIGIT Field Service design tokens — generated from tokens.json. Do not edit by hand.\n" +
 		`export const tokens = ${JSON.stringify(flat, null, "\t")} as const;\n` +
 		"export type Tokens = typeof tokens;\n";
 	return format(source, {

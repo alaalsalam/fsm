@@ -1,15 +1,15 @@
-/* KodLyft FSM — Tailwind v4 theme (generated from tokens.json — do not edit by hand). */
+/* DIGIT Field Service — Tailwind v4 theme (generated from tokens.json — do not edit by hand). */
 
 /* Maps tokens onto Tailwind's @theme so utilities (bg-brand, text-fg-muted,
    rounded-lg, text-2xl …) follow the design tokens, including dark mode. */
 @theme {
 	/* Brand + status colors */
 	--color-brand: var(--kl-brand);
-	--color-brand-50: #E1F5EE;
-	--color-brand-100: #9FE1CB;
-	--color-brand-500: #0F6E56;
-	--color-brand-700: #085041;
-	--color-brand-900: #04342C;
+	--color-brand-50: #E6F3EC;
+	--color-brand-100: #C7E5D5;
+	--color-brand-500: #0A8754;
+	--color-brand-700: #064E3B;
+	--color-brand-900: #032D23;
 	--color-success: var(--kl-success);
 	--color-warning: var(--kl-warning);
 	--color-danger: var(--kl-danger);
@@ -40,10 +40,10 @@
 	--text-xl: 22px;
 	--text-2xl: 28px;
 	--text-3xl: 34px;
-	/* Radius (sm/md/lg overridden to KodLyft values) */
-	--radius-sm: 6px;
-	--radius-md: 10px;
-	--radius-lg: 14px;
+	/* Radius (sm/md/lg overridden to DIGIT values) */
+	--radius-sm: 8px;
+	--radius-md: 12px;
+	--radius-lg: 16px;
 	/* Elevation (card/sheet follow the runtime var so the command theme can deepen them) */
 	--shadow-card: var(--kl-elevation-card);
 	--shadow-sheet: var(--kl-elevation-sheet);

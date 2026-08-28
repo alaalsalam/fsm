@@ -2,6 +2,7 @@
 
 @import "../../design/css/tailwind-theme.css";
 @import "../../design/css/kodlyft-tokens.css";
+@import "../../design/css/digit-brand.css";
 @import "../../design/css/command.css";
 
 @source "../../ui/src";

@@ -2,8 +2,9 @@
 import { ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
-import { Spinner } from "@kodlyft/ui";
-import { t } from "@/lib/i18n";
+import { DigitBrand, Spinner } from "@kodlyft/ui";
+import { theme } from "@/lib/theme";
+import { lang, t } from "@/lib/i18n";
 
 const store = useAuthStore();
 const router = useRouter();
@@ -32,29 +33,13 @@ async function submit() {
 <template>
 	<div class="kl-command flex min-h-screen items-center justify-center p-4">
 		<form class="kl-glass w-full max-w-sm rounded-2xl p-7" @submit.prevent="submit">
-			<div class="mb-7 flex items-center gap-3">
-				<span
-					class="kl-grad-brand flex size-10 items-center justify-center rounded-xl shadow-glass"
-				>
-					<svg
-						viewBox="0 0 24 24"
-						class="size-5 text-white"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="2.2"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						aria-hidden="true"
-					>
-						<path d="M13 2 3 14h8l-1 8 10-12h-8z" />
-					</svg>
-				</span>
-				<div class="leading-tight">
-					<p class="text-lg font-bold text-cmd-fg">KodLyft</p>
-					<p class="text-xs text-cmd-fg-muted">
-						{{ t("وحدة تحكم الخدمة الميدانية", "Field service console") }}
-					</p>
-				</div>
+			<div class="mb-7">
+				<DigitBrand
+					:locale="lang"
+					:tone="theme === 'light' ? 'dark' : 'light'"
+					product-ar="وحدة التحكم الميدانية"
+					product-en="Field Console"
+				/>
 			</div>
 
 			<h1 class="mb-1 text-xl font-bold text-cmd-fg">
