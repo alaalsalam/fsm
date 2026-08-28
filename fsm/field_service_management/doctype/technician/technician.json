@@ -76,7 +76,7 @@
    "options": "Subcontractor"
   },
   {
-   "default": "company:Global Defaults:default_company",
+  "default": "__default",
    "fieldname": "company",
    "fieldtype": "Link",
    "in_standard_filter": 1,

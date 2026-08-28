@@ -1,6 +1,7 @@
 # Copyright (c) 2026, DIGIT and contributors
 # For license information, please see license.txt
 
+import frappe
 from frappe.model.document import Document
 
 
@@ -30,4 +31,13 @@ class Technician(Document):
 		user: DF.Link | None
 	# end: auto-generated types
 
-	pass
+	def before_validate(self):
+		"""Use the active Company default when the form does not supply one.
+
+		``__default`` gives Desk a valid Link default. This server-side fallback
+		keeps imports and API-created technicians consistent with the form.
+		"""
+		if not self.company:
+			self.company = frappe.defaults.get_user_default("Company") or frappe.defaults.get_global_default(
+				"company"
+			)
