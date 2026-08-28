@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { RouterLink } from "vue-router";
-import { PageHeader, Spinner, StatusPill } from "@kodlyft/ui";
+import { PageHeader, Spinner, StatusPill } from "@digit/ui";
 import { listProcessVisits, type ProcessVisit } from "@/lib/fsm";
 import { t } from "@/lib/i18n";
 

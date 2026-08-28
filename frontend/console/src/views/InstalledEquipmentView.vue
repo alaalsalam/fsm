@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
-import { PageHeader, Spinner, EmptyState } from "@kodlyft/ui";
-import type { InstalledEquipmentSummary } from "@kodlyft/api";
+import { PageHeader, Spinner, EmptyState } from "@digit/ui";
+import type { InstalledEquipmentSummary } from "@digit/api";
 import { installedBase } from "@/lib/fsm";
 import { t } from "@/lib/i18n";
 

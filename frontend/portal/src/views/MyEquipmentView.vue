@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { Spinner, EmptyState, statusLabel, t } from "@kodlyft/ui";
-import type { InstalledEquipmentSummary } from "@kodlyft/api";
+import { Spinner, EmptyState, statusLabel, t } from "@digit/ui";
+import type { InstalledEquipmentSummary } from "@digit/api";
 import { installedBase } from "@/lib/api";
 const rows = ref<InstalledEquipmentSummary[]>([]);
 const loading = ref(true);

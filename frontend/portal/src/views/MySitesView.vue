@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { Spinner, EmptyState, statusLabel, t } from "@kodlyft/ui";
-import type { CustomerSiteSummary } from "@kodlyft/api";
+import { Spinner, EmptyState, statusLabel, t } from "@digit/ui";
+import type { CustomerSiteSummary } from "@digit/api";
 import { installedBase } from "@/lib/api";
 const rows = ref<CustomerSiteSummary[]>([]);
 const loading = ref(true);

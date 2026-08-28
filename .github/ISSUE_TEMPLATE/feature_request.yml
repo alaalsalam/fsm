@@ -1,5 +1,5 @@
 name: Feature request
-description: Suggest an idea or enhancement for KodLyft FSM
+description: Suggest an idea or enhancement for DIGIT FSM
 labels: ["enhancement", "triage"]
 body:
   - type: textarea

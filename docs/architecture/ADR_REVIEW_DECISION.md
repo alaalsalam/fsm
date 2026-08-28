@@ -7,7 +7,7 @@
 
 | ADR | Decision | Binding constraints | Rejected alternatives | Consequence |
 |---|---|---|---|---|
-| ADR-001 | Accepted | KodLyft FSM remains the sole codebase. | Merging or copying SwiftService source/schema/assets. | All implementation and provenance stay in this repository. |
+| ADR-001 | Accepted | DIGIT FSM remains the sole codebase. | Merging or copying SwiftService source/schema/assets. | All implementation and provenance stay in this repository. |
 | ADR-002 | Accepted | SwiftService is capability evidence only; every parity row has a target decision. | Porting its implementation or treating its schema as authoritative. | Any accepted capability is independently designed and tested clean-room. |
 | ADR-003 | Accepted | Service Job is the canonical work order, not a God Document. | Competing work orders; moving Request, Visit, equipment-master, stock, or accounting truth into Job. | Commands correlate through Job while bounded records retain ownership. |
 | ADR-004 | Accepted | ERPNext v16 owns sales, stock, invoicing, collection, tax, and ledgers. | FSM replicas of Item, Warehouse, Invoice, Payment, or ledger state. | FSM stores native links and operational projections only. |

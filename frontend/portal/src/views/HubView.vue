@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { RouterLink } from "vue-router";
-import { Spinner, StatusPill, formatDate, formatMoney, statusLabel, t } from "@kodlyft/ui";
+import { Spinner, StatusPill, formatDate, formatMoney, statusLabel, t } from "@digit/ui";
 import { getMyPortalHub, type PortalHub } from "@/lib/api";
 
 defineProps<{ section?: string }>();

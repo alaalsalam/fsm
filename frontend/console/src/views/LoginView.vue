@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
-import { DigitBrand, Spinner } from "@kodlyft/ui";
+import { DigitBrand, Spinner } from "@digit/ui";
 import { theme } from "@/lib/theme";
 import { lang, t } from "@/lib/i18n";
 

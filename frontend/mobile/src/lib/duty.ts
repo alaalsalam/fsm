@@ -7,7 +7,7 @@
 import { ref } from "vue";
 import { Geolocation } from "@capacitor/geolocation";
 import { clockIn, clockOut, updateLocation } from "./fsm";
-import { t } from "@kodlyft/ui";
+import { t } from "@digit/ui";
 
 const onDuty = ref(false);
 const busy = ref(false);

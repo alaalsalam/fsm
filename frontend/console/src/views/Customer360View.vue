@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { RouterLink } from "vue-router";
-import { KlButton, LinkField, PageHeader, Spinner } from "@kodlyft/ui";
+import { KlButton, LinkField, PageHeader, Spinner } from "@digit/ui";
 import { getCustomer360, searchLink } from "@/lib/fsm";
 import { t } from "@/lib/i18n";
 

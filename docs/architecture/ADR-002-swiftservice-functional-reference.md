@@ -14,7 +14,7 @@ Review SwiftService at capability level. Each capability is classified as Implem
 ## Consequences
 
 - Workflow ideas may shape requirements and tests.
-- SwiftService names do not dictate KodLyft DocTypes or routes.
+- SwiftService names do not dictate DIGIT DocTypes or routes.
 - “Implemented” describes reference evidence, not fitness for adoption.
 - The parity register is complete enough to prevent silent scope adoption.
 

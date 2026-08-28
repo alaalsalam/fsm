@@ -54,10 +54,10 @@ The existing Capacitor Android shell was rebuilt after the DIGIT visual-identity
 | Mobile Web production bundle | PASS |
 | `npx cap sync android` | PASS — 11 plugins synchronized |
 | `yarn brand:android` | PASS |
-| `./gradlew assembleDebug` with Java 17 | PASS — 423 tasks |
+| `./gradlew assembleDebug` with Java 17 | PASS — 368 tasks executed from a clean regenerated Android project |
 | APK application label | `DIGIT Field Service` |
-| Package ID | `com.kodlyft.fsm` (preserved for compatibility) |
-| APK size | 9,739,989 bytes |
-| APK SHA256 | `bc2c1396ad65b708b32efed11960db9b9302b94b86e70a4369f757aca37b6c00` |
+| Package ID | `com.digit.fsm` (new DIGIT install identity; not upgrade-compatible with the previous application ID) |
+| APK size | 8,865,829 bytes |
+| APK SHA256 | `730d613ee1895e5d935642a93412393214776fd5dcd1e458d5cadada5f6b1665` |
 
 The APK remains an ignored local debug artifact. No release signing, release APK, or AAB was produced. The repository has no iOS native directory, so this pass makes no iOS build claim.

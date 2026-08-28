@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
-import { PageHeader, EmptyState } from "@kodlyft/ui";
+import { PageHeader, EmptyState } from "@digit/ui";
 import { getStockLevels, type StockRow } from "@/lib/fsm";
 import { t } from "@/lib/i18n";
 

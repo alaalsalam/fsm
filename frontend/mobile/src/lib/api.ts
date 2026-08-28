@@ -1,4 +1,4 @@
-import { createClient, Auth, InspectionsApi } from "@kodlyft/api";
+import { createClient, Auth, InspectionsApi } from "@digit/api";
 import { Preferences } from "@capacitor/preferences";
 
 const TOKEN_KEY = "fsm_token";

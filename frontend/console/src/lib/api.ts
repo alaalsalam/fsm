@@ -1,4 +1,4 @@
-import { createClient, Auth } from "@kodlyft/api";
+import { createClient, Auth } from "@digit/api";
 
 // Same-origin: in dev the Vite proxy forwards /api to the bench; in prod the SPA is
 // served by Frappe so cookies + CSRF are already present.

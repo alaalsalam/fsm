@@ -3,7 +3,7 @@ import { onMounted } from "vue";
 import { RouterView, RouterLink, useRouter } from "vue-router";
 import { session, loadSession, signOut } from "@/lib/session";
 import { theme, toggleTheme } from "@/lib/theme";
-import { DigitBrand, locale, t, toggleLocale } from "@kodlyft/ui";
+import { DigitBrand, locale, t, toggleLocale } from "@digit/ui";
 
 const router = useRouter();
 

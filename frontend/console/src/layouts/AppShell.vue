@@ -4,7 +4,7 @@ import { RouterView, RouterLink, useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import { theme, toggleTheme } from "@/lib/theme";
 import { lang, toggleLang, t } from "@/lib/i18n";
-import { DigitBrand } from "@kodlyft/ui";
+import { DigitBrand } from "@digit/ui";
 import ConsoleNavIcon from "@/components/ConsoleNavIcon.vue";
 
 const store = useAuthStore();

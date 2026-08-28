@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
 import { RouterLink } from "vue-router";
-import { PageHeader, Spinner } from "@kodlyft/ui";
+import { PageHeader, Spinner } from "@digit/ui";
 import { getOperationsHome, type OperationsHome } from "@/lib/fsm";
 import { t } from "@/lib/i18n";
 

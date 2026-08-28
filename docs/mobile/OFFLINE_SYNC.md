@@ -2,7 +2,7 @@
 
 ## Local database
 
-The Capacitor WebView uses IndexedDB database `kodlyft-fsm-field` with separate `cache`, `commands`, and `media` stores. Jobs/equipment bundles, photos and signatures therefore survive reloads without relying on LocalStorage.
+The Capacitor WebView uses IndexedDB database `digit-fsm-field` with separate `cache`, `commands`, and `media` stores. Jobs/equipment bundles, photos and signatures therefore survive reloads without relying on LocalStorage.
 
 ## Command envelope
 

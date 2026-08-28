@@ -1,6 +1,6 @@
 # BASE-003 API Inventory
 
-KodLyft FSM exposes 58 whitelisted methods: 51 module functions and 7 document methods. Frappe resource endpoints are also used by the shared TypeScript client. `Guest` is allowed only on the three methods explicitly marked below.
+DIGIT FSM exposes 58 whitelisted methods: 51 module functions and 7 document methods. Frappe resource endpoints are also used by the shared TypeScript client. `Guest` is allowed only on the three methods explicitly marked below.
 
 > This file preserves BASE-003 observations at the upstream baseline. GATE-001 closed the authorization findings; the authoritative post-hardening classification for all 58 endpoints is `docs/security/API_AUTHORIZATION_MATRIX.md`.
 
@@ -102,7 +102,7 @@ KodLyft FSM exposes 58 whitelisted methods: 51 module functions and 7 document m
 | Capacitor device APIs     | Mobile → device    | Geolocation, camera, network, preferences, notifications, keyboard/status UI | Device platform                  |
 | Google Fonts              | Web → external CDN | Console/Portal HTML preconnect and stylesheet                                | External presentation dependency |
 
-No payment gateway integration, external map/ETA provider, email/SMS gateway adapter, or accounting synchronization outside native ERPNext documents is implemented in the KodLyft baseline.
+No payment gateway integration, external map/ETA provider, email/SMS gateway adapter, or accounting synchronization outside native ERPNext documents is implemented in the DIGIT baseline.
 
 ## Post-baseline Phase 6 delta
 

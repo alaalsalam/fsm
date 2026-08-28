@@ -1,4 +1,4 @@
-// @kodlyft/ui — shared component library (themed once from design tokens).
+// @digit/ui — shared component library (themed once from design tokens).
 export { default as StatusPill } from "./src/StatusPill.vue";
 export { default as JobCard } from "./src/JobCard.vue";
 export { default as MoneyCard } from "./src/MoneyCard.vue";

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import { useRouter } from "vue-router";
-import { PageHeader, KpiCard, JobCard, EmptyState, type JobStatus } from "@kodlyft/ui";
+import { PageHeader, KpiCard, JobCard, EmptyState, type JobStatus } from "@digit/ui";
 import {
 	getDispatchJobs,
 	getDashboardStats,

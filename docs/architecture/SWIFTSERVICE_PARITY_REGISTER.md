@@ -22,8 +22,8 @@ SwiftService contains 79 DocTypes (21 standalone and 58 child tables), 113 white
 | Live technician tracking/ETA      | Implemented              | Candidate for clean-room event/projection with privacy/retention controls                                                                     | FSM Workforce            |
 | Diagnosis/failure analysis        | Implemented              | Merge as Visit/Job execution data; no competing operational aggregate                                                                         | FSM Work Execution       |
 | Photos/videos/readings            | Schema/UI only           | Candidate evidence child records/attachments under Visit; apply storage policy                                                                | FSM Work Execution       |
-| Sequential checklists             | Partial                  | Already implemented in KodLyft; evolve to equipment/visit scope                                                                               | FSM Work Execution       |
-| Technician time/labour log        | Partial                  | Already implemented in KodLyft; harden immutability and Visit linkage                                                                         | FSM Work Execution       |
+| Sequential checklists             | Partial                  | Already implemented in DIGIT; evolve to equipment/visit scope                                                                               | FSM Work Execution       |
+| Technician time/labour log        | Partial                  | Already implemented in DIGIT; harden immutability and Visit linkage                                                                         | FSM Work Execution       |
 | Spare request workflow            | Implemented              | **Duplicate of ERPNext Material Request**; retain FSM command/projection only                                                                 | ERPNext Stock            |
 | Van inventory                     | Schema/UI only           | **Duplicate of ERPNext Warehouse/Bin**; keep van Warehouse link and stock projection                                                          | ERPNext Stock            |
 | Parts issue/return/consume        | Implemented              | **Clean-room implemented:** ERPNext Pick List/Stock Entry own reservation and posting; FSM records guarded intent/outcome and cost projection | ERPNext Stock + FSM      |
@@ -49,13 +49,13 @@ SwiftService contains 79 DocTypes (21 standalone and 58 child tables), 113 white
 | Settings                          | Partial                  | Merge only FSM operational policies; ERP defaults remain ERPNext settings/links                                                               | FSM Configuration        |
 | Responsive engineer UI            | Partial                  | Useful interaction reference only; not a native/offline mobile architecture                                                                   | FSM Mobile               |
 | Offline mobile                    | Documentation only       | Candidate clean-room implementation under ADR-009; reference is not acceptable foundation                                                     | FSM Mobile               |
-| Customer portal                   | Documentation only       | Keep KodLyft Portal; do not add SwiftService console routes to Portal                                                                         | FSM Customer Experience  |
+| Customer portal                   | Documentation only       | Keep DIGIT Portal; do not add SwiftService console routes to Portal                                                                         | FSM Customer Experience  |
 | RTL/localization                  | Not suitable             | Reference is English-first; implement independently under ADR-010                                                                             | Shared Design System     |
 | Generic resource CRUD screens     | Implemented              | Not suitable as target architecture; use task-specific screens and shared contracts                                                           | Shared UX                |
 
 ## Global rejection reasons
 
-- GPL-3.0 reference code cannot be copied into the MIT KodLyft base.
+- GPL-3.0 reference code cannot be copied into the MIT DIGIT base.
 - The reference duplicates ERPNext commercial and stock concepts.
 - Its 113-method monolithic API and widespread permission bypass/explicit commits are not an authorization model to inherit.
 - Zero tests means implemented controller depth is not evidence of production correctness.

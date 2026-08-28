@@ -6,7 +6,7 @@ import type {
 	JobEquipmentRow,
 	MaterialPlan,
 	ServiceReport,
-} from "@kodlyft/api";
+} from "@digit/api";
 import {
 	IonPage,
 	IonHeader,
@@ -18,8 +18,8 @@ import {
 	IonSpinner,
 } from "@ionic/vue";
 import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
-import { ChecklistItem, KlButton } from "@kodlyft/ui";
-import { formatNumber, statusLabel, t } from "@kodlyft/ui";
+import { ChecklistItem, KlButton } from "@digit/ui";
+import { formatNumber, statusLabel, t } from "@digit/ui";
 import {
 	startTimer,
 	stopTimer,

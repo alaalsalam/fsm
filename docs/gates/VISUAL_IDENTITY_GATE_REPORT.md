@@ -55,8 +55,9 @@ The after-migrate updater changes identity metadata only and is idempotent; rout
 ## Compatibility boundaries
 
 - `fsm` remains the Frappe app name.
-- `@kodlyft/*` remains the internal workspace namespace.
-- `com.kodlyft.fsm` remains the Android application ID to preserve upgrade compatibility.
+- `@digit/*` is the internal workspace namespace after the full DIGIT rebrand.
+- `com.digit.fsm` is the Android application ID after the full DIGIT rebrand. It is a new install identity and does not upgrade an APK installed under the previous application ID.
+- `digit-fsm-field` is the Mobile Web IndexedDB name after the full DIGIT rebrand; legacy offline queues are intentionally not migrated in this development-only change.
 - The current repository does not contain an iOS native directory; iOS asset generation is therefore not claimed by this gate.
 
 ## Final status

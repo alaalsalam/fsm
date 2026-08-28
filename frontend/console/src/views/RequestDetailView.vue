@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { RouterLink, useRouter } from "vue-router";
-import { Spinner, StatusPill } from "@kodlyft/ui";
+import { Spinner, StatusPill } from "@digit/ui";
 import { createJobFromRequest, getServiceRequest, type ServiceRequestDoc } from "@/lib/fsm";
 import { t } from "@/lib/i18n";
 

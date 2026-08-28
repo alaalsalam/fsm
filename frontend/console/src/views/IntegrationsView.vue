@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { PageHeader, Spinner } from "@kodlyft/ui";
+import { PageHeader, Spinner } from "@digit/ui";
 import {
 	generateApiKeys,
 	listWebhooks,

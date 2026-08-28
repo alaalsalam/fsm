@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { Spinner, formatDate, statusLabel, t } from "@kodlyft/ui";
-import type { EquipmentHistoryEvent, InstalledEquipmentDetail } from "@kodlyft/api";
+import { Spinner, formatDate, statusLabel, t } from "@digit/ui";
+import type { EquipmentHistoryEvent, InstalledEquipmentDetail } from "@digit/api";
 import { installedBase } from "@/lib/api";
 const props = defineProps<{ name: string }>();
 const equipment = ref<InstalledEquipmentDetail>();

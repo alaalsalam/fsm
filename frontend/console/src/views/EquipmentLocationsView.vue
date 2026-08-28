@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from "vue";
-import { PageHeader, Spinner } from "@kodlyft/ui";
-import type { CustomerSiteSummary, EquipmentLocation } from "@kodlyft/api";
+import { PageHeader, Spinner } from "@digit/ui";
+import type { CustomerSiteSummary, EquipmentLocation } from "@digit/api";
 import { installedBase } from "@/lib/fsm";
 import { t } from "@/lib/i18n";
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
-import { PageHeader, KpiCard } from "@kodlyft/ui";
+import { PageHeader, KpiCard } from "@digit/ui";
 import {
 	getServicePerformance,
 	getWorkorderVolume,

@@ -1,7 +1,7 @@
 {
-  "name": "@kodlyft/api",
+  "name": "@digit/api",
   "version": "0.1.0",
-  "description": "KodLyft FSM typed Frappe client — REST resources, whitelisted methods, auth and realtime.",
+  "description": "DIGIT FSM typed Frappe client — REST resources, whitelisted methods, auth and realtime.",
   "private": true,
   "type": "module",
   "main": "./index.ts",

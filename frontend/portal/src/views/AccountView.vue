@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
 import { RouterLink } from "vue-router";
-import { StatusPill, Spinner, formatDate, formatMoney, statusLabel, t } from "@kodlyft/ui";
+import { StatusPill, Spinner, formatDate, formatMoney, statusLabel, t } from "@digit/ui";
 import { session } from "@/lib/session";
 import { getMyJobs, getMyRequests, type MyJob, type MyRequest } from "@/lib/api";
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { KlButton, LinkField, PageHeader, Spinner } from "@kodlyft/ui";
+import { KlButton, LinkField, PageHeader, Spinner } from "@digit/ui";
 import { getAfterSalesSetup, searchLink } from "@/lib/fsm";
 import { t } from "@/lib/i18n";
 const deliveryNote = ref("");

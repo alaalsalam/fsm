@@ -1,12 +1,12 @@
-# Contributing to KodLyft FSM
+# Contributing to DIGIT FSM
 
-Thanks for your interest in improving KodLyft FSM! This guide covers everything you need to develop,
+Thanks for your interest in improving DIGIT FSM! This guide covers everything you need to develop,
 test and submit changes.
 
 ## Code of conduct
 
 This project follows the [Contributor Covenant](./CODE_OF_CONDUCT.md). By participating you agree to
-uphold it. Report unacceptable behavior to **hello@kodlyft.com**.
+uphold it. Report unacceptable behavior to **alaalsalam101@gmail.com**.
 
 ## Prerequisites
 
@@ -19,12 +19,12 @@ uphold it. Report unacceptable behavior to **hello@kodlyft.com**.
 ```
 fsm/                 Frappe app (Python): doctypes, API, www host pages, hooks
 frontend/            Yarn-workspaces monorepo (all JS surfaces)
-  design/            @kodlyft/design  — tokens.json + token build (CSS / Ionic / TS)
-  ui/                @kodlyft/ui      — shared Vue components
-  api/               @kodlyft/api     — typed Frappe client + auth + realtime
-  console/           @kodlyft/console — back-office (Vue 3 + Tailwind v4)
-  portal/            @kodlyft/portal  — customer portal (Vue 3 + Tailwind v4)
-  mobile/            @kodlyft/mobile  — technician app (Ionic + Vue + Capacitor)
+  design/            @digit/design  — tokens.json + token build (CSS / Ionic / TS)
+  ui/                @digit/ui      — shared Vue components
+  api/               @digit/api     — typed Frappe client + auth + realtime
+  console/           @digit/console — back-office (Vue 3 + Tailwind v4)
+  portal/            @digit/portal  — customer portal (Vue 3 + Tailwind v4)
+  mobile/            @digit/mobile  — technician app (Ionic + Vue + Capacitor)
 .github/             CI, templates, dependabot, release automation
 ```
 

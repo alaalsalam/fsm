@@ -1,5 +1,5 @@
 name: Bug report
-description: Report a problem with KodLyft FSM
+description: Report a problem with DIGIT FSM
 labels: ["bug", "triage"]
 body:
   - type: markdown

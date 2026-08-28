@@ -1,5 +1,5 @@
-import { createClient, InstalledBaseApi } from "@kodlyft/api";
-import type { JobStatus } from "@kodlyft/ui";
+import { createClient, InstalledBaseApi } from "@digit/api";
+import type { JobStatus } from "@digit/ui";
 
 export const client = createClient({ baseUrl: "" });
 export const installedBase = new InstalledBaseApi(client);

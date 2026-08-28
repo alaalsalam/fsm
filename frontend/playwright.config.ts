@@ -17,17 +17,17 @@ export default defineConfig({
 	],
 	webServer: [
 		{
-			command: "yarn workspace @kodlyft/console dev --host 127.0.0.1 --port 4174",
+			command: "yarn workspace @digit/console dev --host 127.0.0.1 --port 4174",
 			url: "http://127.0.0.1:4174/fsm-console/login",
 			reuseExistingServer: true,
 		},
 		{
-			command: "yarn workspace @kodlyft/portal dev --host 127.0.0.1 --port 4175",
+			command: "yarn workspace @digit/portal dev --host 127.0.0.1 --port 4175",
 			url: "http://127.0.0.1:4175/",
 			reuseExistingServer: true,
 		},
 		{
-			command: "yarn workspace @kodlyft/mobile dev --host 127.0.0.1 --port 4176",
+			command: "yarn workspace @digit/mobile dev --host 127.0.0.1 --port 4176",
 			url: "http://127.0.0.1:4176/jobs",
 			reuseExistingServer: true,
 		},

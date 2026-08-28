@@ -1,4 +1,4 @@
-import { initializeLocale, locale, setLocale, t, toggleLocale, type AppLocale } from "@kodlyft/ui";
+import { initializeLocale, locale, setLocale, t, toggleLocale, type AppLocale } from "@digit/ui";
 
 export const lang = locale;
 export const setLang = (value: AppLocale) => setLocale(value);

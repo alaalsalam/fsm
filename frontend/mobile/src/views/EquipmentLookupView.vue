@@ -13,7 +13,7 @@ import {
 } from "@ionic/vue";
 import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
 import { installedBase } from "@/lib/fsm";
-import { t } from "@kodlyft/ui";
+import { t } from "@digit/ui";
 
 const router = useRouter();
 const token = ref("");

@@ -1,5 +1,5 @@
 /**
- * Conventional Commits for KodLyft FSM.
+ * Conventional Commits for DIGIT FSM.
  * Enforced on every commit via the husky `commit-msg` hook and in CI.
  * https://www.conventionalcommits.org
  */

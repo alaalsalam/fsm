@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useRouter, RouterLink } from "vue-router";
-import { LinkField, KlButton, Spinner } from "@kodlyft/ui";
+import { LinkField, KlButton, Spinner } from "@digit/ui";
 import { createJob, searchLink, type JobDoc } from "@/lib/fsm";
 
 const router = useRouter();

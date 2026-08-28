@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, onBeforeUnmount } from "vue";
 import { RouterLink } from "vue-router";
-import { StatusPill, Spinner } from "@kodlyft/ui";
+import { StatusPill, Spinner } from "@digit/ui";
 import {
 	getJob,
 	startJobTask,

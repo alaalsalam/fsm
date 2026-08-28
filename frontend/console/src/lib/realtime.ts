@@ -1,4 +1,4 @@
-import { Realtime } from "@kodlyft/api";
+import { Realtime } from "@digit/api";
 
 export const SERVICE_JOB_EVENT = "fsm_service_job_update";
 export const TECHNICIAN_EVENT = "fsm_technician_update";

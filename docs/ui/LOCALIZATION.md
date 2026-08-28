@@ -1,6 +1,6 @@
 # Frontend Localization Contract
 
-Console, Portal and Mobile use the shared helpers exported by `@kodlyft/ui` from
+Console, Portal and Mobile use the shared helpers exported by `@digit/ui` from
 `frontend/ui/src/i18n.ts`.
 
 ## Behavior

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from "vue";
-import { PageHeader, EmptyState, Spinner, LinkField } from "@kodlyft/ui";
+import { PageHeader, EmptyState, Spinner, LinkField } from "@digit/ui";
 import {
 	listReturns,
 	createReturn,

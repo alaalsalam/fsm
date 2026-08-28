@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { StatusPill, formatDate, statusLabel, t } from "@kodlyft/ui";
+import { StatusPill, formatDate, statusLabel, t } from "@digit/ui";
 import {
 	getJobMessages,
 	postJobMessage,

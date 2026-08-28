@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import { Spinner, t } from "@kodlyft/ui";
+import { Spinner, t } from "@digit/ui";
 import { signIn } from "@/lib/session";
 
 const router = useRouter();

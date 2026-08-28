@@ -1,8 +1,8 @@
 app_name = "fsm"
 app_title = "DIGIT Field Service"
-app_publisher = "Kodlyft"
+app_publisher = "DIGIT"
 app_description = "DIGIT after-sales and field service operations for ERPNext"
-app_email = "hello@kodlyft.com"
+app_email = "alaalsalam101@gmail.com"
 app_license = "mit"
 app_logo_url = "/assets/fsm/images/fsm-logo.svg"
 

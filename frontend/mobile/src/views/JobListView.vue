@@ -13,8 +13,8 @@ import {
 } from "@ionic/vue";
 import { Network } from "@capacitor/network";
 import { useRouter } from "vue-router";
-import { DigitBrand, JobCard, type JobSummary } from "@kodlyft/ui";
-import { formatNumber, locale, t, toggleLocale } from "@kodlyft/ui";
+import { DigitBrand, JobCard, type JobSummary } from "@digit/ui";
+import { formatNumber, locale, t, toggleLocale } from "@digit/ui";
 import { getDispatchJobs, getVanStock, type StockRow } from "@/lib/fsm";
 import { useDuty } from "@/lib/duty";
 import { cacheGet, cachePut, listCommands, syncQueued, type OfflineCommand } from "@/lib/offline";

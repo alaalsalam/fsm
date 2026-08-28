@@ -1,12 +1,12 @@
 # Default owners for everything in the repo.
-* @kodlyft/maintainers
+* @alaalsalam
 
 # Backend (Frappe app)
-/fsm/ @kodlyft/backend
+/fsm/ @alaalsalam
 
 # Frontends
-/frontend/ @kodlyft/frontend
-/frontend/mobile/ @kodlyft/mobile
+/frontend/ @alaalsalam
+/frontend/mobile/ @alaalsalam
 
 # Repo tooling / CI
-/.github/ @kodlyft/maintainers
+/.github/ @alaalsalam

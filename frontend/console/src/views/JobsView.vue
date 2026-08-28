@@ -10,7 +10,7 @@ import {
 	STATUS_LABEL,
 	type JobSummary,
 	type JobStatus,
-} from "@kodlyft/ui";
+} from "@digit/ui";
 import { getDispatchJobs } from "@/lib/fsm";
 import { t } from "@/lib/i18n";
 

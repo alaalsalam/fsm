@@ -2,7 +2,7 @@
 
 /* Tailwind utilities + tokens + the command (dark glass) theme, layered on Ionic. */
 @import "../../design/css/tailwind-theme.css";
-@import "../../design/css/kodlyft-tokens.css";
+@import "../../design/css/digit-tokens.css";
 @import "../../design/css/digit-brand.css";
 @import "../../design/css/command.css";
 

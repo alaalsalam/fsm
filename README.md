@@ -1,12 +1,12 @@
 <div align="center">
 
-# KodLyft FSM
+# DIGIT FSM
 
 ### Open-source field service management for the missing middle
 
-[![CI](https://github.com/kodlyft/fsm/actions/workflows/ci.yml/badge.svg)](https://github.com/kodlyft/fsm/actions/workflows/ci.yml)
-[![Frontend](https://github.com/kodlyft/fsm/actions/workflows/frontend.yml/badge.svg)](https://github.com/kodlyft/fsm/actions/workflows/frontend.yml)
-[![Linters](https://github.com/kodlyft/fsm/actions/workflows/linter.yml/badge.svg)](https://github.com/kodlyft/fsm/actions/workflows/linter.yml)
+[![CI](https://github.com/alaalsalam/fsm/actions/workflows/ci.yml/badge.svg)](https://github.com/alaalsalam/fsm/actions/workflows/ci.yml)
+[![Frontend](https://github.com/alaalsalam/fsm/actions/workflows/frontend.yml/badge.svg)](https://github.com/alaalsalam/fsm/actions/workflows/frontend.yml)
+[![Linters](https://github.com/alaalsalam/fsm/actions/workflows/linter.yml/badge.svg)](https://github.com/alaalsalam/fsm/actions/workflows/linter.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-1D9E75.svg)](./LICENSE)
 [![Conventional Commits](https://img.shields.io/badge/commits-conventional-1D9E75.svg)](https://www.conventionalcommits.org)
 [![Code style: prettier](https://img.shields.io/badge/code_style-prettier-1D9E75.svg)](https://prettier.io)
@@ -18,11 +18,11 @@ built on [Frappe](https://frappeframework.com) + [ERPNext](https://erpnext.com),
 
 ---
 
-## Why KodLyft
+## Why DIGIT
 
 Field service software for small and mid-sized contractors (HVAC, plumbing, electrical, pest control,
 appliance repair, …) is either too thin or too expensive, and there is **no credible open-source
-option**. KodLyft fills that gap:
+option**. DIGIT fills that gap:
 
 - **Complete core, done elegantly**: scheduling, work orders, mobile + offline, quoting, invoicing,
   CRM and reporting that just work.
@@ -34,7 +34,7 @@ option**. KodLyft fills that gap:
 
 ## Architecture
 
-KodLyft runs as one Frappe app with three frontends that share **one design language** (a single
+DIGIT runs as one Frappe app with three frontends that share **one design language** (a single
 `tokens.json` source of truth) and one backend.
 
 ```
@@ -119,4 +119,4 @@ follow [Conventional Commits](https://www.conventionalcommits.org).
 
 ## License
 
-[MIT](./LICENSE) © KodLyft
+[MIT](./LICENSE) © DIGIT

@@ -1,4 +1,4 @@
-# Copyright (c) 2026, KodLyft and contributors
+# Copyright (c) 2026, DIGIT and contributors
 # For license information, please see license.txt
 #
 # A labour time entry against a Service Job (FSM feature #8). Computes its own duration

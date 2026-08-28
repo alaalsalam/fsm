@@ -1,6 +1,6 @@
 # BASE-002 DocType Inventory
 
-Source: KodLyft FSM at upstream SHA `de4dd177781dd0d7eba2aad7825f0c4b19c1fef6`. The inventory contains 12 standalone DocTypes, one Single, and five child tables.
+Source: DIGIT FSM at upstream SHA `de4dd177781dd0d7eba2aad7825f0c4b19c1fef6`. The inventory contains 12 standalone DocTypes, one Single, and five child tables.
 
 | DocType                 | Kind                       | Domain owner            | Child tables                       | External links                                                                                          | Controller behavior                                                                               |
 | ----------------------- | -------------------------- | ----------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |

@@ -6,8 +6,8 @@ import type {
 	MaintenancePlanStatus,
 	MaintenancePlanSummary,
 	MaintenanceSummary,
-} from "@kodlyft/api";
-import { EmptyState, KlButton, LinkField, PageHeader, Spinner } from "@kodlyft/ui";
+} from "@digit/api";
+import { EmptyState, KlButton, LinkField, PageHeader, Spinner } from "@digit/ui";
 import { maintenance, searchLink } from "@/lib/fsm";
 import { lang, t } from "@/lib/i18n";
 

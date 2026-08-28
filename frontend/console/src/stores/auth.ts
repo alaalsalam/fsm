@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
-import type { SessionUser } from "@kodlyft/api";
+import type { SessionUser } from "@digit/api";
 import { auth } from "@/lib/api";
 
 export const useAuthStore = defineStore("auth", () => {

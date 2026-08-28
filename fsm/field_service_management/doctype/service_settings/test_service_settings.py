@@ -1,4 +1,4 @@
-# Copyright (c) 2026, Kodlyft and Contributors
+# Copyright (c) 2026, DIGIT and Contributors
 # See license.txt
 
 # import frappe

@@ -1,6 +1,6 @@
 import { client } from "./api";
-import { ContractsApi, InstalledBaseApi, MaintenanceApi } from "@kodlyft/api";
-import type { JobSummary, JobStatus, LinkOption } from "@kodlyft/ui";
+import { ContractsApi, InstalledBaseApi, MaintenanceApi } from "@digit/api";
+import type { JobSummary, JobStatus, LinkOption } from "@digit/ui";
 
 export const installedBase = new InstalledBaseApi(client);
 export const contracts = new ContractsApi(client);

@@ -1,7 +1,7 @@
 [project]
 name = "fsm"
 authors = [
-    { name = "Kodlyft", email = "hello@kodlyft.com"}
+    { name = "DIGIT", email = "alaalsalam101@gmail.com"}
 ]
 description = "A field service management app for frappe"
 requires-python = ">=3.14"

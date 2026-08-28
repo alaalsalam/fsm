@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { PageHeader, Spinner } from "@kodlyft/ui";
-import type { EquipmentHistoryEvent, InstalledEquipmentDetail } from "@kodlyft/api";
+import { PageHeader, Spinner } from "@digit/ui";
+import type { EquipmentHistoryEvent, InstalledEquipmentDetail } from "@digit/api";
 import { installedBase } from "@/lib/fsm";
 import { t } from "@/lib/i18n";
 

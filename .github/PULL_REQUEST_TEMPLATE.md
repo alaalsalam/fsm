@@ -1,5 +1,5 @@
 <!--
-Thanks for contributing to KodLyft FSM!
+Thanks for contributing to DIGIT FSM!
 PR titles and commits must follow Conventional Commits, e.g. `feat(console): add dispatch board`.
 -->
 

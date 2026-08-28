@@ -14,7 +14,7 @@ export interface OfflineCommand {
 	error?: string;
 }
 
-const DB_NAME = "kodlyft-fsm-field";
+const DB_NAME = "digit-fsm-field";
 const DB_VERSION = 1;
 
 function database(): Promise<IDBDatabase> {

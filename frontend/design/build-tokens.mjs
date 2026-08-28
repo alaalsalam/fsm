@@ -1,7 +1,7 @@
 /**
  * DIGIT Field Service token build.
  * Reads tokens.json (the single source of truth) and generates:
- *   css/kodlyft-tokens.css  — CSS custom properties for the Vue console & portal
+ *   css/digit-tokens.css  — CSS custom properties for the Vue console & portal
  *   css/ionic-variables.css — Ionic variable contract for the mobile app
  *   css/tailwind-theme.css  — Tailwind v4 @theme mapping (utilities follow the tokens, incl. dark)
  *   src/tokens.ts           — typed export for use in component logic
@@ -387,11 +387,11 @@ async function buildTs() {
 
 mkdirSync(resolve(root, "css"), { recursive: true });
 mkdirSync(resolve(root, "src"), { recursive: true });
-writeFileSync(resolve(root, "css/kodlyft-tokens.css"), buildWebCss());
+writeFileSync(resolve(root, "css/digit-tokens.css"), buildWebCss());
 writeFileSync(resolve(root, "css/ionic-variables.css"), buildIonicCss());
 writeFileSync(resolve(root, "css/tailwind-theme.css"), buildTailwindTheme());
 writeFileSync(resolve(root, "css/command.css"), buildCommandCss());
 writeFileSync(resolve(root, "src/tokens.ts"), await buildTs());
 console.log(
-	"✓ tokens built: css/{kodlyft-tokens,ionic-variables,tailwind-theme,command}.css, src/tokens.ts",
+	"✓ tokens built: css/{digit-tokens,ionic-variables,tailwind-theme,command}.css, src/tokens.ts",
 );

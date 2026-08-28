@@ -1,7 +1,7 @@
 {
-  "name": "@kodlyft/portal",
+  "name": "@digit/portal",
   "version": "0.1.0",
-  "description": "KodLyft FSM customer portal (Vue 3 + Tailwind v4, public).",
+  "description": "DIGIT FSM customer portal (Vue 3 + Tailwind v4, public).",
   "private": true,
   "type": "module",
   "scripts": {
@@ -13,9 +13,9 @@
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
-    "@kodlyft/api": "0.1.0",
-    "@kodlyft/design": "0.1.0",
-    "@kodlyft/ui": "0.1.0",
+    "@digit/api": "0.1.0",
+    "@digit/design": "0.1.0",
+    "@digit/ui": "0.1.0",
     "vue": "^3.5.38",
     "vue-router": "^5.1.0"
   },

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { RouterLink } from "vue-router";
-import { Spinner, t } from "@kodlyft/ui";
+import { Spinner, t } from "@digit/ui";
 import { requestService } from "@/lib/api";
 import { session } from "@/lib/session";
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { PageHeader, EmptyState, Spinner } from "@kodlyft/ui";
+import { PageHeader, EmptyState, Spinner } from "@digit/ui";
 import {
 	listSubcontractors,
 	getSubcontractorWork,

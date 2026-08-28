@@ -1,11 +1,11 @@
-// Flat ESLint config (ESLint 9) for the KodLyft FSM frontends.
+// Flat ESLint config (ESLint 9) for the DIGIT FSM frontends.
 // Scoped to frontend/** only — the Frappe desk JS is handled by the repo's .eslintrc + pre-commit.
 import pluginVue from "eslint-plugin-vue";
 import { defineConfigWithVueTs, vueTsConfigs } from "@vue/eslint-config-typescript";
 
 export default defineConfigWithVueTs(
 	{
-		name: "kodlyft/ignores",
+		name: "digit/ignores",
 		ignores: [
 			"**/node_modules/**",
 			"**/dist/**",
@@ -17,7 +17,7 @@ export default defineConfigWithVueTs(
 		],
 	},
 	{
-		name: "kodlyft/files",
+		name: "digit/files",
 		files: ["**/*.{ts,mts,tsx,vue,js,mjs}"],
 		languageOptions: {
 			ecmaVersion: "latest",
@@ -33,7 +33,7 @@ export default defineConfigWithVueTs(
 	pluginVue.configs["flat/essential"],
 	vueTsConfigs.recommended,
 	{
-		name: "kodlyft/rules",
+		name: "digit/rules",
 		rules: {
 			"vue/multi-word-component-names": "off",
 			// Ionic web components use the native `slot` attribute by design.

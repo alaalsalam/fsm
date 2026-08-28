@@ -10,9 +10,9 @@ import {
 	IonContent,
 	IonSpinner,
 } from "@ionic/vue";
-import type { InstalledEquipmentDetail } from "@kodlyft/api";
+import type { InstalledEquipmentDetail } from "@digit/api";
 import { installedBase } from "@/lib/fsm";
-import { formatDate, statusLabel, t } from "@kodlyft/ui";
+import { formatDate, statusLabel, t } from "@digit/ui";
 const props = defineProps<{ id: string }>();
 const row = ref<InstalledEquipmentDetail>();
 const loading = ref(true);

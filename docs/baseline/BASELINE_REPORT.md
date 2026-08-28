@@ -8,7 +8,7 @@ Baseline repair: `67c0475f7875e8de43bf4cdb01157ccc27561daa`
 
 ## Executive result
 
-Frappe 16.22.0, ERPNext 16.22.0, official Frappe Payments, and KodLyft FSM 0.0.1 install and migrate in the v16 development bench. FSM is installed on the designated development site `digit16.trilogy-erp.com`; Console, Portal, Mobile Web, and the Android debug package build successfully. The missing `Payment Gateway` owner was identified as official `frappe/payments`; pinning its `develop` revision restored the clean FSM test run. JDK 17 and Android Platform 36 are isolated to the Android build command while the server default remains Java 11. The production bench `/home/erpnext/frappe-bench-startd-prod` was not changed.
+Frappe 16.22.0, ERPNext 16.22.0, official Frappe Payments, and DIGIT FSM 0.0.1 install and migrate in the v16 development bench. FSM is installed on the designated development site `digit16.trilogy-erp.com`; Console, Portal, Mobile Web, and the Android debug package build successfully. The missing `Payment Gateway` owner was identified as official `frappe/payments`; pinning its `develop` revision restored the clean FSM test run. JDK 17 and Android Platform 36 are isolated to the Android build command while the server default remains Java 11. The production bench `/home/erpnext/frappe-bench-startd-prod` was not changed.
 
 ADR-001 through ADR-010 are accepted by GATE-001 with their recorded constraints. This approval does not start the next phase or authorize new maintenance DocTypes.
 

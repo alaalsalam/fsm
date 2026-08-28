@@ -1,7 +1,7 @@
 {
-  "name": "@kodlyft/mobile",
+  "name": "@digit/mobile",
   "version": "0.1.0",
-  "description": "KodLyft FSM technician app (Ionic + Vue + Capacitor + Tailwind v4).",
+  "description": "DIGIT FSM technician app (Ionic + Vue + Capacitor + Tailwind v4).",
   "private": true,
   "type": "module",
   "scripts": {
@@ -32,9 +32,9 @@
     "@capacitor/status-bar": "^6.0.0",
     "@ionic/vue": "^8.8.10",
     "@ionic/vue-router": "^8.8.10",
-    "@kodlyft/api": "0.1.0",
-    "@kodlyft/design": "0.1.0",
-    "@kodlyft/ui": "0.1.0",
+    "@digit/api": "0.1.0",
+    "@digit/design": "0.1.0",
+    "@digit/ui": "0.1.0",
     "ionicons": "^8.0.13",
     "leaflet": "^1.9.4",
     "pinia": "^3.0.1",

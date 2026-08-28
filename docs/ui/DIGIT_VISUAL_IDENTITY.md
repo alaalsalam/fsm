@@ -2,9 +2,9 @@
 
 ## Decision
 
-FSM is presented as **DIGIT Field Service**. `fsm` remains the application and package name, and KodLyft FSM remains the functional codebase required by the architecture ADRs. The visible product identity is owned by DIGIT.
+FSM is presented as **DIGIT Field Service**. `fsm` remains the application and package name, and DIGIT FSM remains the functional codebase required by the architecture ADRs. The visible product identity is owned by DIGIT.
 
-The canonical identity source is the installed development app at `/home/erpnext/frappe-bench16/apps/digit`. That repository is read-only for this work. No identity asset was recreated from memory and no functional code was copied from another FSM product.
+The canonical identity source is the installed development app at `/home/erpnext/frappe-bench16/apps/digit`. Identity assets and tokens are reused from that source, while the approved integration adds a conditional FSM entry to the DIGIT shell. No functional code was copied from another FSM product.
 
 ## Canonical tokens
 
@@ -49,6 +49,12 @@ The canonical identity source is the installed development app at `/home/erpnext
 | Mobile Web | Deep-green field surface, DIGIT wordmark, local fonts, RTL-aware directional controls |
 | Android | DIGIT launcher icon, adaptive foreground/background, splash, status bar, notification color, visible app name |
 
+## DIGIT shell integration
+
+The technical Frappe app name remains `fsm` and is the installation-discovery key. When both `digit` and `fsm` are installed on the same site, the DIGIT backend adds one conditional **DIGIT Field Service** item to its workspace navigation, command palette, app switcher, and Connected Apps card. Every entry performs a full same-origin navigation to `/fsm-console/`; no FSM route is rendered inside or duplicated by the DIGIT SPA.
+
+When `fsm` is not installed, the item is absent. This preserves independent installation and avoids a hard dependency between the two applications.
+
 ## Theme and localization contract
 
 - Console and Portal share the `digit-theme` browser preference used by the DIGIT product.
@@ -64,7 +70,7 @@ The canonical identity source is the installed development app at `/home/erpnext
 3. Do not introduce network font dependencies.
 4. Do not use the primary mint as body text on paper without contrast validation.
 5. Native launcher or splash updates must be derived from the official DIGIT assets.
-6. Internal package names such as `@kodlyft/ui` and the Android application ID are compatibility identifiers, not visible brand copy; changing them requires a separate migration decision.
+6. Internal package names use `@digit/*`; the Android application ID is `com.digit.fsm`, and the offline database is `digit-fsm-field`. Future changes to these identifiers require an explicit migration decision.
 
 ## Verification contract
 
