@@ -110,6 +110,18 @@ async function signOut() {
 				</nav>
 
 				<div class="mt-3 space-y-2">
+					<!-- Return to the Frappe Desk workspace without ending the session. -->
+					<a
+						href="/app/field-service"
+						class="flex w-full items-center gap-3 rounded-xl border border-cmd-border bg-white/5 px-3 py-2.5 text-sm font-semibold text-cmd-fg transition-colors hover:bg-white/10"
+					>
+						<svg viewBox="0 0 24 24" class="size-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+							<path d="M15 18l-6-6 6-6" />
+							<path d="M9 12h11" />
+						</svg>
+						<span>{{ t("العودة إلى Desk", "Back to Desk") }}</span>
+					</a>
+
 					<!-- Language toggle -->
 					<button
 						type="button"
@@ -200,6 +212,17 @@ async function signOut() {
 					/>
 				</div>
 				<div class="flex items-center gap-2">
+					<a
+						href="/app/field-service"
+						class="flex size-9 items-center justify-center rounded-full bg-white/5 text-cmd-fg"
+						:title="t('العودة إلى Desk', 'Back to Desk')"
+						:aria-label="t('العودة إلى Desk', 'Back to Desk')"
+					>
+						<svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+							<path d="M15 18l-6-6 6-6" />
+							<path d="M9 12h11" />
+						</svg>
+					</a>
 					<button
 						type="button"
 						class="flex size-9 items-center justify-center rounded-full bg-white/5 text-xs font-bold text-cmd-fg"
