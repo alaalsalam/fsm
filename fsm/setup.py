@@ -216,7 +216,6 @@ def ensure_visual_identity():
 			"header_icon": "wrench",
 		},
 		"Workspace": {
-			"label": "DIGIT Field Service",
 			"icon": "wrench",
 			"indicator_color": "green",
 			"is_hidden": 0,
@@ -224,8 +223,14 @@ def ensure_visual_identity():
 	}
 
 	for doctype, values in identity_values.items():
-		if frappe.db.exists(doctype, "Field Service"):
-			frappe.db.set_value(doctype, "Field Service", values, update_modified=False)
+		# A standard Desktop Icon can coexist with the branded icon created by the
+		# workspace fixture.  Update the branded record when it is present rather
+		# than attempting to give both records the same unique label.
+		name = "DIGIT Field Service" if doctype == "Desktop Icon" and frappe.db.exists(
+			doctype, "DIGIT Field Service"
+		) else "Field Service"
+		if frappe.db.exists(doctype, name):
+			frappe.db.set_value(doctype, name, values, update_modified=False)
 
 
 def ensure_roles():
