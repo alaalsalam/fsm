@@ -124,6 +124,7 @@ def seed_presentation_data():
 			"team_leader": technician,
 			"capacity": 6,
 			"active": 1,
+			"members": [{"technician": technician, "role_in_team": "Team Leader", "active": 1}],
 			"notes": "فريق عرض مخصص لسيناريو الخدمة الميدانية.",
 		},
 	)
