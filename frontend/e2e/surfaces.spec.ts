@@ -92,6 +92,44 @@ test("console boots and protects the jobs route", async ({ page }) => {
 	expect(errors).toEqual([]);
 });
 
+test("DIGIT identity is shared by console, portal, and mobile", async ({ page }) => {
+	await page.goto("http://127.0.0.1:4174/fsm-console/login");
+	await expect(page.getByLabel("DIGIT Field Service")).toBeVisible();
+	await expect
+		.poll(() =>
+			page.evaluate(() =>
+				getComputedStyle(document.body).fontFamily.includes("IBM Plex Sans Arabic"),
+			),
+		)
+		.toBe(true);
+
+	await page.route(/\/api\/(method|resource)\//, (route) => {
+		const url = route.request().url();
+		if (url.includes("get_portal_session"))
+			return json(route, { message: { authenticated: false } });
+		return json(route, { message: null });
+	});
+	await page.goto("http://127.0.0.1:4175/");
+	await expect(page.getByLabel("DIGIT Field Service")).toBeVisible();
+
+	await page.route("http://localhost:8000/api/**", (route) =>
+		route.abort("internetdisconnected"),
+	);
+	await page.goto("http://127.0.0.1:4176/jobs");
+	await expect(page.getByLabel("DIGIT Field Service")).toBeVisible();
+
+	const externalFonts = await page.evaluate(() =>
+		performance
+			.getEntriesByType("resource")
+			.map((entry) => entry.name)
+			.filter(
+				(name) =>
+					name.includes("fonts.googleapis.com") || name.includes("fonts.gstatic.com"),
+			),
+	);
+	expect(externalFonts).toEqual([]);
+});
+
 test("portal creates a canonical service request", async ({ page }) => {
 	const errors: Error[] = [];
 	page.on("pageerror", (error) => errors.push(error));

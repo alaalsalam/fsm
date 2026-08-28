@@ -44,3 +44,20 @@ cd android
 | SHA256 | `3f038163a9f0ade133b7673fe92e2e8242da2788431f5ba4f49c6cb18cb0b7aa` |
 
 The debug APK is a generated local artifact and is not committed. Remaining warnings are the upstream `flatDir` metadata warning, deprecated Gradle features before Gradle 9, and the existing Vite chunk-size warning; none blocked the debug artifact.
+
+## DIGIT identity rebuild — 2026-08-28
+
+The existing Capacitor Android shell was rebuilt after the DIGIT visual-identity alignment. The tracked `brand:android` generator now derives launcher density assets, the adaptive foreground/background, and splash screens from the official DIGIT resources after every Capacitor sync.
+
+| Check | Result |
+|---|---|
+| Mobile Web production bundle | PASS |
+| `npx cap sync android` | PASS — 11 plugins synchronized |
+| `yarn brand:android` | PASS |
+| `./gradlew assembleDebug` with Java 17 | PASS — 423 tasks |
+| APK application label | `DIGIT Field Service` |
+| Package ID | `com.kodlyft.fsm` (preserved for compatibility) |
+| APK size | 9,739,989 bytes |
+| APK SHA256 | `bc2c1396ad65b708b32efed11960db9b9302b94b86e70a4369f757aca37b6c00` |
+
+The APK remains an ignored local debug artifact. No release signing, release APK, or AAB was produced. The repository has no iOS native directory, so this pass makes no iOS build claim.
