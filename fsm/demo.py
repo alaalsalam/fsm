@@ -15,6 +15,7 @@ from fsm.service_operations.commands import (
 	open_request,
 	plan_job,
 	schedule_job,
+	triage_request,
 )
 
 
@@ -94,6 +95,8 @@ def seed_presentation_data():
 		"وحدة تكييف عرض - الطابق الأرضي",
 		"لوحة إنذار حريق عرض - المدخل الرئيسي",
 		"طفاية حريق عرض - قاعة الاجتماعات",
+		"إنارة طوارئ عرض - الممر الشرقي",
+		"باب حريق عرض - مخرج الطوارئ",
 	):
 		equipment_name = frappe.db.exists(
 			"Installed Equipment", {"equipment_name": name, "customer_site": site}
@@ -136,6 +139,32 @@ def seed_presentation_data():
 			"notes": "فريق عرض مخصص لسيناريو الخدمة الميدانية.",
 		},
 	)
+	technician_two = _get_or_create(
+		"Technician",
+		{"technician_name": "فنية عرض DIGIT - جدة"},
+		{
+			"technician_name": "فنية عرض DIGIT - جدة",
+			"company": company,
+			"status": "On Job",
+			"worker_type": "Employee",
+			"active": 1,
+			"phone": "0500000001",
+		},
+	)
+	team_two = _get_or_create(
+		"Service Team",
+		{"team_name": "فريق عرض DIGIT - جدة"},
+		{
+			"team_name": "فريق عرض DIGIT - جدة",
+			"company": company,
+			"status": "Active",
+			"team_leader": technician_two,
+			"capacity": 4,
+			"active": 1,
+			"members": [{"technician": technician_two, "role_in_team": "Team Leader", "active": 1}],
+			"notes": "فريق عرض ثانٍ لإظهار توزيع العمل بين الفرق.",
+		},
+	)
 
 	request = _get_or_create(
 		"Service Request",
@@ -155,6 +184,24 @@ def seed_presentation_data():
 	request_doc = frappe.get_doc("Service Request", request)
 	if request_doc.status == "Draft":
 		open_request(request, source="System", correlation_id=f"{DEMO_PREFIX}-REQUEST-OPEN")
+	triaged_request = _get_or_create(
+		"Service Request",
+		{"subject": "طلب عرض عاجل: صيانة وحدة التكييف"},
+		{
+			"source": "WhatsApp",
+			"priority": "Urgent",
+			"service_type": "Corrective Maintenance",
+			"company": company,
+			"customer": customer,
+			"customer_site": site,
+			"installed_equipment": equipment[0],
+			"subject": "طلب عرض عاجل: صيانة وحدة التكييف",
+			"description": "بلاغ عاجل يوضح تنوع مصادر الطلبات وأولوياتها في شاشة التشغيل.",
+		},
+	)
+	if frappe.db.get_value("Service Request", triaged_request, "status") == "Draft":
+		open_request(triaged_request, source="System", correlation_id=f"{DEMO_PREFIX}-REQUEST-URGENT-OPEN")
+		triage_request(triaged_request, source="System", correlation_id=f"{DEMO_PREFIX}-REQUEST-URGENT-TRIAGE")
 	job = frappe.db.get_value("Service Job", {"request_idempotency_key": f"{DEMO_PREFIX}-JOB-01"})
 	if not job:
 		job = create_job_from_request(request, idempotency_key=f"{DEMO_PREFIX}-JOB-01", source="System")["name"]
@@ -201,7 +248,10 @@ def seed_presentation_data():
 		"equipment": equipment,
 		"technician": technician,
 		"team": team,
+		"technician_two": technician_two,
+		"team_two": team_two,
 		"request": request,
+		"triaged_request": triaged_request,
 		"job": job,
 		"visits": visits,
 	}
