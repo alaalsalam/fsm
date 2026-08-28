@@ -3,7 +3,7 @@
  "creation": "2026-08-26 00:00:00.000000",
  "docstatus": 0,
  "doctype": "Workspace Sidebar",
- "header_icon": "tool",
+ "header_icon": "wrench",
  "idx": 0,
  "items": [
   {
@@ -243,5 +243,5 @@
  "name": "Field Service",
  "owner": "Administrator",
  "standard": 1,
- "title": "Field Service"
+ "title": "DIGIT Field Service"
 }

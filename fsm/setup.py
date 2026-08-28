@@ -198,6 +198,36 @@ FSM_CUSTOM_FIELDS = {
 }
 
 
+def ensure_visual_identity():
+	"""Keep existing Frappe v16 navigation records aligned with DIGIT branding.
+
+	Workspace records can retain user-customized database values when their standard
+	JSON changes. This idempotent system hook updates identity metadata only; names,
+	routes, roles, permissions, and workspace links remain untouched.
+	"""
+	identity_values = {
+		"Desktop Icon": {
+			"label": "DIGIT Field Service",
+			"icon": "wrench",
+			"logo_url": "/assets/fsm/images/fsm-logo.svg",
+		},
+		"Workspace Sidebar": {
+			"title": "DIGIT Field Service",
+			"header_icon": "wrench",
+		},
+		"Workspace": {
+			"label": "DIGIT Field Service",
+			"icon": "wrench",
+			"indicator_color": "green",
+			"is_hidden": 0,
+		},
+	}
+
+	for doctype, values in identity_values.items():
+		if frappe.db.exists(doctype, "Field Service"):
+			frappe.db.set_value(doctype, "Field Service", values, update_modified=False)
+
+
 def ensure_roles():
 	for role_name, desk_access in FSM_ROLES:
 		if not frappe.db.exists("Role", role_name):
@@ -230,8 +260,10 @@ def ensure_custom_fields():
 def after_install():
 	ensure_roles()
 	ensure_custom_fields()
+	ensure_visual_identity()
 
 
 def after_migrate():
 	ensure_roles()
 	ensure_custom_fields()
+	ensure_visual_identity()

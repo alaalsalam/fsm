@@ -11,7 +11,8 @@
     "typecheck": "vue-tsc --noEmit",
     "test": "vitest run --passWithNoTests",
     "sync": "cap sync",
-    "android:dev": "yarn build && cap sync android && cd android && ./gradlew assembleDebug",
+    "brand:android": "node scripts/generate-android-brand.mjs",
+    "android:dev": "yarn build && cap sync android && yarn brand:android && cd android && ./gradlew assembleDebug",
     "android:release": "yarn build && cap sync android && cd android && ./gradlew assembleRelease",
     "ios:dev": "yarn build && cap sync ios && cap open ios",
     "ios:release": "yarn build && cap sync ios"

@@ -1,0 +1,89 @@
+/* DIGIT Field Service identity layer for Frappe Desk and web routes. */
+@font-face {
+	font-family: "IBM Plex Sans Arabic";
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+	src: url("/assets/fsm/fonts/digit/IBMPlexSansArabic-Regular.ttf") format("truetype");
+}
+@font-face {
+	font-family: "IBM Plex Sans Arabic";
+	font-style: normal;
+	font-weight: 500;
+	font-display: swap;
+	src: url("/assets/fsm/fonts/digit/IBMPlexSansArabic-Medium.ttf") format("truetype");
+}
+@font-face {
+	font-family: "IBM Plex Sans Arabic";
+	font-style: normal;
+	font-weight: 600;
+	font-display: swap;
+	src: url("/assets/fsm/fonts/digit/IBMPlexSansArabic-SemiBold.ttf") format("truetype");
+}
+@font-face {
+	font-family: "IBM Plex Sans Arabic";
+	font-style: normal;
+	font-weight: 700;
+	font-display: swap;
+	src: url("/assets/fsm/fonts/digit/IBMPlexSansArabic-Bold.ttf") format("truetype");
+}
+@font-face {
+	font-family: "Archivo";
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+	src: url("/assets/fsm/fonts/digit/Archivo-Regular.ttf") format("truetype");
+}
+
+:root {
+	--fsm-digit-brand: #0a8754;
+	--fsm-digit-deep: #064e3b;
+	--fsm-digit-mint: #34d399;
+	--fsm-digit-soft: #e6f3ec;
+	--fsm-digit-paper: #f4f3ee;
+	--fsm-digit-line: rgba(6, 78, 59, 0.14);
+	--primary: var(--fsm-digit-brand);
+	--primary-color: var(--fsm-digit-brand);
+	--btn-primary: var(--fsm-digit-brand);
+}
+
+body,
+button,
+input,
+select,
+textarea {
+	font-family: "IBM Plex Sans Arabic", Tahoma, system-ui, sans-serif;
+	letter-spacing: 0;
+}
+
+body[data-route="Workspaces/Field Service"] .layout-main-section,
+body[data-route="Field Service"] .layout-main-section,
+[data-page-route="Field Service"] .layout-main-section {
+	background:
+		radial-gradient(circle at 100% 0%, rgba(52, 211, 153, 0.09), transparent 34rem),
+		var(--fsm-digit-paper);
+	border: 1px solid var(--fsm-digit-line);
+	border-radius: 16px;
+}
+
+body[data-route="Workspaces/Field Service"] .widget.shortcut-widget-box,
+body[data-route="Field Service"] .widget.shortcut-widget-box,
+[data-page-route="Field Service"] .widget.shortcut-widget-box {
+	border-color: var(--fsm-digit-line);
+	border-radius: 12px;
+	box-shadow: 0 1px 2px rgba(6, 78, 59, 0.07);
+}
+
+body[data-route="Workspaces/Field Service"] .widget.shortcut-widget-box:hover,
+body[data-route="Field Service"] .widget.shortcut-widget-box:hover,
+[data-page-route="Field Service"] .widget.shortcut-widget-box:hover {
+	border-color: rgba(10, 135, 84, 0.38);
+	box-shadow: 0 8px 22px rgba(6, 78, 59, 0.11);
+}
+
+.desk-sidebar .standard-sidebar-item.selected,
+.desk-sidebar .standard-sidebar-item:hover {
+	background: var(--fsm-digit-soft);
+	color: var(--fsm-digit-deep);
+}
+

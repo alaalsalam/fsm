@@ -1,9 +1,14 @@
 app_name = "fsm"
-app_title = "Field Service Management"
+app_title = "DIGIT Field Service"
 app_publisher = "Kodlyft"
-app_description = "A field service management app for frappe"
+app_description = "DIGIT after-sales and field service operations for ERPNext"
 app_email = "hello@kodlyft.com"
 app_license = "mit"
+app_logo_url = "/assets/fsm/images/fsm-logo.svg"
+
+website_context = {
+	"splash_image": "/assets/fsm/images/fsm-logo.svg",
+}
 
 # Apps
 # ------------------
@@ -14,7 +19,7 @@ add_to_apps_screen = [
 	{
 		"name": app_name,
 		"logo": "/assets/fsm/images/fsm-logo.svg",
-		"title": "Field Service",
+		"title": "DIGIT Field Service",
 		"route": "/app/field-service",
 		"has_permission": "fsm.check_app_permission",
 	}
@@ -35,11 +40,11 @@ add_to_apps_screen = [
 # ------------------
 
 # include js, css files in header of desk.html
-# app_include_css = "/assets/fsm/css/fsm.css"
+app_include_css = "/assets/fsm/css/fsm_identity.css?v=20260828_digit_v1"
 # app_include_js = "/assets/fsm/js/fsm.js"
 
 # include js, css files in header of web template
-# web_include_css = "/assets/fsm/css/fsm.css"
+web_include_css = "/assets/fsm/css/fsm_identity.css?v=20260828_digit_v1"
 # web_include_js = "/assets/fsm/js/fsm.js"
 
 # include custom scss in every website theme (without file extension ".scss")

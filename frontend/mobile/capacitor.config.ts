@@ -1,9 +1,9 @@
 import type { CapacitorConfig } from "@capacitor/cli";
 
-// Brand values mirror the design tokens (brand #1D9E75, brand-900 #04342C).
+// Native chrome mirrors the canonical DIGIT identity.
 const config: CapacitorConfig = {
 	appId: "com.kodlyft.fsm",
-	appName: "KodLyft FSM",
+	appName: "DIGIT Field Service",
 	webDir: "dist",
 	server: {
 		androidScheme: "https",
@@ -12,14 +12,14 @@ const config: CapacitorConfig = {
 	plugins: {
 		SplashScreen: {
 			launchAutoHide: false,
-			backgroundColor: "#04342C",
+			backgroundColor: "#064E3B",
 			showSpinner: false,
 			splashFullScreen: true,
 			splashImmersive: true,
 		},
 		StatusBar: {
 			style: "LIGHT",
-			backgroundColor: "#0F6E56",
+			backgroundColor: "#064E3B",
 		},
 		Keyboard: {
 			resize: "body",
@@ -29,14 +29,14 @@ const config: CapacitorConfig = {
 		},
 		LocalNotifications: {
 			smallIcon: "ic_stat_notification",
-			iconColor: "#1D9E75",
+			iconColor: "#0A8754",
 		},
 	},
 	android: {
-		backgroundColor: "#04342C",
+		backgroundColor: "#064E3B",
 	},
 	ios: {
-		backgroundColor: "#04342C",
+		backgroundColor: "#064E3B",
 		contentInset: "automatic",
 	},
 };
