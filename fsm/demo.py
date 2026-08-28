@@ -7,6 +7,8 @@ submits financial or stock documents and does not invoke external integrations.
 import frappe
 from frappe.utils import add_days, now_datetime, today
 
+from fsm.installed_base.commands import confirm_installation, create_customer_site, create_installed_equipment
+
 
 DEMO_PREFIX = "DIGIT-DEMO-FSM"
 
@@ -66,51 +68,38 @@ def seed_presentation_data():
 			},
 		)
 
-	site = _get_or_create(
-		"Customer Site",
-		{"site_code": f"{DEMO_PREFIX}-RUH-01"},
-		{
-			"site_name": "مركز عرض DIGIT للخدمات الميدانية - الرياض",
-			"site_code": f"{DEMO_PREFIX}-RUH-01",
-			"customer": customer,
-			"company": company,
-			"status": "Active",
-			"site_type": "Commercial",
-			"city": "الرياض",
-			"notes": "بيانات عرض مترابطة لنظام DIGIT Field Service.",
-		},
-	)
+	site = frappe.db.exists("Customer Site", {"site_code": f"{DEMO_PREFIX}-RUH-01"})
+	if not site:
+		site = create_customer_site(
+			site_name="مركز عرض DIGIT للخدمات الميدانية - الرياض",
+			site_code=f"{DEMO_PREFIX}-RUH-01",
+			customer=customer,
+			company=company,
+			status="Active",
+			site_type="Commercial",
+			notes="بيانات عرض مترابطة لنظام DIGIT Field Service.",
+		)["name"]
 
 	equipment = []
-	for sequence, name, category in (
-		("01", "وحدة تكييف عرض - الطابق الأرضي", "General"),
-		("02", "لوحة إنذار حريق عرض - المدخل الرئيسي", "Fire Alarm"),
-		("03", "طفاية حريق عرض - قاعة الاجتماعات", "Fire Extinguisher"),
+	for name in (
+		"وحدة تكييف عرض - الطابق الأرضي",
+		"لوحة إنذار حريق عرض - المدخل الرئيسي",
+		"طفاية حريق عرض - قاعة الاجتماعات",
 	):
-		equipment.append(
-			_get_or_create(
-				"Installed Equipment",
-				{"equipment_id": f"{DEMO_PREFIX}-EQ-{sequence}"},
-				{
-					"equipment_id": f"{DEMO_PREFIX}-EQ-{sequence}",
-					"equipment_name": name,
-					"status": "Active",
-					"qr_code": f"{DEMO_PREFIX}-QR-{sequence}",
-					"company": company,
-					"customer": customer,
-					"customer_site": site,
-					"item_code": item,
-					"installed_quantity": 1,
-					"installation_date": add_days(today(), -180),
-					"warranty_start_date": add_days(today(), -180),
-					"warranty_end_date": add_days(today(), 185),
-					"warranty_status": "Active",
-					"equipment_category": category,
-					"source": "Manual",
-					"provisioning_key": f"{DEMO_PREFIX}-PROVISION-{sequence}",
-				},
-			)
+		equipment_name = frappe.db.exists(
+			"Installed Equipment", {"equipment_name": name, "customer_site": site}
 		)
+		if not equipment_name:
+			equipment_name = create_installed_equipment(
+				equipment_name=name,
+				company=company,
+				customer=customer,
+				customer_site=site,
+				item_code=item,
+				notes="معدات مهيأة لعرض DIGIT Field Service.",
+			)["name"]
+			confirm_installation(equipment_name, site, installation_date=add_days(today(), -180))
+		equipment.append(equipment_name)
 
 	technician = _get_or_create(
 		"Technician",
