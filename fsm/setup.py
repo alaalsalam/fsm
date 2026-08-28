@@ -1,6 +1,8 @@
 # Copyright (c) 2026, DIGIT and contributors
 # For license information, please see license.txt
 
+import json
+
 import frappe
 from frappe.custom.doctype.custom_field.custom_field import create_custom_fields
 
@@ -233,6 +235,34 @@ def ensure_visual_identity():
 			frappe.db.set_value(doctype, name, values, update_modified=False)
 
 
+def ensure_field_service_sidebar():
+	"""Synchronize the standard Field Service navigation without duplicating it.
+
+	Frappe preserves existing child rows of standard Workspace Sidebars during a
+	regular fixture sync.  The navigation is product-owned, so its canonical
+	Dashboard → Operations → screens → reports structure is applied explicitly
+	during migration while keeping the sidebar's stable name and permissions.
+	"""
+	path = frappe.get_app_path("fsm", "workspace_sidebar", "field_service.json")
+	with open(path, encoding="utf-8") as handle:
+		definition = json.load(handle)
+
+	if frappe.db.exists("Workspace Sidebar", definition["name"]):
+		sidebar = frappe.get_doc("Workspace Sidebar", definition["name"])
+		sidebar.update(
+			{
+				"title": definition["title"],
+				"header_icon": definition["header_icon"],
+				"module": definition["module"],
+				"app": definition["app"],
+			}
+		)
+		sidebar.set("items", definition["items"])
+		sidebar.save()
+	else:
+		frappe.get_doc(definition).insert()
+
+
 def ensure_roles():
 	for role_name, desk_access in FSM_ROLES:
 		if not frappe.db.exists("Role", role_name):
@@ -266,9 +296,11 @@ def after_install():
 	ensure_roles()
 	ensure_custom_fields()
 	ensure_visual_identity()
+	ensure_field_service_sidebar()
 
 
 def after_migrate():
 	ensure_roles()
 	ensure_custom_fields()
 	ensure_visual_identity()
+	ensure_field_service_sidebar()

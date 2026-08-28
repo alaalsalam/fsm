@@ -21,6 +21,18 @@
   {
    "child": 0,
    "collapsible": 1,
+   "icon": "chart",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Dashboard",
+   "link_type": "URL",
+   "show_arrow": 0,
+   "type": "Link",
+   "url": "/fsm-console/"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
    "icon": "tool",
    "indent": 0,
    "keep_closed": 0,
@@ -60,6 +72,52 @@
    "keep_closed": 0,
    "label": "Service Visit",
    "link_to": "Service Visit",
+   "link_type": "DocType",
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "chart",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Analytics & Reports",
+   "show_arrow": 0,
+   "type": "Section Break"
+  },
+  {
+   "child": 1,
+   "collapsible": 1,
+   "icon": "chart",
+   "indent": 1,
+   "keep_closed": 0,
+   "label": "Analytics Dashboard",
+   "link_type": "URL",
+   "show_arrow": 0,
+   "type": "Link",
+   "url": "/fsm-console/analytics"
+  },
+  {
+   "child": 1,
+   "collapsible": 1,
+   "icon": "file-text",
+   "indent": 1,
+   "keep_closed": 0,
+   "label": "Service Reports",
+   "link_to": "Service Report",
+   "link_type": "DocType",
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 1,
+   "collapsible": 1,
+   "icon": "award",
+   "indent": 1,
+   "keep_closed": 0,
+   "label": "Service Certificates",
+   "link_to": "Service Certificate",
    "link_type": "DocType",
    "show_arrow": 0,
    "type": "Link"
@@ -162,30 +220,6 @@
    "keep_closed": 0,
    "label": "Equipment Inspection",
    "link_to": "Equipment Inspection",
-   "link_type": "DocType",
-   "show_arrow": 0,
-   "type": "Link"
-  },
-  {
-   "child": 1,
-   "collapsible": 1,
-   "icon": "file-text",
-   "indent": 1,
-   "keep_closed": 0,
-   "label": "Service Report",
-   "link_to": "Service Report",
-   "link_type": "DocType",
-   "show_arrow": 0,
-   "type": "Link"
-  },
-  {
-   "child": 1,
-   "collapsible": 1,
-   "icon": "award",
-   "indent": 1,
-   "keep_closed": 0,
-   "label": "Service Certificate",
-   "link_to": "Service Certificate",
    "link_type": "DocType",
    "show_arrow": 0,
    "type": "Link"
