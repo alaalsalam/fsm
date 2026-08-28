@@ -97,6 +97,7 @@ def seed_presentation_data():
 	_migrate_legacy_labels()
 
 	_rename_if_needed("Company", "Digit Basic", PRESENTATION_COMPANY)
+	_rename_if_needed("Company", "Digit Basic Demo", "شركة نماء لإدارة الأعمال")
 	company = _first("Company", {"name": PRESENTATION_COMPANY}) or _first("Company")
 	if not company:
 		frappe.throw("A Company is required before FSM demo data can be created.")
