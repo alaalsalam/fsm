@@ -131,8 +131,29 @@ async function handleSignOut() {
 			<RouterView />
 		</main>
 
+		<nav
+			v-if="session.session.authenticated"
+			class="kl-glass fixed inset-x-3 bottom-3 z-30 grid grid-cols-4 rounded-2xl p-1.5 shadow-glass sm:hidden"
+			:aria-label="t('التنقل الرئيسي', 'Main navigation')"
+		>
+			<RouterLink
+				v-for="item in [
+					{ to: '/dashboard', ar: 'الرئيسية', en: 'Home' },
+					{ to: '/my-schedule', ar: 'الجدول', en: 'Schedule' },
+					{ to: '/my-services', ar: 'الخدمات', en: 'Services' },
+					{ to: '/my-equipment', ar: 'المعدات', en: 'Equipment' },
+				]"
+				:key="item.to"
+				:to="item.to"
+				class="rounded-xl px-1 py-2 text-center text-xs font-medium text-cmd-fg-muted"
+				active-class="bg-brand/10 text-brand"
+			>
+				{{ t(item.ar, item.en) }}
+			</RouterLink>
+		</nav>
+
 		<footer
-			class="mx-auto flex w-full max-w-6xl flex-col items-center justify-between gap-2 px-4 py-6 text-sm text-cmd-fg-muted sm:flex-row"
+			class="mx-auto mb-20 flex w-full max-w-6xl flex-col items-center justify-between gap-2 px-4 py-6 text-sm text-cmd-fg-muted sm:mb-0 sm:flex-row"
 		>
 			<span dir="ltr">© DIGIT</span>
 			<span>{{ t("خدمة ميدانية سريعة وموثوقة.", "Fast, friendly field service.") }}</span>
