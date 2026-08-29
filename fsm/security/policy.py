@@ -76,6 +76,14 @@ def resolve_manager_company(company: str | None = None, user: str | None = None)
 			return company
 	else:
 		companies = allowed_companies(user) or set()
+		# Console endpoints do not carry a company parameter on every request.
+		# When a manager has more than one authorised company, resolve the
+		# standard user default set by the ERP/DIGIT company switcher — but only
+		# after proving that it is inside the manager's explicit scope. This keeps
+		# the console coherent with the selected company without widening access.
+		active_company = frappe.defaults.get_user_default("Company")
+		if active_company in companies:
+			return active_company
 		if len(companies) == 1:
 			return next(iter(companies))
 	frappe.throw(_("Select a company within your permitted scope."), frappe.PermissionError)
