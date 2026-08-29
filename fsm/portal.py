@@ -20,11 +20,31 @@ def get_my_portal_hub():
 	jobs = frappe.get_list(
 		"Service Job",
 		filters={"customer": customer},
-		fields=["name", "status", "phase", "service_type", "scheduled_date", "completed_on", "coverage_status", "service_contract", "quotation", "sales_invoice"],
+		fields=["name", "status", "phase", "service_type", "scheduled_date", "scheduled_end", "completed_on", "coverage_status", "service_contract", "quotation", "sales_invoice", "customer_site", "primary_technician", "assigned_service_team", "address_display"],
 		order_by="creation desc",
 		limit=500,
 	)
 	job_names = [row.name for row in jobs]
+	visits = (
+		frappe.get_all(
+			"Service Visit",
+			filters={"service_job": ["in", job_names], "status": ["!=", "Cancelled"]},
+			fields=["name", "service_job", "status", "scheduled_start", "scheduled_end", "service_team", "primary_technician", "actual_completion"],
+			order_by="scheduled_start asc",
+			limit=500,
+		)
+		if job_names else []
+	)
+	items = (
+		frappe.get_all(
+			"Service Job Item",
+			filters={"parent": ["in", job_names]},
+			fields=["parent", "item_code", "item_name", "material_type", "qty", "uom", "installed_equipment", "amount"],
+			order_by="parent asc, idx asc",
+			limit=1000,
+		)
+		if job_names else []
+	)
 	requests = frappe.get_list("Service Request", filters={"customer": customer}, fields=["name", "subject", "service_type", "status", "preferred_start", "creation"], order_by="creation desc", limit=200)
 	maintenance = frappe.get_list("Maintenance Occurrence", filters={"customer": customer, "status": ["not in", ["Cancelled", "Skipped"]]}, fields=["name", "installed_equipment", "customer_site", "service_type", "due_date", "status", "released_job"], order_by="due_date asc", limit=500)
 	contracts = frappe.get_list("Service Contract", filters={"customer": customer}, fields=["name", "status", "start_date", "end_date", "included_visits", "renewal_recommended", "renewal_quotation"], order_by="end_date asc", limit=100)
@@ -36,11 +56,43 @@ def get_my_portal_hub():
 	upcoming = [row for row in maintenance if row.status in {"Forecast", "Due", "Released"} and str(row.due_date) >= today]
 	overdue = [row for row in maintenance if row.status == "Overdue" or (row.status in {"Forecast", "Due"} and str(row.due_date) < today)]
 	renewals = [row for row in contracts if row.status in {"Active", "Expired"} and str(row.end_date) <= add_days(today, 60)]
+	service_names = sorted({
+		str(row.service_type) for row in [*jobs, *requests, *maintenance]
+		if row.get("service_type")
+	})
+	calendar = []
+	jobs_by_name = {row.name: row for row in jobs}
+	for visit in visits:
+		job = jobs_by_name.get(visit.service_job, {})
+		calendar.append({
+			"type": "visit", "name": visit.name, "service_job": visit.service_job,
+			"start": visit.scheduled_start, "end": visit.scheduled_end, "status": visit.status,
+			"title": job.get("service_type") or visit.service_job,
+			"site": job.get("customer_site"), "team": visit.service_team,
+			"technician": visit.primary_technician,
+		})
+	maintenance_groups = {}
+	for occurrence in maintenance:
+		key = (
+			occurrence.due_date, occurrence.customer_site, occurrence.service_type,
+			occurrence.status, occurrence.released_job,
+		)
+		group = maintenance_groups.setdefault(key, {
+			"type": "maintenance", "name": occurrence.name, "service_job": occurrence.released_job,
+			"start": occurrence.due_date, "end": occurrence.due_date, "status": occurrence.status,
+			"title": occurrence.service_type or "Preventive Maintenance",
+			"site": occurrence.customer_site, "equipment": occurrence.installed_equipment,
+			"equipment_count": 0,
+		})
+		group["equipment_count"] += 1
+	calendar.extend(maintenance_groups.values())
 	return {
 		"dashboard": {"sites": frappe.db.count("Customer Site", {"customer": customer, "status": "Active"}), "equipment": frappe.db.count("Installed Equipment", {"customer": customer}), "open_jobs": sum(row.status not in {"Completed", "Cancelled"} for row in jobs), "upcoming_maintenance": len(upcoming), "overdue_maintenance": len(overdue), "active_contracts": sum(row.status == "Active" for row in contracts)},
 		"requests": requests, "jobs": jobs, "service_history": [row for row in jobs if row.status in {"Completed", "Cancelled"}],
 		"upcoming_maintenance": upcoming, "overdue_maintenance": overdue, "contracts": contracts, "renewals": renewals,
 		"reports": reports, "certificates": certificates, "quotations": quotations, "invoices": invoices,
+		"visits": visits, "items": items, "services": service_names,
+		"calendar": sorted(calendar, key=lambda row: str(row.get("start") or "")),
 	}
 
 

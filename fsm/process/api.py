@@ -144,6 +144,87 @@ def list_visits(
 
 
 @frappe.whitelist()
+def get_schedule_board(
+	company: str | None = None,
+	date_from: str | None = None,
+	date_to: str | None = None,
+):
+	"""Manager-scoped scheduling projection for calendar, agenda and resource views."""
+	company = _manager_company(company)
+	date_from = date_from or nowdate()
+	date_to = date_to or add_days(date_from, 30)
+	visits = list_visits(company=company, date_from=date_from, date_to=date_to, limit=500)
+	# A campaign can contain thousands of equipment occurrences. The board needs one
+	# schedulable card per plan/site/date/job, not one payload row per asset.
+	occurrences = frappe.db.sql(
+		"""select min(name) name, maintenance_plan, min(installed_equipment) installed_equipment,
+			customer, customer_site, service_type, due_date, min(release_on) release_on,
+			status, released_job, count(*) equipment_count
+		from `tabMaintenance Occurrence`
+		where company = %(company)s and due_date between %(date_from)s and %(date_to)s
+		and status not in ('Cancelled', 'Skipped')
+		group by maintenance_plan, customer, customer_site, service_type, due_date, status, released_job
+		order by due_date asc
+		limit 500""",
+		{"company": company, "date_from": date_from, "date_to": date_to},
+		as_dict=True,
+	)
+	teams = frappe.get_list(
+		"Service Team",
+		filters={"company": company, "active": 1},
+		fields=[
+			"name", "team_name", "status", "territory", "team_leader",
+			"default_warehouse", "vehicle", "capacity",
+		],
+		order_by="team_name asc",
+		limit=200,
+	)
+	team_names = [team.name for team in teams]
+	members = (
+		frappe.get_all(
+			"Service Team Member",
+			filters={"parent": ["in", team_names], "active": 1},
+			fields=["parent", "technician", "role_in_team"],
+			order_by="idx asc",
+		)
+		if team_names
+		else []
+	)
+	for team in teams:
+		team["members"] = [member for member in members if member.parent == team.name]
+		team["visit_count"] = sum(
+			1 for visit in visits if (visit.service_team or visit.assigned_service_team) == team.name
+		)
+	technicians = frappe.get_list(
+		"Technician",
+		filters={"company": company, "active": 1},
+		fields=[
+			"name", "technician_name", "status", "territory", "warehouse",
+			"clocked_in", "last_seen_on",
+		],
+		order_by="technician_name asc",
+		limit=300,
+	)
+	return {
+		"company": company,
+		"date_from": date_from,
+		"date_to": date_to,
+		"summary": {
+			"visits": len(visits),
+			"maintenance_due": sum(row.equipment_count for row in occurrences),
+			"active_teams": len(teams),
+			"unassigned": sum(
+				1 for visit in visits if not visit.service_team and not visit.primary_technician
+			),
+		},
+		"visits": visits,
+		"maintenance": occurrences,
+		"teams": teams,
+		"technicians": technicians,
+	}
+
+
+@frappe.whitelist()
 def get_operations_home(company: str | None = None):
 	company = _manager_company(company)
 	today = nowdate()
