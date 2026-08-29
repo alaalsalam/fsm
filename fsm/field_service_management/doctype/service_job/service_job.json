@@ -4,508 +4,77 @@
  "creation": "2026-06-05 12:00:00",
  "doctype": "DocType",
  "engine": "InnoDB",
- "field_order": [
-  "naming_series",
-  "service_request",
-  "request_idempotency_key",
-  "request_operation_key",
-  "maintenance_release_key",
-  "customer",
-  "customer_name",
-  "contact",
-  "company",
-  "project",
-  "column_break_head",
-  "status",
-  "phase",
-  "hold_reason",
-  "hold_from_status",
-  "priority",
-  "service_type",
-  "section_break_schedule",
-  "scheduled_date",
-  "scheduled_end",
-  "promised_response_by",
-  "responded_on",
-  "column_break_schedule",
-  "territory",
-  "assigned_service_team",
-  "team_leader",
-  "primary_technician",
-  "sla_breached",
-  "section_break_location",
-  "service_address",
-  "address_display",
-  "column_break_location",
-  "service_latitude",
-  "service_longitude",
-  "section_break_checklist",
-  "checklist_template",
-  "tasks",
-  "section_break_equipment",
-  "equipment",
-  "section_break_items",
-  "items",
-  "total_amount",
-  "section_break_coverage",
-  "service_contract",
-  "coverage_status",
-  "coverage_reason",
-  "column_break_coverage",
-  "covered_labour",
-  "covered_parts",
-  "covered_travel",
-  "section_break_completion",
-  "completed_on",
-  "customer_signature",
-  "column_break_completion",
-  "quotation",
-  "sales_invoice",
-  "section_break_costing",
-  "estimated_hours",
-  "actual_hours",
-  "labor_rate",
-  "column_break_costing",
-  "labor_cost",
-  "materials_cost",
-  "travel_cost",
-  "overhead_cost",
-  "total_cost",
-  "section_break_notes",
-  "notes"
- ],
+ "field_order": ["details_section","naming_series","service_request","request_idempotency_key","request_operation_key","maintenance_release_key","customer","customer_name","contact","company","project","column_break_head","status","phase","hold_reason","hold_from_status","priority","service_type","section_break_schedule","scheduled_date","scheduled_end","promised_response_by","responded_on","column_break_schedule","territory","assigned_service_team","team_leader","primary_technician","sla_breached","section_break_location","service_address","address_display","column_break_location","service_latitude","service_longitude","section_break_checklist","checklist_template","tasks","section_break_equipment","equipment","section_break_items","items","total_amount","section_break_coverage","service_contract","coverage_status","coverage_reason","column_break_coverage","covered_labour","covered_parts","covered_travel","section_break_completion","completed_on","customer_signature","column_break_completion","quotation","sales_invoice","section_break_costing","estimated_hours","actual_hours","labor_rate","column_break_costing","labor_cost","materials_cost","travel_cost","overhead_cost","total_cost","section_break_notes","notes"],
  "fields": [
-  {
-   "default": "FSM-JOB-.YYYY.-",
-   "fieldname": "naming_series",
-   "fieldtype": "Select",
-   "label": "Series",
-   "options": "FSM-JOB-.YYYY.-",
-   "reqd": 1
-  },
-  {
-   "fieldname": "service_request",
-   "fieldtype": "Link",
-   "in_standard_filter": 1,
-   "label": "Service Request",
-   "options": "Service Request",
-   "search_index": 1
-  },
-  {
-   "fieldname": "request_idempotency_key",
-   "fieldtype": "Data",
-   "hidden": 1,
-   "label": "Request Idempotency Key",
-   "read_only": 1
-  },
-	{
-	 "fieldname": "request_operation_key",
-	 "fieldtype": "Data",
-	 "hidden": 1,
-	 "label": "Request Operation Key",
-	 "read_only": 1,
-	 "unique": 1
-	},
-  {
-   "fieldname": "maintenance_release_key",
-   "fieldtype": "Data",
-   "hidden": 1,
-   "label": "Maintenance Release Key",
-   "read_only": 1,
-   "unique": 1
-  },
-  {
-   "fieldname": "customer",
-   "fieldtype": "Link",
-   "in_list_view": 1,
-   "in_standard_filter": 1,
-   "label": "Customer",
-   "options": "Customer",
-   "reqd": 1
-  },
-  {
-   "fetch_from": "customer.customer_name",
-   "fieldname": "customer_name",
-   "fieldtype": "Data",
-   "label": "Customer Name",
-   "read_only": 1
-  },
-  {
-   "fieldname": "contact",
-   "fieldtype": "Link",
-   "label": "Contact",
-   "options": "Contact"
-  },
-  {
-   "default": "__default",
-   "fieldname": "company",
-   "fieldtype": "Link",
-   "in_standard_filter": 1,
-   "label": "Company",
-   "options": "Company",
-   "reqd": 1,
-   "search_index": 1
-  },
-  {
-   "fieldname": "project",
-   "fieldtype": "Link",
-   "in_standard_filter": 1,
-   "label": "Project",
-   "options": "Project",
-   "search_index": 1
-  },
-  {
-   "fieldname": "column_break_head",
-   "fieldtype": "Column Break"
-  },
-  {
-   "default": "Draft",
-   "fieldname": "status",
-   "fieldtype": "Select",
-   "in_list_view": 1,
-   "in_standard_filter": 1,
-   "label": "Status",
-   "options": "Draft\nPlanned\nScheduled\nDispatched\nIn Progress\nOn Hold\nCompleted\nCancelled",
-   "read_only": 1
-  },
-  {
-   "default": "Planning",
-   "fieldname": "phase",
-   "fieldtype": "Select",
-   "in_standard_filter": 1,
-   "label": "Phase",
-   "options": "Planning\nTravel\nCheck-In\nInspection\nDiagnosis\nOn-Site Service\nWorkshop\nTesting\nCustomer Verification\nCloseout",
-   "read_only": 1
-  },
-  {
-   "fieldname": "hold_reason",
-   "fieldtype": "Select",
-   "label": "Hold Reason",
-   "options": "\nCustomer\nMaterial\nApproval\nAccess\nWeather\nWorkshop\nOther",
-   "read_only": 1
-  },
-  {
-   "fieldname": "hold_from_status",
-   "fieldtype": "Data",
-   "hidden": 1,
-   "label": "Hold From Status",
-   "read_only": 1
-  },
-  {
-   "default": "Medium",
-   "fieldname": "priority",
-   "fieldtype": "Select",
-   "in_standard_filter": 1,
-   "label": "Priority",
-   "options": "Low\nMedium\nHigh\nUrgent"
-  },
-  {
-   "fieldname": "service_type",
-   "fieldtype": "Data",
-   "label": "Service Type"
-  },
-  {
-   "fieldname": "section_break_schedule",
-   "fieldtype": "Section Break",
-   "label": "Schedule & Assignment"
-  },
-  {
-   "fieldname": "scheduled_date",
-   "fieldtype": "Datetime",
-   "label": "Scheduled Start"
-  },
-  {
-   "fieldname": "scheduled_end",
-   "fieldtype": "Datetime",
-   "label": "Scheduled End"
-  },
-  {
-   "description": "SLA: the time by which a technician should respond to / start this job.",
-   "fieldname": "promised_response_by",
-   "fieldtype": "Datetime",
-   "label": "Promised Response By"
-  },
-  {
-   "fieldname": "responded_on",
-   "fieldtype": "Datetime",
-   "label": "Responded On",
-   "read_only": 1
-  },
-  {
-   "fieldname": "column_break_schedule",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "territory",
-   "fieldtype": "Link",
-   "in_standard_filter": 1,
-   "label": "Service Territory",
-   "options": "Service Territory",
-   "search_index": 1
-  },
-  {
-   "fieldname": "assigned_service_team",
-   "fieldtype": "Link",
-   "in_standard_filter": 1,
-   "label": "Assigned Service Team",
-   "options": "Service Team",
-   "search_index": 1
-  },
-  {
-   "fetch_from": "assigned_service_team.team_leader",
-   "fieldname": "team_leader",
-   "fieldtype": "Link",
-   "label": "Team Leader",
-   "options": "Technician",
-   "read_only": 1
-  },
-  {
-   "fieldname": "primary_technician",
-   "fieldtype": "Link",
-   "in_list_view": 1,
-   "in_standard_filter": 1,
-   "label": "Primary Technician",
-   "options": "Technician",
-   "search_index": 1
-  },
-  {
-   "default": "0",
-   "description": "Set automatically when the promised response time passes without a response.",
-   "fieldname": "sla_breached",
-   "fieldtype": "Check",
-   "in_standard_filter": 1,
-   "label": "SLA Breached",
-   "read_only": 1
-  },
-  {
-   "fieldname": "section_break_location",
-   "fieldtype": "Section Break",
-   "label": "Location"
-  },
-  {
-   "fieldname": "service_address",
-   "fieldtype": "Link",
-   "label": "Service Address",
-   "options": "Address"
-  },
-  {
-   "fieldname": "address_display",
-   "fieldtype": "Small Text",
-   "label": "Address",
-   "read_only": 1
-  },
-  {
-   "fieldname": "column_break_location",
-   "fieldtype": "Column Break"
-  },
-  {
-   "description": "Geocoded job-site coordinates, used by the dispatch engine to find the nearest technician.",
-   "fieldname": "service_latitude",
-   "fieldtype": "Float",
-   "label": "Service Latitude",
-   "precision": "6"
-  },
-  {
-   "fieldname": "service_longitude",
-   "fieldtype": "Float",
-   "label": "Service Longitude",
-   "precision": "6"
-  },
-  {
-   "fieldname": "section_break_checklist",
-   "fieldtype": "Section Break",
-   "label": "Checklist"
-  },
-  {
-   "fieldname": "checklist_template",
-   "fieldtype": "Link",
-   "label": "Checklist Template",
-   "options": "Checklist Template",
-   "search_index": 1
-  },
-  {
-   "fieldname": "tasks",
-   "fieldtype": "Table",
-   "label": "Tasks",
-   "options": "Service Job Task"
-  },
-  {
-   "fieldname": "section_break_equipment",
-   "fieldtype": "Section Break",
-   "label": "Installed Equipment"
-  },
-  {
-   "fieldname": "equipment",
-   "fieldtype": "Table",
-   "label": "Installed Equipment",
-   "options": "Service Job Equipment"
-  },
-  {
-   "fieldname": "section_break_items",
-   "fieldtype": "Section Break",
-   "label": "Parts & Services"
-  },
-  {
-   "fieldname": "items",
-   "fieldtype": "Table",
-   "label": "Items",
-   "options": "Service Job Item"
-  },
-  {
-   "fieldname": "total_amount",
-   "fieldtype": "Currency",
-   "label": "Total Amount",
-   "read_only": 1
-  },
-  {
-   "fieldname": "section_break_coverage",
-   "fieldtype": "Section Break",
-   "label": "Warranty & Contract Coverage"
-  },
-  {
-   "fieldname": "service_contract",
-   "fieldtype": "Link",
-   "in_standard_filter": 1,
-   "label": "Service Contract",
-   "options": "Service Contract",
-   "search_index": 1
-  },
-  {
-   "fieldname": "coverage_status",
-   "fieldtype": "Select",
-   "label": "Coverage Status",
-   "options": "\nWarranty\nContract Covered\nPartially Covered\nChargeable\nFOC\nNot Covered",
-   "read_only": 1
-  },
-  {
-   "fieldname": "coverage_reason",
-   "fieldtype": "Small Text",
-   "label": "Coverage Reason",
-   "read_only": 1
-  },
-  {
-   "fieldname": "column_break_coverage",
-   "fieldtype": "Column Break"
-  },
-  {
-   "default": "0",
-   "fieldname": "covered_labour",
-   "fieldtype": "Check",
-   "label": "Labour Covered",
-   "read_only": 1
-  },
-  {
-   "default": "0",
-   "fieldname": "covered_parts",
-   "fieldtype": "Check",
-   "label": "Parts Covered",
-   "read_only": 1
-  },
-  {
-   "default": "0",
-   "fieldname": "covered_travel",
-   "fieldtype": "Check",
-   "label": "Travel Covered",
-   "read_only": 1
-  },
-  {
-   "fieldname": "section_break_completion",
-   "fieldtype": "Section Break",
-   "label": "Completion"
-  },
-  {
-   "fieldname": "completed_on",
-   "fieldtype": "Datetime",
-   "label": "Completed On",
-   "read_only": 1
-  },
-  {
-   "fieldname": "customer_signature",
-   "fieldtype": "Signature",
-   "label": "Customer Signature"
-  },
-  {
-   "fieldname": "column_break_completion",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "quotation",
-   "fieldtype": "Link",
-   "label": "Quotation",
-   "options": "Quotation"
-  },
-  {
-   "fieldname": "sales_invoice",
-   "fieldtype": "Link",
-   "label": "Sales Invoice",
-   "options": "Sales Invoice"
-  },
-  {
-   "fieldname": "section_break_costing",
-   "fieldtype": "Section Break",
-   "label": "Costing"
-  },
-  {
-   "description": "Estimated labour hours (from the estimate engine or set manually).",
-   "fieldname": "estimated_hours",
-   "fieldtype": "Float",
-   "label": "Estimated Hours",
-   "precision": "2"
-  },
-  {
-   "fieldname": "actual_hours",
-   "fieldtype": "Float",
-   "label": "Actual Hours",
-   "precision": "2",
-   "read_only": 1
-  },
-  {
-   "fieldname": "labor_rate",
-   "fieldtype": "Currency",
-   "label": "Labour Rate (per hour)"
-  },
-  {
-   "fieldname": "column_break_costing",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "labor_cost",
-   "fieldtype": "Currency",
-   "label": "Labour Cost",
-   "read_only": 1
-  },
-  {
-   "fieldname": "materials_cost",
-   "fieldtype": "Currency",
-   "label": "Materials Cost",
-   "read_only": 1
-  },
-  {
-   "fieldname": "travel_cost",
-   "fieldtype": "Currency",
-   "label": "Travel Cost"
-  },
-  {
-   "fieldname": "overhead_cost",
-   "fieldtype": "Currency",
-   "label": "Overhead Cost"
-  },
-  {
-   "fieldname": "total_cost",
-   "fieldtype": "Currency",
-   "label": "Total Cost",
-   "read_only": 1
-  },
-  {
-   "fieldname": "section_break_notes",
-   "fieldtype": "Section Break",
-   "label": "Notes"
-  },
-  {
-   "fieldname": "notes",
-   "fieldtype": "Text",
-   "label": "Notes"
-  }
+  {"fieldname":"details_section","fieldtype":"Section Break","label":"Details"},
+  {"default":"FSM-JOB-.YYYY.-","description":"Prefix used to auto-generate the unique job number for this service job.","fieldname":"naming_series","fieldtype":"Select","label":"Series","options":"FSM-JOB-.YYYY.-","reqd":1},
+  {"description":"The originating customer service request this job was created to fulfil.","fieldname":"service_request","fieldtype":"Link","in_standard_filter":1,"label":"Service Request","options":"Service Request","search_index":1},
+  {"description":"Internal key that prevents the same service request from spawning duplicate jobs.","fieldname":"request_idempotency_key","fieldtype":"Data","hidden":1,"label":"Request Idempotency Key","read_only":1},
+  {"description":"Internal key that guards a single request operation against duplicate processing.","fieldname":"request_operation_key","fieldtype":"Data","hidden":1,"label":"Request Operation Key","read_only":1,"unique":1},
+  {"description":"Internal key that guards against duplicate jobs released from a maintenance schedule.","fieldname":"maintenance_release_key","fieldtype":"Data","hidden":1,"label":"Maintenance Release Key","read_only":1,"unique":1},
+  {"description":"The customer who owns the equipment or site being serviced and will be billed.","fieldname":"customer","fieldtype":"Link","in_list_view":1,"in_standard_filter":1,"label":"Customer","options":"Customer","reqd":1},
+  {"description":"The customer's display name, fetched automatically from the customer record.","fetch_from":"customer.customer_name","fieldname":"customer_name","fieldtype":"Data","label":"Customer Name","read_only":1},
+  {"description":"The person to reach on site or by phone for coordinating this job.","fieldname":"contact","fieldtype":"Link","label":"Contact","options":"Contact"},
+  {"default":"__default","description":"The operating company responsible for delivering and invoicing this job.","fieldname":"company","fieldtype":"Link","in_standard_filter":1,"label":"Company","options":"Company","reqd":1,"search_index":1},
+  {"description":"The project this job is booked against for tracking and cost roll-up.","fieldname":"project","fieldtype":"Link","in_standard_filter":1,"label":"Project","options":"Project","search_index":1},
+  {"fieldname":"column_break_head","fieldtype":"Column Break"},
+  {"default":"Draft","description":"Current lifecycle stage of the job, from Draft through Completed or Cancelled.","fieldname":"status","fieldtype":"Select","in_list_view":1,"in_standard_filter":1,"label":"Status","options":"Draft\nPlanned\nScheduled\nDispatched\nIn Progress\nOn Hold\nCompleted\nCancelled","read_only":1},
+  {"default":"Planning","description":"The active field-execution stage the job is in, such as Travel, Inspection, or On-Site Service.","fieldname":"phase","fieldtype":"Select","in_standard_filter":1,"label":"Phase","options":"Planning\nTravel\nCheck-In\nInspection\nDiagnosis\nOn-Site Service\nWorkshop\nTesting\nCustomer Verification\nCloseout","read_only":1},
+  {"description":"Why the job is paused when it is placed On Hold, such as awaiting parts or approval.","fieldname":"hold_reason","fieldtype":"Select","label":"Hold Reason","options":"\nCustomer\nMaterial\nApproval\nAccess\nWeather\nWorkshop\nOther","read_only":1},
+  {"description":"The status the job will return to once the hold is lifted.","fieldname":"hold_from_status","fieldtype":"Data","hidden":1,"label":"Hold From Status","read_only":1},
+  {"default":"Medium","description":"Urgency level that drives scheduling and dispatch order for this job.","fieldname":"priority","fieldtype":"Select","in_standard_filter":1,"label":"Priority","options":"Low\nMedium\nHigh\nUrgent"},
+  {"description":"The category of work being performed, such as installation, repair, or preventive maintenance.","fieldname":"service_type","fieldtype":"Data","label":"Service Type"},
+  {"fieldname":"section_break_schedule","fieldtype":"Section Break","label":"Schedule & Assignment"},
+  {"description":"Planned date and time the technician should begin work on site.","fieldname":"scheduled_date","fieldtype":"Datetime","label":"Scheduled Start"},
+  {"description":"Planned date and time the job is expected to be finished.","fieldname":"scheduled_end","fieldtype":"Datetime","label":"Scheduled End"},
+  {"description":"SLA deadline by which a technician must respond to or start this job.","fieldname":"promised_response_by","fieldtype":"Datetime","label":"Promised Response By"},
+  {"description":"Actual date and time the job first received a technician response.","fieldname":"responded_on","fieldtype":"Datetime","label":"Responded On","read_only":1},
+  {"fieldname":"column_break_schedule","fieldtype":"Column Break"},
+  {"description":"Geographic service territory this job falls under, used for routing and reporting.","fieldname":"territory","fieldtype":"Link","in_standard_filter":1,"label":"Service Territory","options":"Service Territory","search_index":1},
+  {"description":"The crew assigned to carry out this job.","fieldname":"assigned_service_team","fieldtype":"Link","in_standard_filter":1,"label":"Assigned Service Team","options":"Service Team","search_index":1},
+  {"description":"Lead technician of the assigned team, fetched from the team record.","fetch_from":"assigned_service_team.team_leader","fieldname":"team_leader","fieldtype":"Link","label":"Team Leader","options":"Technician","read_only":1},
+  {"description":"The technician primarily accountable for completing this job.","fieldname":"primary_technician","fieldtype":"Link","in_list_view":1,"in_standard_filter":1,"label":"Primary Technician","options":"Technician","search_index":1},
+  {"default":"0","description":"Set automatically when the promised response time passes without a response.","fieldname":"sla_breached","fieldtype":"Check","in_standard_filter":1,"label":"SLA Breached","read_only":1},
+  {"fieldname":"section_break_location","fieldtype":"Section Break","label":"Location"},
+  {"description":"The address record where the service is to be performed.","fieldname":"service_address","fieldtype":"Link","label":"Service Address","options":"Address"},
+  {"description":"Formatted, read-only view of the full service address.","fieldname":"address_display","fieldtype":"Small Text","label":"Address","read_only":1},
+  {"fieldname":"column_break_location","fieldtype":"Column Break"},
+  {"description":"Geocoded job-site latitude used by dispatch to find the nearest technician.","fieldname":"service_latitude","fieldtype":"Float","label":"Service Latitude","precision":"6"},
+  {"description":"Geocoded job-site longitude used by dispatch to find the nearest technician.","fieldname":"service_longitude","fieldtype":"Float","label":"Service Longitude","precision":"6"},
+  {"fieldname":"section_break_checklist","fieldtype":"Section Break","label":"Checklist"},
+  {"description":"The predefined checklist template applied to generate the job's tasks.","fieldname":"checklist_template","fieldtype":"Link","label":"Checklist Template","options":"Checklist Template","search_index":1},
+  {"description":"The list of work steps or checklist items the technician must complete on this job.","fieldname":"tasks","fieldtype":"Table","label":"Tasks","options":"Service Job Task"},
+  {"fieldname":"section_break_equipment","fieldtype":"Section Break","label":"Installed Equipment"},
+  {"description":"The customer assets or installed equipment serviced during this job.","fieldname":"equipment","fieldtype":"Table","label":"Installed Equipment","options":"Service Job Equipment"},
+  {"fieldname":"section_break_items","fieldtype":"Section Break","label":"Parts & Services"},
+  {"description":"The parts consumed and services rendered on this job, with quantities and rates.","fieldname":"items","fieldtype":"Table","label":"Items","options":"Service Job Item"},
+  {"description":"Total billable value of all parts and services on the job.","fieldname":"total_amount","fieldtype":"Currency","label":"Total Amount","read_only":1},
+  {"fieldname":"section_break_coverage","fieldtype":"Section Break","label":"Warranty & Contract Coverage"},
+  {"description":"The service contract that may cover this job under warranty or a maintenance plan.","fieldname":"service_contract","fieldtype":"Link","in_standard_filter":1,"label":"Service Contract","options":"Service Contract","search_index":1},
+  {"description":"How this job is covered financially, such as under warranty, contract, or chargeable.","fieldname":"coverage_status","fieldtype":"Select","label":"Coverage Status","options":"\nWarranty\nContract Covered\nPartially Covered\nChargeable\nFOC\nNot Covered","read_only":1},
+  {"description":"Explanation of why the determined coverage status applies.","fieldname":"coverage_reason","fieldtype":"Small Text","label":"Coverage Reason","read_only":1},
+  {"fieldname":"column_break_coverage","fieldtype":"Column Break"},
+  {"default":"0","description":"Indicates the labour on this job is covered by warranty or contract.","fieldname":"covered_labour","fieldtype":"Check","label":"Labour Covered","read_only":1},
+  {"default":"0","description":"Indicates the parts on this job are covered by warranty or contract.","fieldname":"covered_parts","fieldtype":"Check","label":"Parts Covered","read_only":1},
+  {"default":"0","description":"Indicates the travel for this job is covered by warranty or contract.","fieldname":"covered_travel","fieldtype":"Check","label":"Travel Covered","read_only":1},
+  {"fieldname":"section_break_completion","fieldtype":"Section Break","label":"Completion"},
+  {"description":"Date and time the job was marked complete.","fieldname":"completed_on","fieldtype":"Datetime","label":"Completed On","read_only":1},
+  {"description":"Customer's captured signature confirming the work was completed and accepted.","fieldname":"customer_signature","fieldtype":"Signature","label":"Customer Signature"},
+  {"fieldname":"column_break_completion","fieldtype":"Column Break"},
+  {"description":"The quotation raised for chargeable work on this job.","fieldname":"quotation","fieldtype":"Link","label":"Quotation","options":"Quotation"},
+  {"description":"The sales invoice generated to bill the customer for this job.","fieldname":"sales_invoice","fieldtype":"Link","label":"Sales Invoice","options":"Sales Invoice"},
+  {"fieldname":"section_break_costing","fieldtype":"Section Break","label":"Costing"},
+  {"description":"Estimated labour hours for the job, from the estimate engine or set manually.","fieldname":"estimated_hours","fieldtype":"Float","label":"Estimated Hours","precision":"2"},
+  {"description":"Actual labour hours logged by technicians against this job.","fieldname":"actual_hours","fieldtype":"Float","label":"Actual Hours","precision":"2","read_only":1},
+  {"description":"Charge-out or cost rate per labour hour used to value the work.","fieldname":"labor_rate","fieldtype":"Currency","label":"Labour Rate (per hour)"},
+  {"fieldname":"column_break_costing","fieldtype":"Column Break"},
+  {"description":"Calculated labour cost based on hours worked and the labour rate.","fieldname":"labor_cost","fieldtype":"Currency","label":"Labour Cost","read_only":1},
+  {"description":"Calculated cost of the parts and materials consumed on the job.","fieldname":"materials_cost","fieldtype":"Currency","label":"Materials Cost","read_only":1},
+  {"description":"Cost of technician travel to and from the job site.","fieldname":"travel_cost","fieldtype":"Currency","label":"Travel Cost"},
+  {"description":"Allocated overhead applied to this job.","fieldname":"overhead_cost","fieldtype":"Currency","label":"Overhead Cost"},
+  {"description":"Total delivered cost of the job, summing labour, materials, travel, and overhead.","fieldname":"total_cost","fieldtype":"Currency","label":"Total Cost","read_only":1},
+  {"fieldname":"section_break_notes","fieldtype":"Section Break","label":"Notes"},
+  {"description":"Free-form internal notes about the job's execution or special instructions.","fieldname":"notes","fieldtype":"Text","label":"Notes"}
  ],
  "index_web_pages_for_search": 1,
  "links": [

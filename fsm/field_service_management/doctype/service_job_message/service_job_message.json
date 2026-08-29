@@ -4,61 +4,16 @@
  "creation": "2026-06-24 00:00:00",
  "doctype": "DocType",
  "engine": "InnoDB",
- "field_order": [
-  "service_job",
-  "author_role",
-  "column_break_main",
-  "author_user",
-  "author_name",
-  "section_break_body",
-  "message"
- ],
+ "field_order": ["details_section","service_job","author_role","column_break_main","author_user","author_name","section_break_body","message"],
  "fields": [
-  {
-   "fieldname": "service_job",
-   "fieldtype": "Link",
-   "in_list_view": 1,
-   "in_standard_filter": 1,
-   "label": "Service Job",
-   "options": "Service Job",
-   "reqd": 1
-  },
-  {
-   "default": "Dispatcher",
-   "fieldname": "author_role",
-   "fieldtype": "Select",
-   "in_standard_filter": 1,
-   "label": "Author Role",
-   "options": "Dispatcher\nTechnician\nCustomer\nSystem"
-  },
-  {
-   "fieldname": "column_break_main",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "author_user",
-   "fieldtype": "Link",
-   "label": "Author User",
-   "options": "User",
-   "read_only": 1
-  },
-  {
-   "fieldname": "author_name",
-   "fieldtype": "Data",
-   "label": "Author Name",
-   "read_only": 1
-  },
-  {
-   "fieldname": "section_break_body",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "message",
-   "fieldtype": "Small Text",
-   "in_list_view": 1,
-   "label": "Message",
-   "reqd": 1
-  }
+  {"fieldname":"details_section","fieldtype":"Section Break","label":"Details"},
+  {"description":"The service job this message is attached to.","fieldname":"service_job","fieldtype":"Link","in_list_view":1,"in_standard_filter":1,"label":"Service Job","options":"Service Job","reqd":1},
+  {"default":"Dispatcher","description":"The role of the person who wrote the message, such as dispatcher, technician, or customer.","fieldname":"author_role","fieldtype":"Select","in_standard_filter":1,"label":"Author Role","options":"Dispatcher\nTechnician\nCustomer\nSystem"},
+  {"fieldname":"column_break_main","fieldtype":"Column Break"},
+  {"description":"The system user account that posted the message.","fieldname":"author_user","fieldtype":"Link","label":"Author User","options":"User","read_only":1},
+  {"description":"Display name of the person who posted the message.","fieldname":"author_name","fieldtype":"Data","label":"Author Name","read_only":1},
+  {"fieldname":"section_break_body","fieldtype":"Section Break"},
+  {"description":"The body of the note or communication logged on the job's timeline.","fieldname":"message","fieldtype":"Small Text","in_list_view":1,"label":"Message","reqd":1}
  ],
  "index_web_pages_for_search": 1,
  "links": [],

@@ -4,135 +4,27 @@
  "creation": "2026-06-05 12:00:00",
  "doctype": "DocType",
  "engine": "InnoDB",
- "field_order": [
-  "default_territory",
-  "default_checklist_template",
-  "column_break_main",
-  "auto_create_invoice",
-  "default_priority",
-  "inventory_section",
-  "default_warehouse",
-  "column_break_inventory",
-  "low_stock_threshold"
-  ,"installed_base_section"
-  ,"warranty_start_basis"
-  ,"failure_analysis_section"
-  ,"repeat_failure_window_days"
-  ,"repeat_failure_escalation_count"
-  ,"completion_policy_section"
-  ,"inspection_required_service_types"
-  ,"report_required_service_types"
-  ,"certificate_required_service_types"
- ],
+ "field_order": ["details_section","default_territory","default_checklist_template","column_break_main","auto_create_invoice","default_priority","inventory_section","default_warehouse","column_break_inventory","low_stock_threshold","installed_base_section","warranty_start_basis","failure_analysis_section","repeat_failure_window_days","repeat_failure_escalation_count","completion_policy_section","inspection_required_service_types","report_required_service_types","certificate_required_service_types"],
  "fields": [
-  {
-   "fieldname": "default_territory",
-   "fieldtype": "Link",
-   "label": "Default Service Territory",
-   "options": "Service Territory"
-  },
-  {
-   "fieldname": "default_checklist_template",
-   "fieldtype": "Link",
-   "label": "Default Checklist Template",
-   "options": "Checklist Template"
-  },
-  {
-   "fieldname": "column_break_main",
-   "fieldtype": "Column Break"
-  },
-  {
-   "default": "Medium",
-   "fieldname": "default_priority",
-   "fieldtype": "Select",
-   "label": "Default Priority",
-   "options": "Low\nMedium\nHigh\nUrgent"
-  },
-  {
-   "default": "0",
-   "fieldname": "auto_create_invoice",
-   "fieldtype": "Check",
-   "label": "Auto-create invoice on job completion"
-  },
-  {
-   "fieldname": "inventory_section",
-   "fieldtype": "Section Break",
-   "label": "Inventory"
-  },
-  {
-   "description": "Fallback warehouse for parts requests when a technician has no van warehouse set.",
-   "fieldname": "default_warehouse",
-   "fieldtype": "Link",
-   "label": "Default Warehouse",
-   "options": "Warehouse"
-  },
-  {
-   "fieldname": "column_break_inventory",
-   "fieldtype": "Column Break"
-  },
-  {
-   "default": "0",
-   "description": "Items at or below this quantity are flagged low when no ERPNext reorder level is set. 0 disables the fallback.",
-   "fieldname": "low_stock_threshold",
-   "fieldtype": "Float",
-   "label": "Low Stock Threshold"
-  },
-  {
-   "fieldname": "installed_base_section",
-   "fieldtype": "Section Break",
-   "label": "Installed Base"
-  },
-  {
-   "default": "Delivery Date",
-   "fieldname": "warranty_start_basis",
-   "fieldtype": "Select",
-   "label": "Warranty Start Basis",
-   "options": "Delivery Date\nInstallation Date\nCommissioning Date"
-  },
-  {
-   "fieldname": "failure_analysis_section",
-   "fieldtype": "Section Break",
-   "label": "Failure Analysis"
-  },
-  {
-   "default": "90",
-   "description": "Look-back period used to identify repeat failures on the same Installed Equipment.",
-   "fieldname": "repeat_failure_window_days",
-   "fieldtype": "Int",
-   "label": "Repeat Failure Window (Days)",
-   "non_negative": 1
-  },
-  {
-   "default": "2",
-   "description": "Previous failures within the window that trigger escalation.",
-   "fieldname": "repeat_failure_escalation_count",
-   "fieldtype": "Int",
-   "label": "Repeat Failure Escalation Count",
-   "non_negative": 1
-  },
-  {
-   "fieldname": "completion_policy_section",
-   "fieldtype": "Section Break",
-   "label": "Completion Policy"
-  },
-  {
-   "description": "One Service Type per line. Matching jobs require a completed inspection for every linked equipment item.",
-   "fieldname": "inspection_required_service_types",
-   "fieldtype": "Small Text",
-   "label": "Service Types Requiring Equipment Inspection"
-  },
-  {
-   "description": "One Service Type per line. Matching jobs require a Submitted Service Report before completion.",
-   "fieldname": "report_required_service_types",
-   "fieldtype": "Small Text",
-   "label": "Service Types Requiring a Report"
-  },
-  {
-   "description": "One Service Type per line. Matching jobs require an active issued certificate before completion.",
-   "fieldname": "certificate_required_service_types",
-   "fieldtype": "Small Text",
-   "label": "Service Types Requiring a Certificate"
-  }
+  {"fieldname":"details_section","fieldtype":"Section Break","label":"Details"},
+  {"description":"Service territory pre-filled on new jobs when none is specified.","fieldname":"default_territory","fieldtype":"Link","label":"Default Service Territory","options":"Service Territory"},
+  {"description":"Checklist template applied by default to new service jobs.","fieldname":"default_checklist_template","fieldtype":"Link","label":"Default Checklist Template","options":"Checklist Template"},
+  {"fieldname":"column_break_main","fieldtype":"Column Break"},
+  {"default":"0","description":"When enabled, a sales invoice is generated automatically once a job is completed.","fieldname":"auto_create_invoice","fieldtype":"Check","label":"Auto-create invoice on job completion"},
+  {"default":"Medium","description":"Priority level assigned to new jobs unless overridden.","fieldname":"default_priority","fieldtype":"Select","label":"Default Priority","options":"Low\nMedium\nHigh\nUrgent"},
+  {"fieldname":"inventory_section","fieldtype":"Section Break","label":"Inventory"},
+  {"description":"Fallback warehouse for parts requests when a technician has no van warehouse set.","fieldname":"default_warehouse","fieldtype":"Link","label":"Default Warehouse","options":"Warehouse"},
+  {"fieldname":"column_break_inventory","fieldtype":"Column Break"},
+  {"default":"0","description":"Quantity at or below which items are flagged low when no ERPNext reorder level exists; 0 disables the fallback.","fieldname":"low_stock_threshold","fieldtype":"Float","label":"Low Stock Threshold"},
+  {"fieldname":"installed_base_section","fieldtype":"Section Break","label":"Installed Base"},
+  {"default":"Delivery Date","description":"Event used to start the warranty clock for installed equipment: delivery, installation, or commissioning.","fieldname":"warranty_start_basis","fieldtype":"Select","label":"Warranty Start Basis","options":"Delivery Date\nInstallation Date\nCommissioning Date"},
+  {"fieldname":"failure_analysis_section","fieldtype":"Section Break","label":"Failure Analysis"},
+  {"default":"90","description":"Look-back period in days used to detect repeat failures on the same installed equipment.","fieldname":"repeat_failure_window_days","fieldtype":"Int","label":"Repeat Failure Window (Days)","non_negative":1},
+  {"default":"2","description":"Number of prior failures within the window that triggers an escalation.","fieldname":"repeat_failure_escalation_count","fieldtype":"Int","label":"Repeat Failure Escalation Count","non_negative":1},
+  {"fieldname":"completion_policy_section","fieldtype":"Section Break","label":"Completion Policy"},
+  {"description":"Service types (one per line) whose jobs require a completed inspection for every linked equipment item.","fieldname":"inspection_required_service_types","fieldtype":"Small Text","label":"Service Types Requiring Equipment Inspection"},
+  {"description":"Service types (one per line) whose jobs require a submitted service report before completion.","fieldname":"report_required_service_types","fieldtype":"Small Text","label":"Service Types Requiring a Report"},
+  {"description":"Service types (one per line) whose jobs require an active issued certificate before completion.","fieldname":"certificate_required_service_types","fieldtype":"Small Text","label":"Service Types Requiring a Certificate"}
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,

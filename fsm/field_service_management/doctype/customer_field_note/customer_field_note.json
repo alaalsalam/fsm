@@ -4,59 +4,16 @@
  "creation": "2026-06-24 00:00:00",
  "doctype": "DocType",
  "engine": "InnoDB",
- "field_order": [
-  "customer",
-  "service_job",
-  "column_break_main",
-  "technician",
-  "visit_date",
-  "section_break_note",
-  "note"
- ],
+ "field_order": ["details_section","customer","service_job","column_break_main","technician","visit_date","section_break_note","note"],
  "fields": [
-  {
-   "fieldname": "customer",
-   "fieldtype": "Link",
-   "in_list_view": 1,
-   "in_standard_filter": 1,
-   "label": "Customer",
-   "options": "Customer",
-   "reqd": 1
-  },
-  {
-   "fieldname": "service_job",
-   "fieldtype": "Link",
-   "in_standard_filter": 1,
-   "label": "Service Job",
-   "options": "Service Job"
-  },
-  {
-   "fieldname": "column_break_main",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "technician",
-   "fieldtype": "Link",
-   "label": "Technician",
-   "options": "Technician"
-  },
-  {
-   "default": "Today",
-   "fieldname": "visit_date",
-   "fieldtype": "Date",
-   "label": "Visit Date"
-  },
-  {
-   "fieldname": "section_break_note",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "note",
-   "fieldtype": "Text",
-   "in_list_view": 1,
-   "label": "Note",
-   "reqd": 1
-  }
+  {"fieldname":"details_section","fieldtype":"Section Break","label":"Details"},
+  {"description":"Customer this field note relates to.","fieldname":"customer","fieldtype":"Link","in_list_view":1,"in_standard_filter":1,"label":"Customer","options":"Customer","reqd":1},
+  {"description":"Service job during which this note was recorded, if any.","fieldname":"service_job","fieldtype":"Link","in_standard_filter":1,"label":"Service Job","options":"Service Job"},
+  {"fieldname":"column_break_main","fieldtype":"Column Break"},
+  {"description":"Technician who observed and logged this note in the field.","fieldname":"technician","fieldtype":"Link","label":"Technician","options":"Technician"},
+  {"default":"Today","description":"Date the note was recorded during the site visit.","fieldname":"visit_date","fieldtype":"Date","label":"Visit Date"},
+  {"fieldname":"section_break_note","fieldtype":"Section Break"},
+  {"description":"Observation or remark captured on site about the customer, equipment, or job.","fieldname":"note","fieldtype":"Text","in_list_view":1,"label":"Note","reqd":1}
  ],
  "index_web_pages_for_search": 1,
  "links": [],

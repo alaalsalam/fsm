@@ -5,138 +5,27 @@
  "creation": "2026-08-24 12:00:00",
  "doctype": "DocType",
  "engine": "InnoDB",
- "field_order": [
-  "team_name",
-  "status",
-  "column_break_head",
-  "company",
-  "territory",
-  "team_leader",
-  "section_break_logistics",
-  "default_warehouse",
-  "vehicle",
-  "column_break_logistics",
-  "capacity",
-  "effective_from",
-  "effective_to",
-  "active",
-  "section_break_members",
-  "members",
-  "section_break_notes",
-  "notes"
- ],
+ "field_order": ["details_section","team_name","status","column_break_head","company","territory","team_leader","section_break_logistics","default_warehouse","vehicle","column_break_logistics","capacity","effective_from","effective_to","active","section_break_members","members","section_break_notes","notes"],
  "fields": [
-  {
-   "fieldname": "team_name",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "Team Name",
-   "reqd": 1,
-   "unique": 1
-  },
-  {
-   "default": "Active",
-   "fieldname": "status",
-   "fieldtype": "Select",
-   "in_list_view": 1,
-   "in_standard_filter": 1,
-   "label": "Status",
-   "options": "Active\nInactive\nSuspended"
-  },
-  {
-   "fieldname": "column_break_head",
-   "fieldtype": "Column Break"
-  },
-  {
-   "default": "__default",
-   "fieldname": "company",
-   "fieldtype": "Link",
-   "in_standard_filter": 1,
-   "label": "Company",
-   "options": "Company",
-   "reqd": 1,
-   "search_index": 1
-  },
-  {
-   "fieldname": "territory",
-   "fieldtype": "Link",
-   "in_standard_filter": 1,
-   "label": "Service Territory",
-   "options": "Service Territory",
-   "search_index": 1
-  },
-  {
-   "description": "Must be one of the team members.",
-   "fieldname": "team_leader",
-   "fieldtype": "Link",
-   "label": "Team Leader",
-   "options": "Technician"
-  },
-  {
-   "fieldname": "section_break_logistics",
-   "fieldtype": "Section Break",
-   "label": "Capacity & Logistics"
-  },
-  {
-   "description": "Team van/stock location (an ERPNext Warehouse).",
-   "fieldname": "default_warehouse",
-   "fieldtype": "Link",
-   "label": "Default Warehouse",
-   "options": "Warehouse"
-  },
-  {
-   "fieldname": "vehicle",
-   "fieldtype": "Data",
-   "label": "Vehicle / Van"
-  },
-  {
-   "fieldname": "column_break_logistics",
-   "fieldtype": "Column Break"
-  },
-  {
-   "description": "Maximum concurrent jobs the team can hold.",
-   "fieldname": "capacity",
-   "fieldtype": "Int",
-   "label": "Capacity",
-   "non_negative": 1
-  },
-  {
-   "fieldname": "effective_from",
-   "fieldtype": "Date",
-   "label": "Effective From"
-  },
-  {
-   "fieldname": "effective_to",
-   "fieldtype": "Date",
-   "label": "Effective To"
-  },
-  {
-   "default": "1",
-   "fieldname": "active",
-   "fieldtype": "Check",
-   "label": "Active"
-  },
-  {
-   "fieldname": "section_break_members",
-   "fieldtype": "Section Break",
-   "label": "Members"
-  },
-  {
-   "fieldname": "members",
-   "fieldtype": "Table",
-   "label": "Members",
-   "options": "Service Team Member"
-  },
-  {
-   "fieldname": "section_break_notes",
-   "fieldtype": "Section Break",
-   "label": "Notes"
-  },
-  {
-   "fieldname": "notes",
-   "fieldtype": "Text",
-   "label": "Notes"
-  }
+  {"fieldname":"details_section","fieldtype":"Section Break","label":"Details"},
+  {"description":"Unique name identifying this field service crew.","fieldname":"team_name","fieldtype":"Data","in_list_view":1,"label":"Team Name","reqd":1,"unique":1},
+  {"default":"Active","description":"Operational state of the team: Active, Inactive, or Suspended.","fieldname":"status","fieldtype":"Select","in_list_view":1,"in_standard_filter":1,"label":"Status","options":"Active\nInactive\nSuspended"},
+  {"fieldname":"column_break_head","fieldtype":"Column Break"},
+  {"default":"__default","description":"The operating company this team belongs to.","fieldname":"company","fieldtype":"Link","in_standard_filter":1,"label":"Company","options":"Company","reqd":1,"search_index":1},
+  {"description":"The service territory or geographic area this team is responsible for covering.","fieldname":"territory","fieldtype":"Link","in_standard_filter":1,"label":"Service Territory","options":"Service Territory","search_index":1},
+  {"description":"The technician who leads the crew; must be one of the team members.","fieldname":"team_leader","fieldtype":"Link","label":"Team Leader","options":"Technician"},
+  {"collapsible":1,"fieldname":"section_break_logistics","fieldtype":"Section Break","label":"Capacity & Logistics"},
+  {"description":"The team's van or stock location (an ERPNext Warehouse) parts are drawn from.","fieldname":"default_warehouse","fieldtype":"Link","label":"Default Warehouse","options":"Warehouse"},
+  {"description":"Identifier of the vehicle or van assigned to this team.","fieldname":"vehicle","fieldtype":"Data","label":"Vehicle / Van"},
+  {"fieldname":"column_break_logistics","fieldtype":"Column Break"},
+  {"description":"Maximum number of concurrent jobs the team can be assigned at once.","fieldname":"capacity","fieldtype":"Int","label":"Capacity","non_negative":1},
+  {"description":"Date from which this team becomes available for scheduling.","fieldname":"effective_from","fieldtype":"Date","label":"Effective From"},
+  {"description":"Date after which this team is no longer available for scheduling.","fieldname":"effective_to","fieldtype":"Date","label":"Effective To"},
+  {"default":"1","description":"Whether the team is currently enabled for job assignment.","fieldname":"active","fieldtype":"Check","label":"Active"},
+  {"fieldname":"section_break_members","fieldtype":"Section Break","label":"Members"},
+  {"description":"The technicians who make up this crew.","fieldname":"members","fieldtype":"Table","label":"Members","options":"Service Team Member"},
+  {"fieldname":"section_break_notes","fieldtype":"Section Break","label":"Notes"},
+  {"description":"Free-text notes about the team, its skills, or scheduling constraints.","fieldname":"notes","fieldtype":"Text","label":"Notes"}
  ],
  "index_web_pages_for_search": 1,
  "links": [

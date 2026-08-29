@@ -96,3 +96,792 @@ When the request was opened.,وقت فتح الطلب.
 When the request was triaged and reviewed.,وقت فرز الطلب ومراجعته.
 When the request was converted into a service job.,وقت تحويل الطلب إلى أمر خدمة.
 When the request was closed.,وقت إغلاق الطلب.
+Identity,الهوية
+Ownership,الملكية
+Product,المنتج
+Sales Source,مصدر البيع
+Dates,التواريخ
+Warranty,الضمان
+Service,الصيانة
+Technical,البيانات الفنية
+Fire Safety Profile,ملف السلامة من الحرائق
+Refill & Hydro History,سجل إعادة التعبئة والاختبار الهيدروستاتيكي
+Media,الوسائط
+Details,التفاصيل
+Task Details,تفاصيل المهام
+Equipment ID,معرف المعدة
+Equipment Name,اسم المعدة
+QR Token,رمز QR
+Asset Tag,وسم الأصل
+Item,الصنف
+Item Name,اسم الصنف
+Item Group,مجموعة الصنف
+Brand,العلامة التجارية
+Serial No,الرقم التسلسلي
+Batch,الدفعة
+Installed Quantity,الكمية المركبة
+Sales Order,أمر البيع
+Sales Order Item,بند أمر البيع
+Delivery Note,إشعار التسليم
+Delivery Note Item,بند إشعار التسليم
+Sales Invoice,فاتورة المبيعات
+Delivery Date,تاريخ التسليم
+Installation Date,تاريخ التركيب
+Commissioning Date,تاريخ التشغيل
+Warranty Start,بداية الضمان
+Warranty End,نهاية الضمان
+Warranty Status,حالة الضمان
+Serviceable,قابل للصيانة
+Last Service Date,تاريخ آخر صيانة
+Last Service Job,آخر مهمة صيانة
+Last Service Visit,آخر زيارة صيانة
+Manufacturer,الشركة المصنّعة
+Model No,رقم الموديل
+Exact Location Notes,ملاحظات الموقع الدقيق
+Equipment Category,فئة المعدة
+Extinguisher Type,نوع الطفاية
+Capacity,السعة
+Capacity UOM,وحدة قياس السعة
+Agent Type,نوع المادة المطفئة
+Nameplate Manufacturer,الشركة المصنّعة (لوحة البيانات)
+Nameplate Model,الموديل (لوحة البيانات)
+Manufacturing Date,تاريخ التصنيع
+Expiry Date,تاريخ الانتهاء
+Pressure Rating,معدل الضغط
+Hydro Test Interval (Months),فترة الاختبار الهيدروستاتيكي (بالأشهر)
+Last Refill Date,تاريخ آخر إعادة تعبئة
+Last Refill Result,نتيجة آخر إعادة تعبئة
+Last Hydro Test Date,تاريخ آخر اختبار هيدروستاتيكي
+Hydro Due Date,تاريخ استحقاق الاختبار الهيدروستاتيكي
+Equipment Photo,صورة المعدة
+Provisioning Key,مفتاح التهيئة
+Notes,ملاحظات
+Visit Date,تاريخ الزيارة
+Note,ملاحظة
+Territory Name,اسم المنطقة
+Parent Territory,المنطقة الأصل
+Disabled,معطّل
+Template Name,اسم القالب
+Tasks,المهام
+"System-generated unique identifier for this installed unit, used to reference it across service jobs and reports.",معرّف فريد يولّده النظام لهذه الوحدة المركّبة، ويُستخدم للإشارة إليها في مهام الصيانة والتقارير.
+Human-friendly name for the equipment as technicians and customers refer to it on site.,اسم واضح للمعدة كما يشير إليها الفنيون والعملاء في الموقع.
+"Current lifecycle state of the unit, from pending installation through active service to removal or disposal.",الحالة الحالية للوحدة ضمن دورة حياتها، من انتظار التركيب إلى الخدمة الفعّالة حتى الإزالة أو التخلص منها.
+Unique QR token printed on the unit so technicians can scan it in the field to open its record.,رمز QR فريد مطبوع على الوحدة ليتمكّن الفنيون من مسحه في الميدان لفتح سجلها.
+Physical asset tag or sticker number affixed to the equipment for on-site identification.,وسم أصل أو رقم ملصق مثبّت على المعدة للتعرّف عليها في الموقع.
+"Legal company that owns or services this equipment, used for accounting and access scoping.",الشركة القانونية التي تملك أو تصون هذه المعدة، وتُستخدم للمحاسبة وتحديد صلاحيات الوصول.
+Customer account at whose premises this equipment is installed and serviced.,حساب العميل الذي رُكّبت وتُصان هذه المعدة في منشآته.
+Specific customer site or branch location where the equipment is physically installed.,موقع العميل أو الفرع المحدد الذي رُكّبت فيه المعدة فعليًا.
+"Precise location within the site (room, floor, or zone) where the unit is mounted.",الموقع الدقيق داخل الموقع (غرفة أو طابق أو منطقة) حيث تم تركيب الوحدة.
+Linked catalog item that defines the make and model of this installed unit.,الصنف المرتبط من الكتالوج الذي يحدد نوع وموديل هذه الوحدة المركّبة.
+Descriptive item name pulled from the linked catalog item.,اسم الصنف الوصفي المستمد من الصنف المرتبط في الكتالوج.
+"Product category of the item, inherited from the item master for grouping and filtering.",فئة منتج الصنف، الموروثة من بطاقة الصنف للتجميع والتصفية.
+"Manufacturer brand of the item, inherited from the item master.",العلامة التجارية للمصنّع، الموروثة من بطاقة الصنف.
+Unique manufacturer serial number tracked for this specific physical unit.,الرقم التسلسلي الفريد من المصنّع المتتبَّع لهذه الوحدة المادية تحديدًا.
+"Manufacturing or supply batch this unit belongs to, for traceability and recalls.",دفعة التصنيع أو التوريد التي تنتمي إليها هذه الوحدة، لأغراض التتبّع والاستدعاء.
+"Number of units this record represents, normally one per tracked asset.",عدد الوحدات التي يمثّلها هذا السجل، وعادةً وحدة واحدة لكل أصل متتبَّع.
+Sales order through which this equipment was originally sold to the customer.,أمر البيع الذي بيعت من خلاله هذه المعدة للعميل أصلًا.
+Specific line item on the sales order that corresponds to this unit.,بند أمر البيع المحدد المقابل لهذه الوحدة.
+Delivery note under which the unit was shipped and handed over to the customer.,إشعار التسليم الذي شُحنت وسُلّمت بموجبه الوحدة إلى العميل.
+Specific delivery note line item that recorded the dispatch of this unit.,بند إشعار التسليم المحدد الذي سجّل إرسال هذه الوحدة.
+Sales invoice that billed the customer for this equipment.,فاتورة المبيعات التي حُمّل العميل بموجبها ثمن هذه المعدة.
+Date the unit was delivered to the customer site.,تاريخ تسليم الوحدة إلى موقع العميل.
+Date the technician physically installed and mounted the unit on site.,تاريخ قيام الفني بتركيب وتثبيت الوحدة فعليًا في الموقع.
+Date the unit was tested and formally put into operational service.,تاريخ اختبار الوحدة وإدخالها رسميًا في الخدمة التشغيلية.
+Date the manufacturer or service warranty coverage begins.,تاريخ بدء تغطية ضمان المصنّع أو ضمان الخدمة.
+Date the warranty coverage expires and chargeable service applies.,تاريخ انتهاء تغطية الضمان وبدء تطبيق الخدمة المدفوعة.
+"Whether the unit is currently under active warranty, expired, or not covered.",ما إذا كانت الوحدة حاليًا ضمن ضمان فعّال أو منتهٍ أو غير مشمولة.
+Indicates the unit is eligible for scheduled maintenance and service visits.,يشير إلى أن الوحدة مؤهلة للصيانة المجدولة وزيارات الخدمة.
+Date of the most recent completed service or maintenance visit.,تاريخ آخر زيارة صيانة أو خدمة مكتملة.
+Reference to the most recent service job carried out on this unit.,مرجع لآخر مهمة صيانة نُفّذت على هذه الوحدة.
+Reference to the most recent on-site service visit for this unit.,مرجع لآخر زيارة صيانة ميدانية لهذه الوحدة.
+Name of the company that manufactured the equipment.,اسم الشركة التي صنّعت المعدة.
+Manufacturer model number of the equipment.,رقم موديل المعدة لدى المصنّع.
+Free-text directions helping technicians find the exact spot of the unit on site.,إرشادات نصية حرة تساعد الفنيين على تحديد الموضع الدقيق للوحدة في الموقع.
+Functional category of the equipment that drives which service rules and fields apply.,الفئة الوظيفية للمعدة التي تحدد قواعد الخدمة والحقول المطبَّقة.
+"Extinguishing agent class of a fire extinguisher, determining its suitable fire types.",فئة المادة المطفئة لطفاية الحريق، التي تحدد أنواع الحرائق المناسبة لها.
+"Rated capacity of the extinguisher, such as the weight or volume of its agent.",السعة المقدّرة للطفاية، مثل وزن أو حجم المادة المطفئة بها.
+Unit of measure in which the extinguisher capacity is expressed.,وحدة القياس التي تُعبَّر بها سعة الطفاية.
+Specific extinguishing agent contained in the unit as printed on its nameplate.,المادة المطفئة المحددة الموجودة داخل الوحدة كما هو مطبوع على لوحة بياناتها.
+Manufacturer name as shown on the fire equipment nameplate.,اسم المصنّع كما هو مبيّن على لوحة بيانات معدة الحريق.
+Model designation as shown on the fire equipment nameplate.,تسمية الموديل كما هي مبيّنة على لوحة بيانات معدة الحريق.
+"Date the fire unit was manufactured, used to calculate its service life.",تاريخ تصنيع وحدة الحريق، ويُستخدم لحساب عمرها التشغيلي.
+Date after which the fire unit must be retired or replaced.,التاريخ الذي يجب بعده سحب وحدة الحريق أو استبدالها.
+Rated operating pressure of the fire unit as certified by the manufacturer.,ضغط التشغيل المقدّر لوحدة الحريق كما اعتمده المصنّع.
+Number of months between mandatory hydrostatic pressure tests for this unit.,عدد الأشهر بين اختبارات الضغط الهيدروستاتيكي الإلزامية لهذه الوحدة.
+Date the extinguisher was last recharged or refilled with agent.,تاريخ آخر إعادة شحن أو تعبئة للطفاية بالمادة المطفئة.
+Outcome of the most recent refill or recharge operation.,نتيجة آخر عملية إعادة تعبئة أو شحن.
+Date the unit last passed a hydrostatic pressure test.,تاريخ آخر اجتياز للوحدة اختبار الضغط الهيدروستاتيكي.
+Date the next hydrostatic pressure test is due for this unit.,تاريخ استحقاق اختبار الضغط الهيدروستاتيكي التالي لهذه الوحدة.
+Photograph of the installed unit for identification and condition reference.,صورة للوحدة المركّبة للتعرّف عليها ومرجع لحالتها.
+"How this equipment record was created, such as from a delivery note, import, or manual entry.",كيفية إنشاء سجل هذه المعدة، مثل إنشائه من إشعار تسليم أو استيراد أو إدخال يدوي.
+Internal key used to link this unit to its automated provisioning or onboarding process.,مفتاح داخلي يُستخدم لربط هذه الوحدة بعملية التهيئة أو التسجيل الآلي الخاصة بها.
+General free-text notes and remarks about this equipment.,ملاحظات وتعليقات نصية عامة حول هذه المعدة.
+Customer this field note relates to.,العميل الذي تتعلق به هذه الملاحظة الميدانية.
+"Service job during which this note was recorded, if any.",مهمة الصيانة التي سُجّلت خلالها هذه الملاحظة، إن وُجدت.
+Technician who observed and logged this note in the field.,الفني الذي رصد وسجّل هذه الملاحظة في الميدان.
+Date the note was recorded during the site visit.,تاريخ تسجيل الملاحظة أثناء زيارة الموقع.
+"Observation or remark captured on site about the customer, equipment, or job.",ملاحظة أو تعليق مسجّل في الموقع حول العميل أو المعدة أو المهمة.
+Name of the geographic service area used to route jobs and assign technicians.,اسم المنطقة الجغرافية للخدمة المستخدَمة لتوجيه المهام وتعيين الفنيين.
+"Broader territory this area rolls up into, forming a service coverage hierarchy.",المنطقة الأوسع التي تندرج تحتها هذه المنطقة، لتكوين هرمية تغطية الخدمة.
+"When enabled, hides this territory so it can no longer be assigned to new jobs or technicians.",عند تفعيله، يُخفي هذه المنطقة بحيث لا يمكن إسنادها إلى مهام أو فنيين جدد.
+Notes describing the boundaries or coverage details of this territory.,ملاحظات تصف حدود هذه المنطقة أو تفاصيل تغطيتها.
+Name of the reusable checklist template applied to service jobs.,اسم قالب قائمة التحقق القابل لإعادة الاستخدام المطبَّق على مهام الصيانة.
+"Type of service this checklist is intended for, used to match it to relevant jobs.",نوع الخدمة المخصص لها قائمة التحقق هذه، ويُستخدم لمطابقتها مع المهام ذات الصلة.
+"When enabled, retires this template so it can no longer be selected for new jobs.",عند تفعيله، يُوقف هذا القالب بحيث لا يمكن اختياره لمهام جديدة.
+Ordered list of checklist tasks technicians must complete when this template is used.,قائمة مرتّبة بمهام قائمة التحقق التي يجب على الفنيين إكمالها عند استخدام هذا القالب.
+Schedule & Assignment,الجدولة والإسناد
+Checklist,قائمة التحقق
+Parts & Services,القطع والخدمات
+Warranty & Contract Coverage,تغطية الضمان والعقد
+Completion,الإنجاز
+Costing,التكلفة
+Request Idempotency Key,مفتاح منع تكرار الطلب
+Request Operation Key,مفتاح عملية الطلب
+Maintenance Release Key,مفتاح إصدار الصيانة
+Customer Name,اسم العميل
+Phase,المرحلة
+Hold Reason,سبب التعليق
+Hold From Status,الحالة قبل التعليق
+Scheduled Start,بداية الموعد المجدول
+Scheduled End,نهاية الموعد المجدول
+Promised Response By,موعد الاستجابة المتعهد به
+Responded On,تاريخ الاستجابة
+Assigned Service Team,فريق الخدمة المسند
+Team Leader,قائد الفريق
+Primary Technician,الفني الرئيسي
+SLA Breached,تم خرق اتفاقية مستوى الخدمة
+Address,العنوان
+Service Latitude,خط عرض الموقع
+Service Longitude,خط طول الموقع
+Items,الأصناف
+Total Amount,المبلغ الإجمالي
+Coverage Status,حالة التغطية
+Coverage Reason,سبب التغطية
+Labour Covered,العمالة مغطاة
+Parts Covered,القطع مغطاة
+Travel Covered,التنقل مغطى
+Completed On,تاريخ الإنجاز
+Customer Signature,توقيع العميل
+Quotation,عرض السعر
+Estimated Hours,الساعات المقدرة
+Actual Hours,الساعات الفعلية
+Labour Rate (per hour),أجر العمالة (للساعة)
+Labour Cost,تكلفة العمالة
+Materials Cost,تكلفة المواد
+Travel Cost,تكلفة التنقل
+Overhead Cost,التكاليف غير المباشرة
+Total Cost,التكلفة الإجمالية
+Author Role,دور الكاتب
+Author User,مستخدم الكاتب
+Author Name,اسم الكاتب
+Message,الرسالة
+Rating (1-5),التقييم (1-5)
+NPS (0-10),مؤشر صافي الترويج (0-10)
+Submitted On,تاريخ الإرسال
+Comments,التعليقات
+Prefix used to auto-generate the unique job number for this service job.,بادئة تُستخدم لإنشاء رقم المهمة الفريد لهذه المهمة تلقائياً.
+The originating customer service request this job was created to fulfil.,طلب خدمة العميل الأصلي الذي أُنشئت هذه المهمة لتلبيته.
+Internal key that prevents the same service request from spawning duplicate jobs.,مفتاح داخلي يمنع طلب الخدمة نفسه من إنشاء مهام مكررة.
+Internal key that guards a single request operation against duplicate processing.,مفتاح داخلي يحمي عملية الطلب الواحدة من المعالجة المكررة.
+Internal key that guards against duplicate jobs released from a maintenance schedule.,مفتاح داخلي يحمي من تكرار المهام الصادرة عن جدول صيانة.
+The customer who owns the equipment or site being serviced and will be billed.,العميل الذي يملك المعدات أو الموقع الذي تجري خدمته وسيُصدر له الفاتورة.
+"The customer's display name, fetched automatically from the customer record.",اسم العميل الظاهر، يُجلب تلقائياً من سجل العميل.
+The person to reach on site or by phone for coordinating this job.,الشخص الذي يُتواصل معه في الموقع أو هاتفياً لتنسيق هذه المهمة.
+The operating company responsible for delivering and invoicing this job.,الشركة المشغّلة المسؤولة عن تنفيذ هذه المهمة وإصدار فاتورتها.
+The project this job is booked against for tracking and cost roll-up.,المشروع الذي تُقيّد عليه هذه المهمة للمتابعة وتجميع التكاليف.
+"Current lifecycle stage of the job, from Draft through Completed or Cancelled.",مرحلة دورة حياة المهمة الحالية، من مسودة حتى منجزة أو ملغاة.
+"The active field-execution stage the job is in, such as Travel, Inspection, or On-Site Service.",مرحلة التنفيذ الميداني النشطة للمهمة، مثل التنقل أو الفحص أو الخدمة في الموقع.
+"Why the job is paused when it is placed On Hold, such as awaiting parts or approval.",سبب إيقاف المهمة عند تعليقها، مثل انتظار القطع أو الموافقة.
+The status the job will return to once the hold is lifted.,الحالة التي ستعود إليها المهمة بعد رفع التعليق.
+Urgency level that drives scheduling and dispatch order for this job.,مستوى الإلحاح الذي يحدد جدولة هذه المهمة وترتيب إرسالها.
+"The category of work being performed, such as installation, repair, or preventive maintenance.",فئة العمل المنفذ، مثل التركيب أو الإصلاح أو الصيانة الوقائية.
+Planned date and time the technician should begin work on site.,التاريخ والوقت المخططان لبدء الفني العمل في الموقع.
+Planned date and time the job is expected to be finished.,التاريخ والوقت المخططان لإنهاء المهمة المتوقع.
+SLA deadline by which a technician must respond to or start this job.,الموعد النهائي وفق اتفاقية مستوى الخدمة الذي يجب أن يستجيب الفني خلاله أو يبدأ المهمة.
+Actual date and time the job first received a technician response.,التاريخ والوقت الفعليان لأول استجابة فني للمهمة.
+"Geographic service territory this job falls under, used for routing and reporting.",منطقة الخدمة الجغرافية التي تندرج تحتها هذه المهمة، وتُستخدم للتوجيه وإعداد التقارير.
+The crew assigned to carry out this job.,الفريق المسند لتنفيذ هذه المهمة.
+"Lead technician of the assigned team, fetched from the team record.",الفني القائد للفريق المسند، يُجلب من سجل الفريق.
+The technician primarily accountable for completing this job.,الفني المسؤول أساساً عن إنجاز هذه المهمة.
+Set automatically when the promised response time passes without a response.,يُضبط تلقائياً عند انقضاء وقت الاستجابة المتعهد به دون استجابة.
+The address record where the service is to be performed.,سجل العنوان الذي ستُنفذ فيه الخدمة.
+"Formatted, read-only view of the full service address.",عرض منسّق للقراءة فقط لعنوان الخدمة الكامل.
+Geocoded job-site latitude used by dispatch to find the nearest technician.,خط عرض موقع المهمة المُحدد جغرافياً، يستخدمه الإرسال لإيجاد أقرب فني.
+Geocoded job-site longitude used by dispatch to find the nearest technician.,خط طول موقع المهمة المُحدد جغرافياً، يستخدمه الإرسال لإيجاد أقرب فني.
+The predefined checklist template applied to generate the job's tasks.,قالب قائمة التحقق المُعرّف مسبقاً والمطبّق لإنشاء مهام العمل.
+The list of work steps or checklist items the technician must complete on this job.,قائمة خطوات العمل أو بنود التحقق التي يجب على الفني إنجازها في هذه المهمة.
+The customer assets or installed equipment serviced during this job.,أصول العميل أو المعدات المركبة التي تجري خدمتها خلال هذه المهمة.
+"The parts consumed and services rendered on this job, with quantities and rates.",القطع المستهلكة والخدمات المقدمة في هذه المهمة، مع الكميات والأسعار.
+Total billable value of all parts and services on the job.,القيمة القابلة للفوترة الإجمالية لجميع القطع والخدمات في المهمة.
+The service contract that may cover this job under warranty or a maintenance plan.,عقد الخدمة الذي قد يغطي هذه المهمة بموجب الضمان أو خطة صيانة.
+"How this job is covered financially, such as under warranty, contract, or chargeable.",كيفية تغطية هذه المهمة مالياً، مثل ضمن الضمان أو العقد أو قابلة للفوترة.
+Explanation of why the determined coverage status applies.,شرح لسبب انطباق حالة التغطية المحددة.
+Indicates the labour on this job is covered by warranty or contract.,يشير إلى أن العمالة في هذه المهمة مغطاة بالضمان أو العقد.
+Indicates the parts on this job are covered by warranty or contract.,يشير إلى أن القطع في هذه المهمة مغطاة بالضمان أو العقد.
+Indicates the travel for this job is covered by warranty or contract.,يشير إلى أن التنقل لهذه المهمة مغطى بالضمان أو العقد.
+Date and time the job was marked complete.,تاريخ ووقت وضع علامة إنجاز المهمة.
+Customer's captured signature confirming the work was completed and accepted.,توقيع العميل الملتقط الذي يؤكد إنجاز العمل وقبوله.
+The quotation raised for chargeable work on this job.,عرض السعر الصادر للأعمال القابلة للفوترة في هذه المهمة.
+The sales invoice generated to bill the customer for this job.,فاتورة المبيعات المنشأة لمطالبة العميل بتكاليف هذه المهمة.
+"Estimated labour hours for the job, from the estimate engine or set manually.",ساعات العمالة المقدرة للمهمة، من محرك التقدير أو تُحدد يدوياً.
+Actual labour hours logged by technicians against this job.,ساعات العمالة الفعلية التي سجلها الفنيون على هذه المهمة.
+Charge-out or cost rate per labour hour used to value the work.,سعر الفوترة أو التكلفة لكل ساعة عمالة المستخدم لتقييم العمل.
+Calculated labour cost based on hours worked and the labour rate.,تكلفة العمالة المحسوبة بناءً على ساعات العمل وأجر العمالة.
+Calculated cost of the parts and materials consumed on the job.,التكلفة المحسوبة للقطع والمواد المستهلكة في المهمة.
+Cost of technician travel to and from the job site.,تكلفة تنقل الفني من وإلى موقع المهمة.
+Allocated overhead applied to this job.,التكاليف غير المباشرة المخصصة والمطبقة على هذه المهمة.
+"Total delivered cost of the job, summing labour, materials, travel, and overhead.",التكلفة الإجمالية لتنفيذ المهمة، بجمع العمالة والمواد والتنقل والتكاليف غير المباشرة.
+Free-form internal notes about the job's execution or special instructions.,ملاحظات داخلية حرة حول تنفيذ المهمة أو تعليمات خاصة.
+The service job this message is attached to.,مهمة الخدمة المرفقة بها هذه الرسالة.
+"The role of the person who wrote the message, such as dispatcher, technician, or customer.",دور الشخص الذي كتب الرسالة، مثل المرسل أو الفني أو العميل.
+The system user account that posted the message.,حساب المستخدم في النظام الذي نشر الرسالة.
+Display name of the person who posted the message.,الاسم الظاهر للشخص الذي نشر الرسالة.
+The body of the note or communication logged on the job's timeline.,نص الملاحظة أو المراسلة المسجلة على مسار زمني للمهمة.
+Prefix used to auto-generate the unique feedback record number.,بادئة تُستخدم لإنشاء رقم سجل الملاحظات الفريد تلقائياً.
+The completed service job this feedback relates to.,مهمة الخدمة المنجزة التي تتعلق بها هذه الملاحظات.
+"The customer who provided this feedback, fetched from the service job.",العميل الذي قدّم هذه الملاحظات، يُجلب من مهمة الخدمة.
+"Customer satisfaction rating, 1 (poor) to 5 (excellent).",تقييم رضا العميل، من 1 (ضعيف) إلى 5 (ممتاز).
+"Net Promoter Score answer, 0 to 10 (optional).",إجابة مؤشر صافي الترويج، من 0 إلى 10 (اختياري).
+Date and time the customer submitted this feedback.,التاريخ والوقت اللذان أرسل فيهما العميل هذه الملاحظات.
+Free-text remarks the customer left about the service experience.,ملاحظات نصية حرة تركها العميل حول تجربة الخدمة.
+Identity Key,مفتاح التعريف
+Unique fingerprint that prevents the same planned maintenance from being generated twice.,بصمة فريدة تمنع إنشاء الصيانة المخططة نفسها مرتين.
+Preventive maintenance plan whose schedule produced this occurrence.,خطة الصيانة الوقائية التي أنتج جدولها هذا الحدث.
+Plan Revision,مراجعة الخطة
+Version number of the maintenance plan that was active when this occurrence was generated.,رقم إصدار خطة الصيانة الذي كان نشطاً عند إنشاء هذا الحدث.
+Plan Line,بند الخطة
+Stable identifier of the specific plan row (task) this occurrence was generated from.,معرف ثابت لبند الخطة (المهمة) الذي أُنشئ منه هذا الحدث.
+Plan Line Code,رمز بند الخطة
+"Human-readable code of the plan task, used to match the occurrence back to its source line.",رمز مقروء لمهمة الخطة يُستخدم لمطابقة الحدث ببنده المصدر.
+Specific piece of installed equipment this maintenance visit will service.,قطعة المعدات المركبة المحددة التي ستخدمها زيارة الصيانة هذه.
+Customer who owns the equipment and receives this scheduled maintenance.,العميل الذي يملك المعدات ويتلقى هذه الصيانة المجدولة.
+Operating company responsible for delivering this maintenance.,الشركة المشغّلة المسؤولة عن تنفيذ هذه الصيانة.
+"Project this maintenance occurrence is tracked under, if any.",المشروع الذي يُتابع تحته حدث الصيانة هذا، إن وُجد.
+Physical customer location where the equipment is installed and serviced.,الموقع الفعلي للعميل حيث تُركّب المعدات وتُخدم.
+Service contract that entitles the customer to this scheduled maintenance.,عقد الخدمة الذي يمنح العميل الحق في هذه الصيانة المجدولة.
+Category of maintenance work to be performed during this visit.,فئة أعمال الصيانة التي ستُنفذ خلال هذه الزيارة.
+Due Date,تاريخ الاستحقاق
+Calendar date on which this maintenance is scheduled to fall due.,التاريخ الذي تستحق فيه هذه الصيانة.
+Due At UTC,الاستحقاق بتوقيت UTC
+Exact due moment stored in UTC for reliable cross-timezone scheduling.,لحظة الاستحقاق الدقيقة المخزنة بتوقيت UTC لجدولة موثوقة عبر المناطق الزمنية.
+Due Timezone,المنطقة الزمنية للاستحقاق
+Timezone of the customer site used to interpret the local due date.,المنطقة الزمنية لموقع العميل المستخدمة لتفسير تاريخ الاستحقاق المحلي.
+UTC Offset Minutes,دقائق الإزاحة عن UTC
+Offset in minutes from UTC applied to the site timezone at the due moment.,الإزاحة بالدقائق عن UTC المطبقة على منطقة الموقع الزمنية عند لحظة الاستحقاق.
+Release On,تاريخ الإصدار
+Date on which the system will automatically create the service job for this occurrence.,التاريخ الذي سينشئ فيه النظام مهمة الخدمة تلقائياً لهذا الحدث.
+Grace Days,أيام السماح
+Number of days the occurrence may slip past its due date before it is flagged overdue.,عدد الأيام التي يمكن أن يتجاوز فيها الحدث تاريخ استحقاقه قبل أن يُعلَّم كمتأخر.
+Auto Release Job,إصدار المهمة تلقائياً
+"When enabled, the service job is generated automatically on the release date.",عند التفعيل، تُنشأ مهمة الخدمة تلقائياً في تاريخ الإصدار.
+"Current lifecycle stage of the occurrence, from forecast through released to completed.",المرحلة الحالية لدورة حياة الحدث، من التوقع مروراً بالإصدار حتى الإنجاز.
+Generated On,تاريخ الإنشاء
+Timestamp when this occurrence was created by the scheduling engine.,الطابع الزمني لإنشاء هذا الحدث بواسطة محرك الجدولة.
+Released Job,المهمة المُصدَرة
+Service job that was created when this occurrence was released for execution.,مهمة الخدمة التي أُنشئت عند إصدار هذا الحدث للتنفيذ.
+Grouping Key,مفتاح التجميع
+Internal key used to batch related occurrences into a single service visit.,مفتاح داخلي يُستخدم لتجميع الأحداث المرتبطة في زيارة خدمة واحدة.
+Rescheduled From,أُعيدت جدولته من
+Earlier occurrence that this one replaces after a reschedule.,الحدث السابق الذي يحل هذا الحدث محله بعد إعادة الجدولة.
+Skip / Cancel Reason,سبب التخطي / الإلغاء
+Explanation recorded when the occurrence is skipped or cancelled.,التفسير المسجل عند تخطي الحدث أو إلغائه.
+Naming series used to auto-generate the service visit reference number.,سلسلة التسمية المستخدمة لتوليد الرقم المرجعي لزيارة الخدمة تلقائياً.
+Service job this visit fulfils; the source of the work to be performed.,مهمة الخدمة التي تنفذها هذه الزيارة؛ مصدر العمل المطلوب تنفيذه.
+"Project linked to the service job, carried over for reporting.",المشروع المرتبط بمهمة الخدمة، منقول لأغراض التقارير.
+Visit Number,رقم الزيارة
+Sequential number of this visit within the parent service job.,الرقم التسلسلي لهذه الزيارة ضمن مهمة الخدمة الأصلية.
+"Current stage of the visit, from planned through in progress to completed.",المرحلة الحالية للزيارة، من المخطط مروراً بقيد التنفيذ حتى الإنجاز.
+Schedule,الجدولة
+Planned date and time the technician is expected to begin work.,التاريخ والوقت المخططان لبدء الفني للعمل.
+Planned date and time the visit is expected to finish.,التاريخ والوقت المخططان لانتهاء الزيارة.
+Execution,التنفيذ
+Field team assigned to carry out this visit.,الفريق الميداني المكلف بتنفيذ هذه الزيارة.
+Technician who leads and is accountable for this visit.,الفني الذي يقود الزيارة ويكون مسؤولاً عنها.
+Actual Departure,المغادرة الفعلية
+Time the technician departed toward the customer site.,وقت مغادرة الفني نحو موقع العميل.
+Actual Check In,تسجيل الوصول الفعلي
+Time the technician checked in on arrival at the site.,وقت تسجيل الفني وصوله إلى الموقع.
+Actual Start,البدء الفعلي
+Time the technician actually started the on-site work.,الوقت الذي بدأ فيه الفني العمل فعلياً في الموقع.
+Actual Check Out,تسجيل الانصراف الفعلي
+Time the technician checked out when leaving the site.,وقت تسجيل الفني انصرافه عند مغادرة الموقع.
+Actual Completion,الإنجاز الفعلي
+Time the work was actually completed.,الوقت الذي اكتمل فيه العمل فعلياً.
+Customer address where the visit is performed.,عنوان العميل الذي تُنفذ فيه الزيارة.
+Latitude of the planned service location.,خط عرض موقع الخدمة المخطط.
+Longitude of the planned service location.,خط طول موقع الخدمة المخطط.
+GPS,نظام تحديد المواقع
+Check In Latitude,خط عرض تسجيل الوصول
+Latitude captured from the technician's device at check-in.,خط العرض الملتقط من جهاز الفني عند تسجيل الوصول.
+Check In Longitude,خط طول تسجيل الوصول
+Longitude captured from the technician's device at check-in.,خط الطول الملتقط من جهاز الفني عند تسجيل الوصول.
+Check In Accuracy,دقة تسجيل الوصول
+GPS accuracy in metres reported for the check-in reading.,دقة نظام تحديد المواقع بالأمتار المسجلة لقراءة تسجيل الوصول.
+Check Out Latitude,خط عرض تسجيل الانصراف
+Latitude captured from the technician's device at check-out.,خط العرض الملتقط من جهاز الفني عند تسجيل الانصراف.
+Check Out Longitude,خط طول تسجيل الانصراف
+Longitude captured from the technician's device at check-out.,خط الطول الملتقط من جهاز الفني عند تسجيل الانصراف.
+Check Out Accuracy,دقة تسجيل الانصراف
+GPS accuracy in metres reported for the check-out reading.,دقة نظام تحديد المواقع بالأمتار المسجلة لقراءة تسجيل الانصراف.
+Visit Notes,ملاحظات الزيارة
+Free-text notes the technician records about the visit.,ملاحظات نصية حرة يسجلها الفني حول الزيارة.
+Subcontractor Name,اسم المقاول من الباطن
+Business name of the external subcontractor who performs field work on your behalf.,الاسم التجاري للمقاول من الباطن الخارجي الذي ينفذ العمل الميداني نيابة عنك.
+Whether this subcontractor is currently active and available for assignments.,ما إذا كان هذا المقاول من الباطن نشطاً حالياً ومتاحاً للتكليفات.
+Operating company that engages this subcontractor.,الشركة المشغّلة التي تتعاقد مع هذا المقاول من الباطن.
+Service territory this subcontractor covers.,منطقة الخدمة التي يغطيها هذا المقاول من الباطن.
+Hourly Rate,السعر بالساعة
+Default labour rate billed by this subcontractor per hour.,سعر العمالة الافتراضي الذي يفوتره هذا المقاول من الباطن في الساعة.
+Primary phone number for reaching the subcontractor.,رقم الهاتف الرئيسي للتواصل مع المقاول من الباطن.
+Primary email address for the subcontractor.,عنوان البريد الإلكتروني الرئيسي للمقاول من الباطن.
+Contact Person,الشخص المسؤول
+Name of the main contact at the subcontractor.,اسم جهة الاتصال الرئيسية لدى المقاول من الباطن.
+"Additional notes about the subcontractor's terms, coverage, or performance.",ملاحظات إضافية حول شروط المقاول من الباطن أو تغطيته أو أدائه.
+Command ID,معرف الأمر
+"Unique identifier of the offline command sent from the mobile app, used to deduplicate on sync.",معرف فريد للأمر غير المتصل المرسل من تطبيق الجوال، يُستخدم لمنع التكرار عند المزامنة.
+User,المستخدم
+Technician or user whose device issued this command.,الفني أو المستخدم الذي أصدر جهازه هذا الأمر.
+Action,الإجراء
+"Operation the mobile app requested, such as check-in or status update.",العملية التي طلبها تطبيق الجوال، مثل تسجيل الوصول أو تحديث الحالة.
+Entity Type,نوع الكيان
+"Type of record the command acts on, for example Service Visit.",نوع السجل الذي يؤثر عليه الأمر، مثل زيارة الخدمة.
+Entity ID,معرف الكيان
+Identifier of the specific record targeted by the command.,معرف السجل المحدد المستهدف بالأمر.
+State,حالة المزامنة
+"Sync state of the command, either still processing or successfully synced.",حالة مزامنة الأمر، إما قيد المعالجة أو تمت مزامنته بنجاح.
+Result JSON,نتيجة JSON
+Server response payload returned after the command was processed.,حمولة استجابة الخادم المُعادة بعد معالجة الأمر.
+Error,خطأ
+Error detail recorded if the command failed to process.,تفاصيل الخطأ المسجلة إذا فشلت معالجة الأمر.
+Site Name,اسم الموقع
+Human-readable name of the customer premises where field service is delivered.,الاسم الواضح لموقع العميل الذي تُقدَّم فيه الخدمة الميدانية.
+Site Code,رمز الموقع
+"Unique short code that identifies this site across jobs, contracts, and reports.",رمز قصير فريد يُعرِّف هذا الموقع عبر المهام والعقود والتقارير.
+The customer account that owns or occupies this service site.,حساب العميل الذي يملك موقع الخدمة هذا أو يشغله.
+Legal entity within your organization responsible for servicing this site.,الكيان القانوني ضمن مؤسستك المسؤول عن خدمة هذا الموقع.
+Whether the site is currently active and eligible for scheduling service visits.,ما إذا كان الموقع نشطًا حاليًا ومؤهلًا لجدولة زيارات الخدمة.
+Linked Address record holding the site's full postal location.,سجل العنوان المرتبط الذي يحتوي على الموقع البريدي الكامل للموقع.
+Address Display,عرض العنوان
+Formatted read-only snapshot of the linked address for quick reference.,لقطة مُنسَّقة للقراءة فقط للعنوان المرتبط للرجوع السريع.
+City,المدينة
+"City pulled from the linked address, used for territory routing and reporting.",المدينة المستمدة من العنوان المرتبط، وتُستخدم في توزيع المناطق وإعداد التقارير.
+Service territory that determines which team or region covers this site.,منطقة الخدمة التي تحدد أي فريق أو إقليم يغطي هذا الموقع.
+Address Override Reason,سبب تجاوز العنوان
+Required when an FSM Manager deliberately links an Address that is not linked to this Customer.,مطلوب عندما يربط مدير الخدمة الميدانية عمدًا عنوانًا غير مرتبط بهذا العميل.
+Geographic latitude of the site used for map display and technician routing.,خط عرض الموقع الجغرافي المستخدم لعرض الخريطة وتوجيه الفنيين.
+Geographic longitude of the site used for map display and technician routing.,خط طول الموقع الجغرافي المستخدم لعرض الخريطة وتوجيه الفنيين.
+Map Location,موقع الخريطة
+Pinpointed location on the map used for navigation and proximity checks.,موقع محدد بدقة على الخريطة يُستخدم للملاحة وفحص القرب.
+Primary Contact,جهة الاتصال الرئيسية
+Main on-site contact person technicians should coordinate with.,الشخص الرئيسي في الموقع الذي ينبغي على الفنيين التنسيق معه.
+Contact Phone,هاتف جهة الاتصال
+"Phone number of the primary contact, pulled from the contact record.",رقم هاتف جهة الاتصال الرئيسية، المستمد من سجل جهة الاتصال.
+Contact Email,البريد الإلكتروني لجهة الاتصال
+"Email address of the primary contact, pulled from the contact record.",عنوان البريد الإلكتروني لجهة الاتصال الرئيسية، المستمد من سجل جهة الاتصال.
+Site Type,نوع الموقع
+Category of the premises that guides how service is planned and handled.,فئة الموقع التي توجّه طريقة تخطيط الخدمة والتعامل معها.
+Access Notes,ملاحظات الدخول
+"Instructions for gaining entry to the site, such as gate codes or check-in steps.",تعليمات الدخول إلى الموقع، مثل رموز البوابات أو خطوات تسجيل الوصول.
+Working Hours,ساعات العمل
+Hours during which technicians are allowed to perform work at this site.,الساعات التي يُسمح فيها للفنيين بأداء العمل في هذا الموقع.
+Safety Notes,ملاحظات السلامة
+On-site hazards and safety precautions technicians must observe.,المخاطر في الموقع واحتياطات السلامة التي يجب على الفنيين الالتزام بها.
+Hierarchy,التسلسل الهرمي
+Parent Site,الموقع الأصل
+Parent site in the hierarchy when this location belongs to a larger group site.,الموقع الأصل في التسلسل الهرمي عندما يكون هذا الموقع جزءًا من موقع مجموعة أكبر.
+Is Group,مجموعة
+Marks this record as a grouping node that can contain child sites.,يُحدِّد هذا السجل كعقدة تجميع يمكن أن تحتوي على مواقع فرعية.
+Enabled,مُفعَّل
+Turns the site record on or off without deleting it.,يُفعِّل سجل الموقع أو يُعطِّله دون حذفه.
+Free-form internal notes about the site.,ملاحظات داخلية حرة حول الموقع.
+Contract,العقد
+Numbering series used to auto-generate the contract number.,تسلسل الترقيم المستخدم لتوليد رقم العقد تلقائيًا.
+Contract No,رقم العقد
+System-generated unique identifier for this service contract.,معرّف فريد يولّده النظام لعقد الخدمة هذا.
+Customer that holds this service contract.,العميل صاحب عقد الخدمة هذا.
+Legal entity providing the contracted services.,الكيان القانوني الذي يقدّم الخدمات المتعاقد عليها.
+Optional project this contract is associated with.,المشروع الاختياري المرتبط بهذا العقد.
+"Current lifecycle state of the contract, such as draft, active, or expired.",الحالة الحالية لدورة حياة العقد، مثل مسودة أو نشط أو منتهٍ.
+Start Date,تاريخ البدء
+Date on which the contract coverage begins.,التاريخ الذي تبدأ فيه تغطية العقد.
+End Date,تاريخ الانتهاء
+Date on which the contract coverage ends.,التاريخ الذي تنتهي فيه تغطية العقد.
+Service Terms,شروط الخدمة
+Included Visits,الزيارات المشمولة
+Number of routine service visits included in the contract term.,عدد زيارات الخدمة الروتينية المشمولة في مدة العقد.
+Emergency Visits,الزيارات الطارئة
+Number of emergency call-outs included in the contract term.,عدد الاستدعاءات الطارئة المشمولة في مدة العقد.
+Response SLA (Hours),مدة الاستجابة المتفق عليها (ساعات)
+Maximum hours allowed to respond to a service request under this contract.,الحد الأقصى للساعات المسموح بها للاستجابة لطلب خدمة بموجب هذا العقد.
+Resolution SLA (Hours),مدة الحل المتفق عليها (ساعات)
+Maximum hours allowed to resolve a service request under this contract.,الحد الأقصى للساعات المسموح بها لحل طلب خدمة بموجب هذا العقد.
+Covered Sites & Equipment,المواقع والمعدات المشمولة
+An empty table means customer-wide coverage. Site-only rows cover that site; equipment or item group narrows the row.,الجدول الفارغ يعني تغطية على مستوى العميل بالكامل. الصفوف التي تحدد الموقع فقط تغطي ذلك الموقع؛ وتحديد المعدة أو مجموعة الأصناف يضيّق نطاق الصف.
+Coverage Rules,قواعد التغطية
+"Rules defining which services, conditions, or exclusions apply under this contract.",القواعد التي تحدد الخدمات أو الشروط أو الاستثناءات المطبقة بموجب هذا العقد.
+Entitlements,الاستحقاقات
+Specific service entitlements the customer can consume under this contract.,استحقاقات الخدمة المحددة التي يمكن للعميل استهلاكها بموجب هذا العقد.
+ERPNext Commercial References,المراجع التجارية في ERPNext
+Source quotation that led to this contract.,عرض السعر المصدري الذي أدى إلى هذا العقد.
+Sales order that booked this contract commercially.,أمر البيع الذي حجز هذا العقد تجاريًا.
+Sales invoice raised against this contract.,فاتورة المبيعات الصادرة مقابل هذا العقد.
+Renewal,التجديد
+Expiring Soon,قارب على الانتهاء
+Automatically flagged when the contract end date is approaching.,يُعلَّم تلقائيًا عند اقتراب تاريخ انتهاء العقد.
+Renewal Recommended,يُوصى بالتجديد
+Marks the contract as recommended for renewal by the account team.,يُحدِّد العقد على أنه موصى بتجديده من قبل فريق الحساب.
+Renewal Quotation,عرض سعر التجديد
+Quotation prepared to renew this contract for a new term.,عرض السعر المُعَد لتجديد هذا العقد لمدة جديدة.
+Renewed From,مُجدَّد من
+Prior contract that this one renews and replaces.,العقد السابق الذي يجدده هذا العقد ويحل محله.
+Free-form internal notes about the contract.,ملاحظات داخلية حرة حول العقد.
+The service job whose on-site work this time entry belongs to.,مهمة الخدمة التي ينتمي إليها العمل الميداني لهذا القيد الزمني.
+Technician who performed the work during this time interval.,الفني الذي أدى العمل خلال هذه الفترة الزمنية.
+From,من
+Timestamp when the technician started this block of work.,الطابع الزمني لبدء الفني هذه الفترة من العمل.
+To,إلى
+Timestamp when the technician stopped this block of work.,الطابع الزمني لتوقف الفني عن هذه الفترة من العمل.
+Hours,الساعات
+"Duration worked in this interval, calculated from the start and end times.",مدة العمل في هذه الفترة، محسوبة من وقتي البدء والانتهاء.
+Activity,النشاط
+Short label describing the task carried out during this interval.,وصف مختصر للمهمة المنفذة خلال هذه الفترة.
+Additional details about the work logged for this interval.,تفاصيل إضافية حول العمل المُسجَّل لهذه الفترة.
+Technician whose device reported this location.,الفني الذي أبلغ جهازه عن هذا الموقع.
+Recorded On,سُجِّل في
+Timestamp when this location fix was captured.,الطابع الزمني لالتقاط تحديد الموقع هذا.
+Service job the technician was attending when the location was recorded.,مهمة الخدمة التي كان الفني يحضرها عند تسجيل الموقع.
+"Origin of the location reading, such as the mobile app, manual entry, or system.",مصدر قراءة الموقع، مثل تطبيق الجوال أو الإدخال اليدوي أو النظام.
+Latitude coordinate of the reported position.,إحداثي خط العرض للموقع المُبلَّغ عنه.
+Longitude coordinate of the reported position.,إحداثي خط الطول للموقع المُبلَّغ عنه.
+Accuracy (m),الدقة (متر)
+Reported GPS accuracy in metres.,دقة نظام تحديد المواقع المُبلَّغ عنها بالأمتار.
+Returned Items,الأصناف المرتجعة
+Stock & Reason,المخزون والسبب
+Workshop Repair,إصلاح الورشة
+Scheduling Policy,سياسة الجدولة
+Equipment,المعدات
+Plan Lines,بنود الخطة
+Report Type,نوع التقرير
+Revision,المراجعة
+Supersedes,يحل محل
+Generation Key,مفتاح التوليد
+Verified On,تم التحقق في
+Approved Snapshot,اللقطة المعتمدة
+Work Performed,العمل المنفذ
+Recommendations,التوصيات
+Signature Timestamp,وقت التوقيع
+Signature Refused,رُفض التوقيع
+Refusal Reason,سبب الرفض
+Return Date,تاريخ الإرجاع
+Receiving Warehouse,مستودع الاستلام
+Pickup Date,تاريخ الاستلام
+Pickup Address,عنوان الاستلام
+Stock Entry,قيد المخزون
+ERPNext Quotation,عرض سعر ERPNext
+ERPNext Sales Invoice,فاتورة مبيعات ERPNext
+Reason,السبب
+Customer Approval,موافقة العميل
+Customer Approval On,تاريخ موافقة العميل
+Repair Notes,ملاحظات الإصلاح
+Testing Result,نتيجة الاختبار
+Quality Result,نتيجة الجودة
+Final Outcome,النتيجة النهائية
+Plan Title,عنوان الخطة
+Active,نشط
+Timezone,المنطقة الزمنية
+Forecast Horizon (Days),أفق التوقع (أيام)
+Job Grouping Window (Days),نافذة تجميع المهام (أيام)
+Catch-up Policy,سياسة التعويض
+DST Policy,سياسة التوقيت الصيفي
+Schedule Signature,توقيع الجدول
+The field service job this report documents the outcome of.,مهمة الخدمة الميدانية التي يوثّق هذا التقرير نتيجتها.
+"Whether this is a standard service, an inspection, or a preventive maintenance report.",ما إذا كان هذا تقرير خدمة عادية أو تفتيش أو صيانة وقائية.
+"Sequential version number, incremented each time the report is regenerated.",رقم إصدار متسلسل يزداد في كل مرة يُعاد فيها توليد التقرير.
+The earlier report revision that this document replaces.,إصدار التقرير السابق الذي يحل محله هذا المستند.
+"Unique key identifying the snapshot from which this report was generated, preventing duplicates.",مفتاح فريد يحدد اللقطة التي وُلّد منها هذا التقرير لمنع التكرار.
+"Current stage of the report in its draft, review, signature, verification, and submission lifecycle.",المرحلة الحالية للتقرير ضمن دورة حياته من المسودة والمراجعة والتوقيع والتحقق والتقديم.
+The customer who received the service covered by this report.,العميل الذي تلقى الخدمة التي يغطيها هذا التقرير.
+The operating company responsible for delivering the service.,الشركة المشغّلة المسؤولة عن تقديم الخدمة.
+The project this service work is billed or tracked against.,المشروع الذي تُحتسب أو تُتابع عليه أعمال الخدمة.
+The physical site or location where the service was performed.,الموقع الفعلي الذي نُفّذت فيه الخدمة.
+Timestamp when the report was first generated from the job snapshot.,وقت توليد التقرير لأول مرة من لقطة المهمة.
+Timestamp when a supervisor verified the report contents.,وقت تحقق المشرف من محتوى التقرير.
+Timestamp when the finalized report was submitted to the customer.,وقت تقديم التقرير النهائي إلى العميل.
+Frozen JSON copy of the approved job data the report was built from.,نسخة JSON مجمّدة من بيانات المهمة المعتمدة التي بُني عليها التقرير.
+Detailed description of the work the technician actually carried out on site.,وصف تفصيلي للعمل الذي نفّذه الفني فعلياً في الموقع.
+Follow-up actions or repairs the technician recommends to the customer.,الإجراءات أو الإصلاحات المتابعة التي يوصي بها الفني للعميل.
+Name of the customer representative who reviewed and signed the report.,اسم ممثل العميل الذي راجع التقرير ووقّعه.
+Captured signature confirming the customer accepts the completed work.,التوقيع الملتقط الذي يؤكد قبول العميل للعمل المنجز.
+Timestamp when the customer signature was captured.,وقت التقاط توقيع العميل.
+Indicates the customer declined to sign off on the report.,يشير إلى أن العميل رفض التوقيع على التقرير.
+Explanation the customer gave for refusing to sign the report.,التوضيح الذي قدّمه العميل لرفضه التوقيع على التقرير.
+Prefix used to auto-generate the return document number.,البادئة المستخدمة لتوليد رقم مستند الإرجاع تلقائياً.
+The field service job that triggered this equipment return.,مهمة الخدمة الميدانية التي استدعت إرجاع هذه المعدة.
+The installed equipment unit being pulled from site for return or workshop repair.,وحدة المعدة المركبة التي تُسحب من الموقع للإرجاع أو الإصلاح في الورشة.
+"The customer who owns the returned equipment, fetched from the service job.",العميل الذي يملك المعدة المرتجعة، ويُجلب من مهمة الخدمة.
+"Current stage of the return workflow, from pickup through workshop repair to dispatch.",المرحلة الحالية لسير عمل الإرجاع من الاستلام مروراً بإصلاح الورشة حتى الإرسال.
+Date the equipment was logged as returned.,تاريخ تسجيل المعدة كمرتجعة.
+Warehouse where restocked or refurbished parts are received back into stock.,المستودع الذي تُستلم فيه القطع المُعاد تخزينها أو المُجددة إلى المخزون.
+Date and time the equipment was collected from the customer site.,تاريخ ووقت استلام المعدة من موقع العميل.
+Address from which the equipment is to be picked up.,العنوان الذي ستُستلم منه المعدة.
+Line items listing each part or unit included in this return.,بنود تسرد كل قطعة أو وحدة مشمولة في هذا الإرجاع.
+The stock entry posted to record the returned items back into inventory.,قيد المخزون المُرحّل لتسجيل الأصناف المرتجعة في المخزون.
+ERPNext quotation raised for chargeable repair or replacement work.,عرض سعر ERPNext الصادر لأعمال الإصلاح أو الاستبدال المدفوعة.
+ERPNext sales invoice billing the customer for the repair.,فاتورة مبيعات ERPNext التي تُحمّل العميل تكلفة الإصلاح.
+"Reason the equipment is being returned, such as fault, warranty, or replacement.",سبب إرجاع المعدة، مثل عطل أو ضمان أو استبدال.
+Whether the customer has approved the repair estimate before work proceeds.,ما إذا كان العميل قد وافق على تقدير الإصلاح قبل بدء العمل.
+Timestamp when the customer approved or rejected the repair estimate.,وقت موافقة العميل على تقدير الإصلاح أو رفضه له.
+Workshop notes describing the diagnosis and repair actions taken.,ملاحظات الورشة التي تصف التشخيص وإجراءات الإصلاح المتخذة.
+Results of functional testing performed after the repair.,نتائج الاختبار الوظيفي الذي أُجري بعد الإصلاح.
+"Outcome of the final quality inspection, pass or fail.",نتيجة فحص الجودة النهائي، نجاح أو فشل.
+"Final disposition of the equipment, such as repaired, replaced, or not repairable.",المصير النهائي للمعدة، مثل مُصلحة أو مستبدلة أو غير قابلة للإصلاح.
+General remarks about the return not captured in other fields.,ملاحظات عامة حول الإرجاع لم تُسجّل في حقول أخرى.
+Prefix used to auto-generate the maintenance plan number.,البادئة المستخدمة لتوليد رقم خطة الصيانة تلقائياً.
+Descriptive name identifying this maintenance plan.,اسم وصفي يحدد خطة الصيانة هذه.
+The customer this preventive maintenance plan serves.,العميل الذي تخدمه خطة الصيانة الوقائية هذه.
+The operating company responsible for delivering the scheduled maintenance.,الشركة المشغّلة المسؤولة عن تنفيذ الصيانة المجدولة.
+The project this maintenance plan is tracked or billed against.,المشروع الذي تُتابع أو تُحتسب عليه خطة الصيانة.
+"Current lifecycle state of the plan, from draft through active to completed.",الحالة الحالية لدورة حياة الخطة من المسودة إلى النشطة حتى المكتملة.
+Indicates the plan is currently generating scheduled maintenance occurrences.,يشير إلى أن الخطة تولّد حالياً مواعيد الصيانة المجدولة.
+The site or location where the covered equipment is installed.,الموقع الذي رُكّبت فيه المعدات المشمولة.
+The service contract that funds and governs this maintenance plan.,عقد الخدمة الذي يموّل خطة الصيانة هذه ويحكمها.
+Date from which maintenance occurrences begin to be scheduled.,التاريخ الذي تبدأ منه جدولة مواعيد الصيانة.
+Date after which no further maintenance occurrences are scheduled.,التاريخ الذي لا تُجدول بعده مواعيد صيانة إضافية.
+"Version number of the plan, incremented when the schedule changes.",رقم إصدار الخطة الذي يزداد عند تغيّر الجدول.
+"IANA timezone used to compute due dates, for example Asia/Riyadh.",المنطقة الزمنية بمعيار IANA المستخدمة لحساب مواعيد الاستحقاق، مثل Asia/Riyadh.
+How many days ahead the system generates upcoming maintenance occurrences.,عدد الأيام المستقبلية التي يولّد خلالها النظام مواعيد الصيانة القادمة.
+Occurrences falling within this many days are grouped into a single job.,المواعيد الواقعة ضمن هذا العدد من الأيام تُجمّع في مهمة واحدة.
+Whether missed occurrences are generated retroactively or skipped.,ما إذا كانت المواعيد الفائتة تُولّد بأثر رجعي أم تُتخطى.
+How scheduling resolves times that fall in a daylight-saving transition.,كيفية معالجة الجدولة للأوقات التي تقع في انتقال التوقيت الصيفي.
+Internal hash of the schedule settings used to detect changes.,بصمة داخلية لإعدادات الجدول تُستخدم لاكتشاف التغييرات.
+The equipment units covered by this maintenance plan.,وحدات المعدات المشمولة بخطة الصيانة هذه.
+The recurring maintenance tasks and their frequencies defined for this plan.,مهام الصيانة المتكررة وتواترها المحددة لهذه الخطة.
+General remarks about the maintenance plan.,ملاحظات عامة حول خطة الصيانة.
+Service Context,سياق الخدمة
+Analysis,التحليل
+Repeat Failure & Escalation,تكرار العطل والتصعيد
+Contact & Coverage,الاتصال والتغطية
+Tracking,التتبع
+Skills,المهارات
+Certifications,الشهادات
+Actor,المنفّذ
+Transition,الانتقال
+Event,الحدث
+Coordinates,الإحداثيات
+Failure Code,رمز العطل
+Severity,درجة الخطورة
+Safety Risk,خطر على السلامة
+Symptom,العَرَض
+Root Cause,السبب الجذري
+Corrective Action,الإجراء التصحيحي
+Verification,التحقق
+Repeat Failure,عطل متكرر
+Previous Failure Count,عدد الأعطال السابقة
+Escalated,تم التصعيد
+Priority Suggestion,الأولوية المقترحة
+Amended From,معدّل من
+Technician Name,اسم الفني
+Worker Type,نوع العامل
+Van Warehouse,مستودع المركبة
+Clocked In,مسجّل الدخول
+Last Clock In,آخر تسجيل دخول
+Last Clock Out,آخر تسجيل خروج
+Last Seen Latitude,خط عرض آخر ظهور
+Last Seen Longitude,خط طول آخر ظهور
+Last Seen On,تاريخ آخر ظهور
+Event ID,معرّف الحدث
+Event Type,نوع الحدث
+Reference DocType,نوع المستند المرجعي
+Reference Name,اسم المرجع
+Actor Type,نوع المنفّذ
+From Status,من الحالة
+To Status,إلى الحالة
+From Phase,من المرحلة
+To Phase,إلى المرحلة
+Event Time,وقت الحدث
+Correlation ID,معرّف الربط
+Metadata JSON,بيانات وصفية JSON
+Location Name,اسم الموقع
+Location Code,رمز الموقع
+Parent Location,الموقع الأصل
+Location Type,نوع الموقع
+Naming series prefix that auto-generates the unique root-cause analysis number.,بادئة التسلسل التي تولّد رقم تحليل السبب الجذري الفريد تلقائيًا.
+"Current stage of the failure investigation, from draft through analysis to closure.",المرحلة الحالية للتحقيق في العطل، من المسودة مرورًا بالتحليل حتى الإغلاق.
+Short standardized code classifying the type of failure for reporting and trend analysis.,رمز قياسي مختصر يصنّف نوع العطل لأغراض التقارير وتحليل الاتجاهات.
+"How serious the failure is, driving prioritization and escalation of the corrective work.",مدى خطورة العطل، وهو ما يحدّد أولوية العمل التصحيحي وتصعيده.
+Marks that the failure poses a safety hazard to people or property and needs urgent attention.,يشير إلى أن العطل يشكّل خطرًا على سلامة الأشخاص أو الممتلكات ويتطلب اهتمامًا عاجلاً.
+The service job during which this failure was discovered or is being investigated.,مهمة الخدمة التي اكتُشف خلالها هذا العطل أو يجري التحقيق فيه.
+The specific on-site visit where the failure was observed by the technician.,الزيارة الميدانية المحددة التي لاحظ فيها الفني العطل.
+The installed unit that experienced the failure being analyzed.,الوحدة المركّبة التي تعرّضت للعطل الجاري تحليله.
+The equipment inspection record that first flagged or documented this failure.,سجل فحص المعدة الذي رصد أو وثّق هذا العطل أول مرة.
+The observable problem or malfunction as first reported or noticed on the equipment.,المشكلة أو الخلل الظاهر كما أُبلغ عنه أو لوحظ لأول مرة على المعدة.
+The underlying reason determined to have caused the failure after investigation.,السبب الكامن الذي تبيّن أنه أدى إلى العطل بعد التحقيق.
+The repair or remedy carried out to fix the failure and its root cause.,الإصلاح أو المعالجة التي أُجريت لمعالجة العطل وسببه الجذري.
+"How the corrective action was confirmed effective, such as a retest or follow-up check.",كيفية التأكد من فعالية الإجراء التصحيحي، مثل إعادة الاختبار أو فحص المتابعة.
+Indicates this failure has occurred before on the same equipment.,يشير إلى أن هذا العطل قد حدث من قبل على المعدة نفسها.
+"Number of prior recorded failures on this equipment, used to detect chronic problems.",عدد الأعطال المسجّلة سابقًا على هذه المعدة، ويُستخدم لاكتشاف المشكلات المزمنة.
+Indicates the case was escalated to a manager or specialist for further handling.,يشير إلى أنه تم تصعيد الحالة إلى مدير أو مختص لمزيد من المعالجة.
+System-suggested priority for the corrective work based on severity and repeat history.,الأولوية التي يقترحها النظام للعمل التصحيحي بناءً على درجة الخطورة وسجل التكرار.
+Date and time the failure analysis was completed and closed.,تاريخ ووقت اكتمال تحليل العطل وإغلاقه.
+Reference to the original document this amended analysis was created from.,مرجع إلى المستند الأصلي الذي أُنشئ منه هذا التحليل المعدّل.
+"Full name of the field technician, used as the unique identifier for this record.",الاسم الكامل للفني الميداني، ويُستخدم كمعرّف فريد لهذا السجل.
+"Current availability of the technician for dispatch, such as available, on a job, or off duty.",التوفر الحالي للفني للإرسال، مثل متاح أو في مهمة أو خارج الدوام.
+The system user account linked to this technician for login and mobile app access.,حساب المستخدم في النظام المرتبط بهذا الفني لتسجيل الدخول والوصول عبر تطبيق الجوال.
+Whether the technician is an in-house employee or an external contractor.,ما إذا كان الفني موظفًا داخليًا أو مقاولاً خارجيًا.
+The subcontracting company this technician works for when they are a contractor.,شركة المقاولة من الباطن التي يعمل لديها الفني عندما يكون مقاولاً.
+"The company that employs or engages this technician, used for access scoping.",الشركة التي توظّف هذا الفني أو تتعاقد معه، وتُستخدم لتحديد نطاق الوصول.
+Contact phone number for reaching the technician in the field.,رقم الهاتف للتواصل مع الفني في الميدان.
+The service territory or region this technician is assigned to cover.,منطقة أو نطاق الخدمة المكلّف الفني بتغطيته.
+Indicates the technician is currently active and eligible to be scheduled for jobs.,يشير إلى أن الفني نشط حاليًا ومؤهل لجدولته في المهام.
+"The van or truck stock location for this technician, held as an ERPNext Warehouse.",موقع مخزون المركبة أو الشاحنة الخاص بهذا الفني، ويُحفظ كمستودع في ERPNext.
+Indicates the technician is currently clocked in and on the clock.,يشير إلى أن الفني مسجّل الدخول حاليًا وعلى رأس العمل.
+Date and time of the technician's most recent clock-in.,تاريخ ووقت آخر تسجيل دخول للفني.
+Date and time of the technician's most recent clock-out.,تاريخ ووقت آخر تسجيل خروج للفني.
+Latitude of the technician's last reported GPS location.,خط عرض آخر موقع GPS أبلغ عنه الفني.
+Longitude of the technician's last reported GPS location.,خط طول آخر موقع GPS أبلغ عنه الفني.
+Date and time the technician's location was last reported.,تاريخ ووقت آخر إبلاغ عن موقع الفني.
+List of skills and trades the technician is qualified to perform.,قائمة المهارات والحِرَف التي يكون الفني مؤهلاً لأدائها.
+"List of certifications and licenses held by the technician, with their validity.",قائمة الشهادات والتراخيص التي يحملها الفني مع مدة صلاحيتها.
+System-generated unique identifier for this logged event.,معرّف فريد يولّده النظام لهذا الحدث المسجّل.
+"The kind of event recorded, such as a status change, assignment, or completion.",نوع الحدث المسجّل، مثل تغيير الحالة أو الإسناد أو الإكمال.
+The type of document this event relates to.,نوع المستند الذي يتعلق به هذا الحدث.
+The specific document record this event was logged against.,سجل المستند المحدد الذي سُجّل هذا الحدث عليه.
+"The service request associated with this event, when applicable.",طلب الخدمة المرتبط بهذا الحدث، إن وُجد.
+"The service job associated with this event, when applicable.",مهمة الخدمة المرتبطة بهذا الحدث، إن وُجدت.
+"The service visit associated with this event, when applicable.",زيارة الخدمة المرتبطة بهذا الحدث، إن وُجدت.
+"The installed unit associated with this event, when applicable.",الوحدة المركّبة المرتبطة بهذا الحدث، إن وُجدت.
+The user who performed the action that triggered this event.,المستخدم الذي نفّذ الإجراء الذي أدى إلى هذا الحدث.
+"The category of the actor, such as technician, customer, or system.",فئة المنفّذ، مثل فني أو عميل أو النظام.
+The status the referenced document held before this event.,الحالة التي كان عليها المستند المرجعي قبل هذا الحدث.
+The status the referenced document moved to after this event.,الحالة التي انتقل إليها المستند المرجعي بعد هذا الحدث.
+The workflow phase the document was in before this event.,مرحلة سير العمل التي كان فيها المستند قبل هذا الحدث.
+The workflow phase the document moved to after this event.,مرحلة سير العمل التي انتقل إليها المستند بعد هذا الحدث.
+Date and time the event occurred.,تاريخ ووقت وقوع الحدث.
+"The channel that generated the event, such as the console, portal, mobile app, or scheduler.",القناة التي ولّدت الحدث، مثل لوحة التحكم أو البوابة أو تطبيق الجوال أو المجدول.
+Identifier that links related events belonging to the same operation or request.,معرّف يربط الأحداث المتعلقة التي تنتمي إلى العملية أو الطلب نفسه.
+Additional structured details about the event stored as JSON.,تفاصيل إضافية منظّمة عن الحدث مخزّنة بصيغة JSON.
+Naming series prefix that auto-generates the unique location code.,بادئة التسلسل التي تولّد رمز الموقع الفريد تلقائيًا.
+The customer site this location belongs to.,موقع العميل الذي ينتمي إليه هذا الموقع.
+Descriptive name of the location as staff and technicians refer to it.,الاسم الوصفي للموقع كما يشير إليه الموظفون والفنيون.
+Short code used to identify this location for signage or quick reference.,رمز مختصر يُستخدم لتعريف هذا الموقع على اللافتات أو للرجوع السريع.
+"The larger location that contains this one, forming a location hierarchy.",الموقع الأكبر الذي يحتوي هذا الموقع، مكوّنًا تسلسلاً هرميًا للمواقع.
+"The kind of location, such as a building, floor, zone, room, or outdoor area.",نوع الموقع، مثل مبنى أو طابق أو منطقة أو غرفة أو مساحة خارجية.
+Additional details describing the location and how to find it.,تفاصيل إضافية تصف الموقع وكيفية الوصول إليه.
+Geographic latitude of the location for mapping and navigation.,خط العرض الجغرافي للموقع لأغراض الخرائط والملاحة.
+Geographic longitude of the location for mapping and navigation.,خط الطول الجغرافي للموقع لأغراض الخرائط والملاحة.
+Indicates the location is currently in use and available for equipment placement.,يشير إلى أن الموقع قيد الاستخدام حاليًا ومتاح لوضع المعدات فيه.
+Prefix used to auto-generate the unique inspection number for each record.,بادئة تُستخدم لتوليد رقم الفحص الفريد لكل سجل تلقائيًا.
+The specific customer-owned asset (e.g. fire extinguisher or unit) being inspected during this visit.,الأصل المملوك للعميل تحديدًا (مثل طفاية الحريق أو الوحدة) الذي يجري فحصه خلال هذه الزيارة.
+The field service job this inspection was carried out under.,مهمة الخدمة الميدانية التي أُجري هذا الفحص ضمنها.
+The scheduled on-site visit during which the technician performed the inspection.,الزيارة الميدانية المجدولة التي أجرى خلالها الفني الفحص.
+The checklist template whose items define the checks the technician must complete.,قالب قائمة التحقق الذي تحدد عناصره الفحوصات التي يجب على الفني إكمالها.
+Template Revision,مراجعة القالب
+Version number of the template captured at inspection time so results stay tied to the exact checklist used.,رقم إصدار القالب المُسجّل وقت الفحص لتبقى النتائج مرتبطة بقائمة التحقق المستخدمة بالضبط.
+The field technician who physically performed and signed off the inspection.,الفني الميداني الذي أجرى الفحص فعليًا واعتمده.
+"The customer who owns the inspected equipment, copied from the service job.",العميل المالك للمعدة التي جرى فحصها، منسوخ من مهمة الخدمة.
+The operating company responsible for delivering this service.,الشركة المشغّلة المسؤولة عن تقديم هذه الخدمة.
+The physical site or location where the equipment is installed and was inspected.,الموقع الفعلي حيث تُركّب المعدة وجرى فحصها فيه.
+"Progress state of the inspection: In Progress, Completed, or Cancelled.",حالة تقدم الفحص: قيد التنفيذ أو مكتمل أو ملغى.
+Started On,بدأ في
+Date and time the technician began the inspection on site.,تاريخ ووقت بدء الفني للفحص في الموقع.
+Date and time the technician finished and submitted the inspection.,تاريخ ووقت انتهاء الفني من الفحص وتقديمه.
+Overall Result,النتيجة الإجمالية
+"Aggregate outcome derived from the individual checklist results, indicating whether the equipment passed or needs action.",النتيجة الإجمالية المستخلصة من نتائج قائمة التحقق الفردية، تبيّن ما إذا كانت المعدة قد نجحت أم تحتاج إلى إجراء.
+Corrective Action Hint,تلميح الإجراء التصحيحي
+"System-suggested next step (e.g. refill, repair, or replace) based on failed checklist items.",الخطوة التالية المقترحة من النظام (مثل إعادة التعبئة أو الإصلاح أو الاستبدال) بناءً على عناصر قائمة التحقق التي رسبت.
+Results,النتائج
+"Line-by-line inspection findings, one row per checklist item with its measured value and verdict.",نتائج الفحص سطرًا بسطر، صف واحد لكل عنصر تحقق مع قيمته المقاسة وحكمه.
+Free-text observations or remarks the technician recorded during the inspection.,ملاحظات أو تعليقات نصية حرة سجّلها الفني أثناء الفحص.
+The submitted service report this certificate is generated from and evidences.,تقرير الخدمة المُقدَّم الذي تُولَّد منه هذه الشهادة وتستند إليه.
+The field service job that produced the work being certified.,مهمة الخدمة الميدانية التي نتج عنها العمل الذي تجري المصادقة عليه.
+"The specific customer asset the certificate covers, such as a refilled or tested unit.",أصل العميل المحدد الذي تغطيه الشهادة، مثل وحدة أُعيد تعبئتها أو اختُبرت.
+Certificate Type,نوع الشهادة
+Kind of certificate issued: a Refill Certificate or a Hydro Test Certificate.,نوع الشهادة الصادرة: شهادة إعادة تعبئة أو شهادة اختبار هيدروليكي.
+"Sequential version of the certificate, incremented each time it is regenerated.",الإصدار المتسلسل للشهادة، يزداد في كل مرة يُعاد توليدها.
+Unique deterministic key that prevents duplicate certificates for the same work.,مفتاح فريد وحتمي يمنع تكرار الشهادات لنفس العمل.
+Whether the certificate is currently Issued or has been Revoked.,ما إذا كانت الشهادة صادرة حاليًا أم جرى إلغاؤها.
+"The customer this certificate is issued to, copied from the service job.",العميل الصادرة له هذه الشهادة، منسوخ من مهمة الخدمة.
+The operating company issuing the certificate.,الشركة المشغّلة المُصدِرة للشهادة.
+The site where the certified equipment is installed.,الموقع الذي تُركّب فيه المعدة المُصادق عليها.
+Issued On,صدر في
+Date and time the certificate was officially issued.,تاريخ ووقت إصدار الشهادة رسميًا.
+Revoked On,أُلغي في
+"Date and time the certificate was revoked, if it is no longer valid.",تاريخ ووقت إلغاء الشهادة، إذا لم تعد سارية.
+Revocation Reason,سبب الإلغاء
+Explanation of why the certificate was revoked.,توضيح سبب إلغاء الشهادة.
+Certificate Snapshot,لقطة الشهادة
+"Frozen JSON copy of all certificate data at issue time, used for tamper-proof printing.",نسخة JSON مجمّدة من جميع بيانات الشهادة وقت الإصدار، تُستخدم للطباعة المقاومة للتلاعب.
+Team Name,اسم الفريق
+Unique name identifying this field service crew.,اسم فريد يميّز طاقم الخدمة الميدانية هذا.
+"Operational state of the team: Active, Inactive, or Suspended.",الحالة التشغيلية للفريق: نشط أو غير نشط أو موقوف.
+The operating company this team belongs to.,الشركة المشغّلة التي ينتمي إليها هذا الفريق.
+The service territory or geographic area this team is responsible for covering.,منطقة الخدمة أو المنطقة الجغرافية المسؤول هذا الفريق عن تغطيتها.
+The technician who leads the crew; must be one of the team members.,الفني الذي يقود الطاقم؛ يجب أن يكون أحد أعضاء الفريق.
+Capacity & Logistics,السعة والخدمات اللوجستية
+Default Warehouse,المستودع الافتراضي
+The team's van or stock location (an ERPNext Warehouse) parts are drawn from.,شاحنة الفريق أو موقع المخزون (مستودع في ERPNext) الذي تُسحب منه القطع.
+Vehicle / Van,المركبة / الشاحنة
+Identifier of the vehicle or van assigned to this team.,معرّف المركبة أو الشاحنة المخصصة لهذا الفريق.
+Maximum number of concurrent jobs the team can be assigned at once.,الحد الأقصى لعدد المهام المتزامنة التي يمكن إسنادها للفريق في وقت واحد.
+Effective From,ساري من
+Date from which this team becomes available for scheduling.,التاريخ الذي يصبح فيه هذا الفريق متاحًا للجدولة.
+Effective To,ساري إلى
+Date after which this team is no longer available for scheduling.,التاريخ الذي لا يعود هذا الفريق بعده متاحًا للجدولة.
+Whether the team is currently enabled for job assignment.,ما إذا كان الفريق مفعّلًا حاليًا لإسناد المهام.
+Members,الأعضاء
+The technicians who make up this crew.,الفنيون الذين يتألف منهم هذا الطاقم.
+"Free-text notes about the team, its skills, or scheduling constraints.",ملاحظات نصية حرة عن الفريق أو مهاراته أو قيود جدولته.
+Default Service Territory,منطقة الخدمة الافتراضية
+Service territory pre-filled on new jobs when none is specified.,منطقة الخدمة المعبّأة مسبقًا في المهام الجديدة عند عدم تحديد أي منطقة.
+Default Checklist Template,قالب قائمة التحقق الافتراضي
+Checklist template applied by default to new service jobs.,قالب قائمة التحقق المطبّق افتراضيًا على مهام الخدمة الجديدة.
+Auto-create invoice on job completion,إنشاء فاتورة تلقائيًا عند إكمال المهمة
+"When enabled, a sales invoice is generated automatically once a job is completed.",عند التفعيل، تُنشأ فاتورة مبيعات تلقائيًا بمجرد إكمال المهمة.
+Default Priority,الأولوية الافتراضية
+Priority level assigned to new jobs unless overridden.,مستوى الأولوية المُسند للمهام الجديدة ما لم يُتجاوز.
+Inventory,المخزون
+Fallback warehouse for parts requests when a technician has no van warehouse set.,المستودع الاحتياطي لطلبات القطع عندما لا يكون لدى الفني مستودع شاحنة محدد.
+Low Stock Threshold,حد المخزون المنخفض
+Quantity at or below which items are flagged low when no ERPNext reorder level exists; 0 disables the fallback.,الكمية التي عندها أو دونها تُعلَّم الأصناف كمنخفضة عند عدم وجود مستوى إعادة طلب في ERPNext؛ القيمة 0 تعطّل هذا الاحتياطي.
+Warranty Start Basis,أساس بدء الضمان
+"Event used to start the warranty clock for installed equipment: delivery, installation, or commissioning.",الحدث المستخدم لبدء احتساب الضمان للمعدات المركبة: التسليم أو التركيب أو التشغيل.
+Repeat Failure Window (Days),نافذة تكرار العطل (بالأيام)
+Look-back period in days used to detect repeat failures on the same installed equipment.,فترة الرجوع بالأيام المستخدمة لاكتشاف الأعطال المتكررة على نفس المعدة المركبة.
+Repeat Failure Escalation Count,عدد تصعيد تكرار العطل
+Number of prior failures within the window that triggers an escalation.,عدد الأعطال السابقة ضمن النافذة الذي يطلق التصعيد.
+Completion Policy,سياسة الإنجاز
+Service Types Requiring Equipment Inspection,أنواع الخدمة التي تتطلب فحص المعدات
+Service types (one per line) whose jobs require a completed inspection for every linked equipment item.,أنواع الخدمة (نوع واحد في كل سطر) التي تتطلب مهامها فحصًا مكتملًا لكل صنف معدات مرتبط.
+Service Types Requiring a Report,أنواع الخدمة التي تتطلب تقريرًا
+Service types (one per line) whose jobs require a submitted service report before completion.,أنواع الخدمة (نوع واحد في كل سطر) التي تتطلب مهامها تقرير خدمة مُقدَّمًا قبل الإكمال.
+Service Types Requiring a Certificate,أنواع الخدمة التي تتطلب شهادة
+Service types (one per line) whose jobs require an active issued certificate before completion.,أنواع الخدمة (نوع واحد في كل سطر) التي تتطلب مهامها شهادة صادرة وسارية قبل الإكمال.
+Prefix used to auto-generate the unique template number.,بادئة تُستخدم لتوليد رقم القالب الفريد تلقائيًا.
+Descriptive name of this inspection checklist template.,الاسم الوصفي لقالب قائمة تحقق الفحص هذا.
+The operating company that owns and uses this template.,الشركة المشغّلة التي تمتلك هذا القالب وتستخدمه.
+"Lifecycle state of the template: Draft, Active, Inactive, or Archived.",حالة دورة حياة القالب: مسودة أو نشط أو غير نشط أو مؤرشف.
+System flag indicating this template is the current usable version.,علامة نظامية تشير إلى أن هذا القالب هو الإصدار الصالح للاستخدام حاليًا.
+"Version number, incremented each time the template's items change.",رقم الإصدار، يزداد في كل مرة تتغير فيها عناصر القالب.
+Template Signature,توقيع القالب
+Internal hash of the template contents used to detect changes and version revisions.,بصمة داخلية لمحتويات القالب تُستخدم لاكتشاف التغييرات وتحديد المراجعات.
+Equipment Item Group,مجموعة أصناف المعدات
+Equipment item group this template's checks are intended for.,مجموعة أصناف المعدات التي تستهدفها فحوصات هذا القالب.
+Rich-text explanation of the template's purpose and usage guidance.,شرح بنص منسّق لغرض القالب وإرشادات استخدامه.
+Inspection Items,عناصر الفحص
+The ordered list of checks that make up this inspection checklist.,القائمة المرتّبة للفحوصات التي تتألف منها قائمة تحقق الفحص هذه.
+Idempotency Key,مفتاح عدم التكرار
+Unique key ensuring the same consumption is never recorded twice.,مفتاح فريد يضمن عدم تسجيل نفس الاستهلاك مرتين أبدًا.
+The service contract whose entitlement is being drawn down.,عقد الخدمة الذي يجري السحب من استحقاقه.
+Entitlement Row,صف الاستحقاق
+Stable row name from the Service Contract Entitlement being consumed.,اسم الصف الثابت من استحقاق عقد الخدمة الذي يجري استهلاكه.
+The field service job that consumed this entitlement.,مهمة الخدمة الميدانية التي استهلكت هذا الاستحقاق.
+"The specific on-site visit that consumed the entitlement, if applicable.",الزيارة الميدانية المحددة التي استهلكت الاستحقاق، إن وُجدت.
+Quantity,الكمية
+Amount of the entitlement consumed by this record.,مقدار الاستحقاق المستهلك بواسطة هذا السجل.
+Consumed On,استُهلك في
+Date and time the entitlement was consumed.,تاريخ ووقت استهلاك الاستحقاق.
+Reversed,معكوس
+Whether this consumption has been reversed and no longer counts against the contract.,ما إذا كان هذا الاستهلاك قد عُكس ولم يعد يُحتسب على العقد.
+Reversed On,عُكس في
+Date and time the consumption was reversed.,تاريخ ووقت عكس الاستهلاك.
+Explanation for the consumption or its reversal.,توضيح سبب الاستهلاك أو عكسه.

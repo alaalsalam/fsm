@@ -6,49 +6,15 @@
  "creation": "2026-06-05 12:00:00",
  "doctype": "DocType",
  "engine": "InnoDB",
- "field_order": [
-  "territory_name",
-  "parent_territory",
-  "column_break_kefi",
-  "disabled",
-  "description_section",
-  "description"
- ],
+ "field_order": ["details_section","territory_name","parent_territory","column_break_kefi","disabled","description_section","description"],
  "fields": [
-  {
-   "fieldname": "territory_name",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "Territory Name",
-   "reqd": 1,
-   "unique": 1
-  },
-  {
-   "fieldname": "parent_territory",
-   "fieldtype": "Link",
-   "label": "Parent Territory",
-   "options": "Service Territory"
-  },
-  {
-   "default": "0",
-   "fieldname": "disabled",
-   "fieldtype": "Check",
-   "label": "Disabled"
-  },
-  {
-   "fieldname": "description",
-   "fieldtype": "Small Text",
-   "label": "Description"
-  },
-  {
-   "fieldname": "column_break_kefi",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "description_section",
-   "fieldtype": "Section Break",
-   "label": "Description"
-  }
+  {"fieldname":"details_section","fieldtype":"Section Break","label":"Details"},
+  {"description":"Name of the geographic service area used to route jobs and assign technicians.","fieldname":"territory_name","fieldtype":"Data","in_list_view":1,"label":"Territory Name","reqd":1,"unique":1},
+  {"description":"Broader territory this area rolls up into, forming a service coverage hierarchy.","fieldname":"parent_territory","fieldtype":"Link","label":"Parent Territory","options":"Service Territory"},
+  {"fieldname":"column_break_kefi","fieldtype":"Column Break"},
+  {"default":"0","description":"When enabled, hides this territory so it can no longer be assigned to new jobs or technicians.","fieldname":"disabled","fieldtype":"Check","label":"Disabled"},
+  {"fieldname":"description_section","fieldtype":"Section Break","label":"Description"},
+  {"description":"Notes describing the boundaries or coverage details of this territory.","fieldname":"description","fieldtype":"Small Text","label":"Description"}
  ],
  "index_web_pages_for_search": 1,
  "links": [

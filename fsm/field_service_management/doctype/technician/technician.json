@@ -5,192 +5,34 @@
  "creation": "2026-06-05 12:00:00",
  "doctype": "DocType",
  "engine": "InnoDB",
- "field_order": [
-  "technician_name",
-  "status",
-  "column_break_main",
-  "user",
-  "worker_type",
-  "subcontractor",
-  "company",
-  "section_break_contact",
-  "phone",
-  "territory",
-  "column_break_contact",
-  "active",
-  "warehouse",
-  "section_break_tracking",
-  "clocked_in",
-  "last_clock_in",
-  "last_clock_out",
-  "column_break_tracking",
-  "last_seen_latitude",
-  "last_seen_longitude",
-  "last_seen_on",
-  "section_break_skills",
-  "skills",
-  "section_break_certifications",
-  "certifications"
- ],
+ "field_order": ["details_section","technician_name","status","column_break_main","user","worker_type","subcontractor","company","section_break_contact","phone","territory","column_break_contact","active","warehouse","section_break_tracking","clocked_in","last_clock_in","last_clock_out","column_break_tracking","last_seen_latitude","last_seen_longitude","last_seen_on","section_break_skills","skills","section_break_certifications","certifications"],
  "fields": [
-  {
-   "fieldname": "technician_name",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "Technician Name",
-   "reqd": 1,
-   "unique": 1
-  },
-  {
-   "default": "Available",
-   "fieldname": "status",
-   "fieldtype": "Select",
-   "in_list_view": 1,
-   "in_standard_filter": 1,
-   "label": "Status",
-   "options": "Available\nOn Job\nOff Duty"
-  },
-  {
-   "fieldname": "column_break_main",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "user",
-   "fieldtype": "Link",
-   "label": "User",
-   "options": "User"
-  },
-  {
-   "default": "Employee",
-   "fieldname": "worker_type",
-   "fieldtype": "Select",
-   "in_standard_filter": 1,
-   "label": "Worker Type",
-   "options": "Employee\nContractor"
-  },
-  {
-   "depends_on": "eval:doc.worker_type==\"Contractor\"",
-   "fieldname": "subcontractor",
-   "fieldtype": "Link",
-   "label": "Subcontractor",
-   "options": "Subcontractor"
-  },
-  {
-  "default": "__default",
-   "fieldname": "company",
-   "fieldtype": "Link",
-   "in_standard_filter": 1,
-   "label": "Company",
-   "options": "Company",
-   "reqd": 1,
-   "search_index": 1
-  },
-  {
-   "fieldname": "section_break_contact",
-   "fieldtype": "Section Break",
-   "label": "Contact & Coverage"
-  },
-  {
-   "fieldname": "phone",
-   "fieldtype": "Data",
-   "label": "Phone",
-   "options": "Phone"
-  },
-  {
-   "fieldname": "territory",
-   "fieldtype": "Link",
-   "in_standard_filter": 1,
-   "label": "Service Territory",
-   "options": "Service Territory",
-   "search_index": 1
-  },
-  {
-   "fieldname": "column_break_contact",
-   "fieldtype": "Column Break"
-  },
-  {
-   "default": "1",
-   "fieldname": "active",
-   "fieldtype": "Check",
-   "label": "Active"
-  },
-  {
-   "description": "The van/truck stock location for this technician (an ERPNext Warehouse).",
-   "fieldname": "warehouse",
-   "fieldtype": "Link",
-   "label": "Van Warehouse",
-   "options": "Warehouse"
-  },
-  {
-   "fieldname": "section_break_tracking",
-   "fieldtype": "Section Break",
-   "label": "Tracking"
-  },
-  {
-   "default": "0",
-   "fieldname": "clocked_in",
-   "fieldtype": "Check",
-   "label": "Clocked In",
-   "read_only": 1
-  },
-  {
-   "fieldname": "last_clock_in",
-   "fieldtype": "Datetime",
-   "label": "Last Clock In",
-   "read_only": 1
-  },
-  {
-   "fieldname": "last_clock_out",
-   "fieldtype": "Datetime",
-   "label": "Last Clock Out",
-   "read_only": 1
-  },
-  {
-   "fieldname": "column_break_tracking",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "last_seen_latitude",
-   "fieldtype": "Float",
-   "label": "Last Seen Latitude",
-   "precision": "6",
-   "read_only": 1
-  },
-  {
-   "fieldname": "last_seen_longitude",
-   "fieldtype": "Float",
-   "label": "Last Seen Longitude",
-   "precision": "6",
-   "read_only": 1
-  },
-  {
-   "fieldname": "last_seen_on",
-   "fieldtype": "Datetime",
-   "label": "Last Seen On",
-   "read_only": 1
-  },
-  {
-   "fieldname": "section_break_skills",
-   "fieldtype": "Section Break",
-   "label": "Skills"
-  },
-  {
-   "fieldname": "skills",
-   "fieldtype": "Table",
-   "label": "Skills",
-   "options": "Technician Skill"
-  },
-  {
-   "fieldname": "section_break_certifications",
-   "fieldtype": "Section Break",
-   "label": "Certifications"
-  },
-  {
-   "fieldname": "certifications",
-   "fieldtype": "Table",
-   "label": "Certifications",
-   "options": "Technician Certification"
-  }
+  {"fieldname":"details_section","fieldtype":"Section Break","label":"Details"},
+  {"description":"Full name of the field technician, used as the unique identifier for this record.","fieldname":"technician_name","fieldtype":"Data","in_list_view":1,"label":"Technician Name","reqd":1,"unique":1},
+  {"default":"Available","description":"Current availability of the technician for dispatch, such as available, on a job, or off duty.","fieldname":"status","fieldtype":"Select","in_list_view":1,"in_standard_filter":1,"label":"Status","options":"Available\nOn Job\nOff Duty"},
+  {"fieldname":"column_break_main","fieldtype":"Column Break"},
+  {"description":"The system user account linked to this technician for login and mobile app access.","fieldname":"user","fieldtype":"Link","label":"User","options":"User"},
+  {"default":"Employee","description":"Whether the technician is an in-house employee or an external contractor.","fieldname":"worker_type","fieldtype":"Select","in_standard_filter":1,"label":"Worker Type","options":"Employee\nContractor"},
+  {"depends_on":"eval:doc.worker_type==\"Contractor\"","description":"The subcontracting company this technician works for when they are a contractor.","fieldname":"subcontractor","fieldtype":"Link","label":"Subcontractor","options":"Subcontractor"},
+  {"default":"__default","description":"The company that employs or engages this technician, used for access scoping.","fieldname":"company","fieldtype":"Link","in_standard_filter":1,"label":"Company","options":"Company","reqd":1,"search_index":1},
+  {"fieldname":"section_break_contact","fieldtype":"Section Break","label":"Contact & Coverage"},
+  {"description":"Contact phone number for reaching the technician in the field.","fieldname":"phone","fieldtype":"Data","label":"Phone","options":"Phone"},
+  {"description":"The service territory or region this technician is assigned to cover.","fieldname":"territory","fieldtype":"Link","in_standard_filter":1,"label":"Service Territory","options":"Service Territory","search_index":1},
+  {"fieldname":"column_break_contact","fieldtype":"Column Break"},
+  {"default":"1","description":"Indicates the technician is currently active and eligible to be scheduled for jobs.","fieldname":"active","fieldtype":"Check","label":"Active"},
+  {"description":"The van or truck stock location for this technician, held as an ERPNext Warehouse.","fieldname":"warehouse","fieldtype":"Link","label":"Van Warehouse","options":"Warehouse"},
+  {"collapsible":1,"fieldname":"section_break_tracking","fieldtype":"Section Break","label":"Tracking"},
+  {"default":"0","description":"Indicates the technician is currently clocked in and on the clock.","fieldname":"clocked_in","fieldtype":"Check","label":"Clocked In","read_only":1},
+  {"description":"Date and time of the technician's most recent clock-in.","fieldname":"last_clock_in","fieldtype":"Datetime","label":"Last Clock In","read_only":1},
+  {"description":"Date and time of the technician's most recent clock-out.","fieldname":"last_clock_out","fieldtype":"Datetime","label":"Last Clock Out","read_only":1},
+  {"fieldname":"column_break_tracking","fieldtype":"Column Break"},
+  {"description":"Latitude of the technician's last reported GPS location.","fieldname":"last_seen_latitude","fieldtype":"Float","label":"Last Seen Latitude","precision":"6","read_only":1},
+  {"description":"Longitude of the technician's last reported GPS location.","fieldname":"last_seen_longitude","fieldtype":"Float","label":"Last Seen Longitude","precision":"6","read_only":1},
+  {"description":"Date and time the technician's location was last reported.","fieldname":"last_seen_on","fieldtype":"Datetime","label":"Last Seen On","read_only":1},
+  {"fieldname":"section_break_skills","fieldtype":"Section Break","label":"Skills"},
+  {"description":"List of skills and trades the technician is qualified to perform.","fieldname":"skills","fieldtype":"Table","label":"Skills","options":"Technician Skill"},
+  {"fieldname":"section_break_certifications","fieldtype":"Section Break","label":"Certifications"},
+  {"description":"List of certifications and licenses held by the technician, with their validity.","fieldname":"certifications","fieldtype":"Table","label":"Certifications","options":"Technician Certification"}
  ],
  "index_web_pages_for_search": 1,
  "links": [

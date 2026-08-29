@@ -5,101 +5,22 @@
  "creation": "2026-06-24 00:00:00",
  "doctype": "DocType",
  "engine": "InnoDB",
- "field_order": [
-  "subcontractor_name",
-  "status",
-  "company",
-  "column_break_main",
-  "territory",
-  "hourly_rate",
-  "section_break_contact",
-  "phone",
-  "email",
-  "column_break_contact",
-  "contact_person",
-  "section_break_notes",
-  "notes"
- ],
+ "field_order": ["details_section","subcontractor_name","status","company","column_break_main","territory","hourly_rate","section_break_contact","phone","email","column_break_contact","contact_person","section_break_notes","notes"],
  "fields": [
-  {
-   "fieldname": "subcontractor_name",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "Subcontractor Name",
-   "reqd": 1,
-   "unique": 1
-  },
-  {
-   "default": "Active",
-   "fieldname": "status",
-   "fieldtype": "Select",
-   "in_list_view": 1,
-   "in_standard_filter": 1,
-   "label": "Status",
-   "options": "Active\nInactive"
-  },
-  {
-   "default": "__default",
-   "fieldname": "company",
-   "fieldtype": "Link",
-   "in_standard_filter": 1,
-   "label": "Company",
-   "options": "Company",
-   "reqd": 1,
-   "search_index": 1
-  },
-  {
-   "fieldname": "column_break_main",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "territory",
-   "fieldtype": "Link",
-   "in_standard_filter": 1,
-   "label": "Service Territory",
-   "options": "Service Territory"
-  },
-  {
-   "description": "Default labour rate billed by this subcontractor (per hour).",
-   "fieldname": "hourly_rate",
-   "fieldtype": "Currency",
-   "label": "Hourly Rate"
-  },
-  {
-   "fieldname": "section_break_contact",
-   "fieldtype": "Section Break",
-   "label": "Contact"
-  },
-  {
-   "fieldname": "phone",
-   "fieldtype": "Data",
-   "label": "Phone",
-   "options": "Phone"
-  },
-  {
-   "fieldname": "email",
-   "fieldtype": "Data",
-   "label": "Email",
-   "options": "Email"
-  },
-  {
-   "fieldname": "column_break_contact",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "contact_person",
-   "fieldtype": "Data",
-   "label": "Contact Person"
-  },
-  {
-   "fieldname": "section_break_notes",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "notes",
-   "fieldtype": "Text",
-   "label": "Notes"
-  }
+  {"fieldname":"details_section","fieldtype":"Section Break","label":"Details"},
+  {"description":"Business name of the external subcontractor who performs field work on your behalf.","fieldname":"subcontractor_name","fieldtype":"Data","in_list_view":1,"label":"Subcontractor Name","reqd":1,"unique":1},
+  {"default":"Active","description":"Whether this subcontractor is currently active and available for assignments.","fieldname":"status","fieldtype":"Select","in_list_view":1,"in_standard_filter":1,"label":"Status","options":"Active\nInactive"},
+  {"default":"__default","description":"Operating company that engages this subcontractor.","fieldname":"company","fieldtype":"Link","in_standard_filter":1,"label":"Company","options":"Company","reqd":1,"search_index":1},
+  {"fieldname":"column_break_main","fieldtype":"Column Break"},
+  {"description":"Service territory this subcontractor covers.","fieldname":"territory","fieldtype":"Link","in_standard_filter":1,"label":"Service Territory","options":"Service Territory"},
+  {"description":"Default labour rate billed by this subcontractor per hour.","fieldname":"hourly_rate","fieldtype":"Currency","label":"Hourly Rate"},
+  {"fieldname":"section_break_contact","fieldtype":"Section Break","label":"Contact"},
+  {"description":"Primary phone number for reaching the subcontractor.","fieldname":"phone","fieldtype":"Data","label":"Phone","options":"Phone"},
+  {"description":"Primary email address for the subcontractor.","fieldname":"email","fieldtype":"Data","label":"Email","options":"Email"},
+  {"fieldname":"column_break_contact","fieldtype":"Column Break"},
+  {"description":"Name of the main contact at the subcontractor.","fieldname":"contact_person","fieldtype":"Data","label":"Contact Person"},
+  {"fieldname":"section_break_notes","fieldtype":"Section Break"},
+  {"description":"Additional notes about the subcontractor's terms, coverage, or performance.","fieldname":"notes","fieldtype":"Text","label":"Notes"}
  ],
  "index_web_pages_for_search": 1,
  "links": [

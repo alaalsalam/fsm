@@ -4,74 +4,18 @@
  "creation": "2026-06-24 00:00:00",
  "doctype": "DocType",
  "engine": "InnoDB",
- "field_order": [
-  "service_job",
-  "technician",
-  "column_break_main",
-  "from_time",
-  "to_time",
-  "hours",
-  "section_break_note",
-  "activity",
-  "note"
- ],
+ "field_order": ["details_section","service_job","technician","column_break_main","from_time","to_time","hours","section_break_note","activity","note"],
  "fields": [
-  {
-   "fieldname": "service_job",
-   "fieldtype": "Link",
-   "in_list_view": 1,
-   "in_standard_filter": 1,
-   "label": "Service Job",
-   "options": "Service Job",
-   "reqd": 1
-  },
-  {
-   "fieldname": "technician",
-   "fieldtype": "Link",
-   "in_list_view": 1,
-   "in_standard_filter": 1,
-   "label": "Technician",
-   "options": "Technician"
-  },
-  {
-   "fieldname": "column_break_main",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "from_time",
-   "fieldtype": "Datetime",
-   "in_list_view": 1,
-   "label": "From",
-   "reqd": 1
-  },
-  {
-   "fieldname": "to_time",
-   "fieldtype": "Datetime",
-   "in_list_view": 1,
-   "label": "To"
-  },
-  {
-   "fieldname": "hours",
-   "fieldtype": "Float",
-   "in_list_view": 1,
-   "label": "Hours",
-   "precision": "2",
-   "read_only": 1
-  },
-  {
-   "fieldname": "section_break_note",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "activity",
-   "fieldtype": "Data",
-   "label": "Activity"
-  },
-  {
-   "fieldname": "note",
-   "fieldtype": "Small Text",
-   "label": "Note"
-  }
+  {"fieldname":"details_section","fieldtype":"Section Break","label":"Details"},
+  {"description":"The service job whose on-site work this time entry belongs to.","fieldname":"service_job","fieldtype":"Link","in_list_view":1,"in_standard_filter":1,"label":"Service Job","options":"Service Job","reqd":1},
+  {"description":"Technician who performed the work during this time interval.","fieldname":"technician","fieldtype":"Link","in_list_view":1,"in_standard_filter":1,"label":"Technician","options":"Technician"},
+  {"fieldname":"column_break_main","fieldtype":"Column Break"},
+  {"description":"Timestamp when the technician started this block of work.","fieldname":"from_time","fieldtype":"Datetime","in_list_view":1,"label":"From","reqd":1},
+  {"description":"Timestamp when the technician stopped this block of work.","fieldname":"to_time","fieldtype":"Datetime","in_list_view":1,"label":"To"},
+  {"description":"Duration worked in this interval, calculated from the start and end times.","fieldname":"hours","fieldtype":"Float","in_list_view":1,"label":"Hours","precision":"2","read_only":1},
+  {"fieldname":"section_break_note","fieldtype":"Section Break"},
+  {"description":"Short label describing the task carried out during this interval.","fieldname":"activity","fieldtype":"Data","label":"Activity"},
+  {"description":"Additional details about the work logged for this interval.","fieldname":"note","fieldtype":"Small Text","label":"Note"}
  ],
  "index_web_pages_for_search": 1,
  "links": [],

@@ -4,201 +4,37 @@
  "creation": "2026-06-24 00:00:00",
  "doctype": "DocType",
  "engine": "InnoDB",
- "field_order": [
-  "naming_series",
-  "service_job",
-  "installed_equipment",
-  "customer",
-  "column_break_head",
-  "status",
-  "return_date",
-  "warehouse",
-  "pickup_date",
-  "pickup_address",
-  "section_break_items",
-  "items",
-  "section_break_links",
-  "stock_entry",
-  "quotation",
-  "sales_invoice",
-  "column_break_links",
-  "reason",
-  "workshop_section",
-  "customer_approval",
-  "customer_approval_on",
-  "repair_notes",
-  "testing_result",
-  "quality_result",
-  "final_outcome",
-  "section_break_notes",
-  "notes"
- ],
+ "field_order": ["details_section","naming_series","service_job","installed_equipment","customer","column_break_head","status","return_date","warehouse","pickup_date","pickup_address","section_break_items","items","section_break_links","stock_entry","quotation","sales_invoice","column_break_links","reason","workshop_section","customer_approval","customer_approval_on","repair_notes","col_break_1","testing_result","quality_result","final_outcome","section_break_notes","notes"],
  "fields": [
-  {
-   "default": "FSM-RET-.YYYY.-",
-   "fieldname": "naming_series",
-   "fieldtype": "Select",
-   "label": "Series",
-   "options": "FSM-RET-.YYYY.-",
-   "reqd": 1
-  },
-  {
-   "fieldname": "installed_equipment",
-   "fieldtype": "Link",
-   "in_standard_filter": 1,
-   "label": "Installed Equipment",
-   "options": "Installed Equipment",
-   "search_index": 1
-  },
-  {
-   "fieldname": "service_job",
-   "fieldtype": "Link",
-   "in_list_view": 1,
-   "in_standard_filter": 1,
-   "label": "Service Job",
-   "options": "Service Job",
-   "reqd": 1
-  },
-  {
-   "fetch_from": "service_job.customer",
-   "fieldname": "customer",
-   "fieldtype": "Link",
-   "in_list_view": 1,
-   "label": "Customer",
-   "options": "Customer",
-   "read_only": 1
-  },
-  {
-   "fieldname": "column_break_head",
-   "fieldtype": "Column Break"
-  },
-  {
-   "default": "Draft",
-   "fieldname": "status",
-   "fieldtype": "Select",
-   "in_list_view": 1,
-   "in_standard_filter": 1,
-   "label": "Status",
-   "options": "Draft\nPickup Requested\nPicked Up\nWorkshop Received\nInitial Inspection\nEstimate Required\nAwaiting Customer Approval\nRepair In Progress\nWaiting Material\nRepair Completed\nTesting\nQuality Inspection\nReady for Dispatch\nDispatched\nReinstalled\nClosed\nCancelled",
-   "read_only": 1
-  },
-  {
-   "default": "Today",
-   "fieldname": "return_date",
-   "fieldtype": "Date",
-   "label": "Return Date"
-  },
-  {
-   "description": "Where restocked / refurbished parts are received back into stock.",
-   "fieldname": "warehouse",
-   "fieldtype": "Link",
-   "label": "Receiving Warehouse",
-   "options": "Warehouse"
-  },
-  {
-   "fieldname": "pickup_date",
-   "fieldtype": "Datetime",
-   "label": "Pickup Date"
-  },
-  {
-   "fieldname": "pickup_address",
-   "fieldtype": "Link",
-   "label": "Pickup Address",
-   "options": "Address"
-  },
-  {
-   "fieldname": "section_break_items",
-   "fieldtype": "Section Break",
-   "label": "Returned Items"
-  },
-  {
-   "fieldname": "items",
-   "fieldtype": "Table",
-   "label": "Items",
-   "options": "Service Return Item"
-  },
-  {
-   "fieldname": "section_break_links",
-   "fieldtype": "Section Break",
-   "label": "Stock & Reason"
-  },
-  {
-   "fieldname": "stock_entry",
-   "fieldtype": "Link",
-   "label": "Stock Entry",
-   "options": "Stock Entry",
-   "read_only": 1
-  },
-  {
-   "fieldname": "quotation",
-   "fieldtype": "Link",
-   "label": "ERPNext Quotation",
-   "options": "Quotation"
-  },
-  {
-   "fieldname": "sales_invoice",
-   "fieldtype": "Link",
-   "label": "ERPNext Sales Invoice",
-   "options": "Sales Invoice"
-  },
-  {
-   "fieldname": "column_break_links",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "reason",
-   "fieldtype": "Small Text",
-   "label": "Reason"
-  },
-  {
-   "fieldname": "workshop_section",
-   "fieldtype": "Section Break",
-   "label": "Workshop Repair"
-  },
-  {
-   "default": "Pending",
-   "fieldname": "customer_approval",
-   "fieldtype": "Select",
-   "label": "Customer Approval",
-   "options": "Pending\nApproved\nRejected"
-  },
-  {
-   "fieldname": "customer_approval_on",
-   "fieldtype": "Datetime",
-   "label": "Customer Approval On",
-   "read_only": 1
-  },
-  {
-   "fieldname": "repair_notes",
-   "fieldtype": "Text",
-   "label": "Repair Notes"
-  },
-  {
-   "fieldname": "testing_result",
-   "fieldtype": "Text",
-   "label": "Testing Result"
-  },
-  {
-   "fieldname": "quality_result",
-   "fieldtype": "Select",
-   "label": "Quality Result",
-   "options": "\nPass\nFail"
-  },
-  {
-   "fieldname": "final_outcome",
-   "fieldtype": "Select",
-   "label": "Final Outcome",
-   "options": "\nRepaired\nNot Repairable\nReplacement Recommended\nReplaced"
-  },
-  {
-   "fieldname": "section_break_notes",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "notes",
-   "fieldtype": "Text",
-   "label": "Notes"
-  }
+  {"fieldname":"details_section","fieldtype":"Section Break","label":"Details"},
+  {"default":"FSM-RET-.YYYY.-","description":"Prefix used to auto-generate the return document number.","fieldname":"naming_series","fieldtype":"Select","label":"Series","options":"FSM-RET-.YYYY.-","reqd":1},
+  {"description":"The field service job that triggered this equipment return.","fieldname":"service_job","fieldtype":"Link","in_list_view":1,"in_standard_filter":1,"label":"Service Job","options":"Service Job","reqd":1},
+  {"description":"The installed equipment unit being pulled from site for return or workshop repair.","fieldname":"installed_equipment","fieldtype":"Link","in_standard_filter":1,"label":"Installed Equipment","options":"Installed Equipment","search_index":1},
+  {"description":"The customer who owns the returned equipment, fetched from the service job.","fetch_from":"service_job.customer","fieldname":"customer","fieldtype":"Link","in_list_view":1,"label":"Customer","options":"Customer","read_only":1},
+  {"fieldname":"column_break_head","fieldtype":"Column Break"},
+  {"default":"Draft","description":"Current stage of the return workflow, from pickup through workshop repair to dispatch.","fieldname":"status","fieldtype":"Select","in_list_view":1,"in_standard_filter":1,"label":"Status","options":"Draft\nPickup Requested\nPicked Up\nWorkshop Received\nInitial Inspection\nEstimate Required\nAwaiting Customer Approval\nRepair In Progress\nWaiting Material\nRepair Completed\nTesting\nQuality Inspection\nReady for Dispatch\nDispatched\nReinstalled\nClosed\nCancelled","read_only":1},
+  {"default":"Today","description":"Date the equipment was logged as returned.","fieldname":"return_date","fieldtype":"Date","label":"Return Date"},
+  {"description":"Warehouse where restocked or refurbished parts are received back into stock.","fieldname":"warehouse","fieldtype":"Link","label":"Receiving Warehouse","options":"Warehouse"},
+  {"description":"Date and time the equipment was collected from the customer site.","fieldname":"pickup_date","fieldtype":"Datetime","label":"Pickup Date"},
+  {"description":"Address from which the equipment is to be picked up.","fieldname":"pickup_address","fieldtype":"Link","label":"Pickup Address","options":"Address"},
+  {"fieldname":"section_break_items","fieldtype":"Section Break","label":"Returned Items"},
+  {"description":"Line items listing each part or unit included in this return.","fieldname":"items","fieldtype":"Table","label":"Items","options":"Service Return Item"},
+  {"fieldname":"section_break_links","fieldtype":"Section Break","label":"Stock & Reason"},
+  {"description":"The stock entry posted to record the returned items back into inventory.","fieldname":"stock_entry","fieldtype":"Link","label":"Stock Entry","options":"Stock Entry","read_only":1},
+  {"description":"ERPNext quotation raised for chargeable repair or replacement work.","fieldname":"quotation","fieldtype":"Link","label":"ERPNext Quotation","options":"Quotation"},
+  {"description":"ERPNext sales invoice billing the customer for the repair.","fieldname":"sales_invoice","fieldtype":"Link","label":"ERPNext Sales Invoice","options":"Sales Invoice"},
+  {"fieldname":"column_break_links","fieldtype":"Column Break"},
+  {"description":"Reason the equipment is being returned, such as fault, warranty, or replacement.","fieldname":"reason","fieldtype":"Small Text","label":"Reason"},
+  {"fieldname":"workshop_section","fieldtype":"Section Break","label":"Workshop Repair"},
+  {"default":"Pending","description":"Whether the customer has approved the repair estimate before work proceeds.","fieldname":"customer_approval","fieldtype":"Select","label":"Customer Approval","options":"Pending\nApproved\nRejected"},
+  {"description":"Timestamp when the customer approved or rejected the repair estimate.","fieldname":"customer_approval_on","fieldtype":"Datetime","label":"Customer Approval On","read_only":1},
+  {"description":"Workshop notes describing the diagnosis and repair actions taken.","fieldname":"repair_notes","fieldtype":"Text","label":"Repair Notes"},
+  {"fieldname":"col_break_1","fieldtype":"Column Break"},
+  {"description":"Results of functional testing performed after the repair.","fieldname":"testing_result","fieldtype":"Text","label":"Testing Result"},
+  {"description":"Outcome of the final quality inspection, pass or fail.","fieldname":"quality_result","fieldtype":"Select","label":"Quality Result","options":"\nPass\nFail"},
+  {"description":"Final disposition of the equipment, such as repaired, replaced, or not repairable.","fieldname":"final_outcome","fieldtype":"Select","label":"Final Outcome","options":"\nRepaired\nNot Repairable\nReplacement Recommended\nReplaced"},
+  {"fieldname":"section_break_notes","fieldtype":"Section Break"},
+  {"description":"General remarks about the return not captured in other fields.","fieldname":"notes","fieldtype":"Text","label":"Notes"}
  ],
  "index_web_pages_for_search": 1,
  "links": [],
