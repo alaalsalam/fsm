@@ -21,7 +21,7 @@ from fsm.service_operations.commands import (
 
 SCENARIO_KEY = "الخدمة-الرياض"
 SITE_CODE = "مركز-الأعمال-الرياض-01"
-PRESENTATION_COMPANY = "شركة الرواد للخدمات الفنية"
+PRESENTATION_COMPANY = "Digit"
 PRESENTATION_ITEM = "مستلزمات-الصيانة-الميدانية"
 
 
@@ -99,6 +99,7 @@ def seed_presentation_data(company=None, customer=None):
 	_migrate_legacy_labels()
 
 	if not company:
+		_rename_if_needed("Company", "شركة الرواد للخدمات الفنية", PRESENTATION_COMPANY)
 		_rename_if_needed("Company", "Digit Basic", PRESENTATION_COMPANY)
 		_rename_if_needed("Company", "Digit Basic Demo", "شركة نماء لإدارة الأعمال")
 		company = _first("Company", {"name": PRESENTATION_COMPANY}) or _first("Company")
