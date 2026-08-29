@@ -885,3 +885,36 @@ Whether this consumption has been reversed and no longer counts against the cont
 Reversed On,عُكس في
 Date and time the consumption was reversed.,تاريخ ووقت عكس الاستهلاك.
 Explanation for the consumption or its reversal.,توضيح سبب الاستهلاك أو عكسه.
+Open the service request,فتح طلب الخدمة
+Triage and classify the request,فرز الطلب وتصنيفه
+Convert to a Service Job,التحويل إلى أمر خدمة
+Continue execution in the linked Service Job,متابعة التنفيذ في أمر الخدمة المرتبط
+Plan the job scope and schedule,تخطيط نطاق أمر الخدمة وجدولته
+Schedule the job and assign a service team,جدولة أمر الخدمة وإسناد فريق الخدمة
+Assign or dispatch the service team,إسناد فريق الخدمة أو توزيعه
+Start travel for the next service visit,بدء التنقل للزيارة التالية
+Complete the Service Job,إكمال أمر الخدمة
+Complete or cancel {0} active service visit(s),أكمل أو ألغِ {0} زيارة خدمة نشطة
+Complete {0} mandatory checklist item(s),أكمل {0} بند إلزامي في قائمة التحقق
+{0} equipment item(s) still require a completed inspection,توجد {0} معدة ما زالت تحتاج فحصًا مكتملًا
+Resolve {0} critical failure(s),عالج {0} عطل حرج مفتوح
+Resolve {0} open workshop case(s),عالج {0} حالة ورشة مفتوحة
+Generate the Service Report,إنشاء تقرير الخدمة
+Verify and submit the Service Report,مراجعة تقرير الخدمة واعتماده
+Issue the required Service Certificate,إصدار شهادة الخدمة المطلوبة
+Open Visits,فتح الزيارات
+Open Checklist,فتح قائمة التحقق
+Open Inspections,فتح الفحوصات
+Open Failures,فتح الأعطال
+Open Workshop,فتح الورشة
+Generate Report,إنشاء التقرير
+Open Reports,فتح التقارير
+Open Certificates,فتح الشهادات
+FSM Manager,مدير الخدمة الميدانية
+Assigned Team,فريق الخدمة المسند
+Assigned Technician,الفني المسند
+No service team is assigned,لم يتم إسناد فريق خدمة
+Customer signature or refusal is pending,توقيع العميل أو إثبات رفضه ما زال معلقًا
+Unassigned Job,أمر خدمة غير مسند
+Overdue Maintenance,صيانة متأخرة
+Report Awaiting Signature,تقرير بانتظار التوقيع

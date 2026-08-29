@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { STATUS_TONE, STATUS_LABEL, type JobStatus, type StatusTone } from "./types";
+import { statusLabel } from "./i18n";
 
 const props = defineProps<{
 	status: JobStatus;
@@ -20,7 +21,7 @@ const TONE_CLASS: Record<StatusTone, string> = {
 
 const tone = computed(() => props.tone ?? STATUS_TONE[props.status]);
 const classes = computed(() => TONE_CLASS[tone.value]);
-const text = computed(() => props.label ?? STATUS_LABEL[props.status]);
+const text = computed(() => props.label ?? statusLabel(props.status) ?? STATUS_LABEL[props.status]);
 </script>
 
 <template>
