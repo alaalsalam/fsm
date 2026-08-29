@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from "vue";
-import { useRoute } from "vue-router";
+import { RouterLink, useRoute } from "vue-router";
 import type {
 	MaintenanceOccurrence,
 	MaintenanceOccurrenceStatus,
@@ -21,6 +21,7 @@ const summary = ref<MaintenanceSummary | null>(null);
 const tab = ref<Tab>("plans");
 const loading = ref(true);
 const saving = ref(false);
+const savingRow = ref("");
 const error = ref("");
 const showCreate = ref(false);
 const form = reactive({
@@ -181,6 +182,25 @@ async function release(plan: MaintenancePlanSummary) {
 	}
 }
 
+async function releaseOccurrence(row: MaintenanceOccurrence) {
+	savingRow.value = row.name;
+	error.value = "";
+	try {
+		await maintenance.release(row.maintenance_plan);
+		await load();
+	} catch {
+		error.value = t(
+			"تعذّر إنشاء أمر الخدمة من الاستحقاق.",
+			"Couldn't create a service job from the occurrence.",
+		);
+	} finally {
+		savingRow.value = "";
+	}
+}
+
+const planOccurrenceCount = (plan: string) =>
+	occurrences.value.filter((row) => row.maintenance_plan === plan).length;
+
 onMounted(() => {
 	const requestedTab = typeof route.query.tab === "string" ? route.query.tab : "";
 	if (["plans", "schedule", "due", "overdue", "occurrences", "jobs"].includes(requestedTab))
@@ -211,6 +231,28 @@ onMounted(() => {
 		>
 			{{ error }}
 		</p>
+
+		<section
+			class="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-4"
+		>
+			<div>
+				<p class="font-semibold">{{ t("تسلسل التشغيل", "Operating sequence") }}</p>
+				<p class="text-sm text-fg-muted">
+					{{
+						t(
+							"تفعيل الخطة ← توليد المواعيد ← تحرير أمر الخدمة ← إسناد الفريق ← تنفيذ الزيارة والتقرير",
+							"Activate plan → generate dates → release job → assign team → execute visit and report",
+						)
+					}}
+				</p>
+			</div>
+			<RouterLink
+				to="/after-sales"
+				class="rounded-xl border border-primary px-3 py-2 text-sm font-semibold text-primary hover:bg-primary/10"
+			>
+				{{ t("بدء رحلة ما بعد البيع", "Start after-sales journey") }}
+			</RouterLink>
+		</section>
 
 		<form
 			v-if="showCreate"
@@ -362,13 +404,21 @@ onMounted(() => {
 						{{ plan.start_date }}
 						<template v-if="plan.end_date">— {{ plan.end_date }}</template>
 					</p>
+					<p class="mt-1 text-xs text-fg-muted">
+						{{
+							t(
+								`${planOccurrenceCount(plan.name)} موعد مولد`,
+								`${planOccurrenceCount(plan.name)} generated occurrence(s)`,
+							)
+						}}
+					</p>
 					<div class="mt-4 flex flex-wrap gap-2">
 						<KlButton
 							v-if="plan.status === 'Draft' || plan.status === 'Paused'"
 							size="sm"
 							:disabled="saving"
 							@click="transition(plan, 'Active')"
-							>{{ t("تفعيل", "Activate") }}</KlButton
+							>{{ t("1. تفعيل الخطة", "1. Activate plan") }}</KlButton
 						>
 						<KlButton
 							v-if="plan.status === 'Active'"
@@ -384,7 +434,7 @@ onMounted(() => {
 							variant="secondary"
 							:disabled="saving"
 							@click="generate(plan)"
-							>{{ t("توليد", "Generate") }}</KlButton
+							>{{ t("2. توليد الجدول", "2. Generate schedule") }}</KlButton
 						>
 						<KlButton
 							v-if="plan.status === 'Active'"
@@ -392,7 +442,7 @@ onMounted(() => {
 							variant="secondary"
 							:disabled="saving"
 							@click="release(plan)"
-							>{{ t("تحرير الأوامر", "Release jobs") }}</KlButton
+							>{{ t("3. إنشاء أوامر الخدمة", "3. Create service jobs") }}</KlButton
 						>
 					</div>
 				</article>
@@ -418,6 +468,7 @@ onMounted(() => {
 							<th class="px-4 py-3">{{ t("المعدة", "Equipment") }}</th>
 							<th class="px-4 py-3">{{ t("الحالة", "Status") }}</th>
 							<th class="px-4 py-3">{{ t("أمر العمل", "Job") }}</th>
+							<th class="px-4 py-3">{{ t("الإجراء", "Action") }}</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -428,9 +479,45 @@ onMounted(() => {
 						>
 							<td class="px-4 py-3">{{ row.due_date }}</td>
 							<td class="px-4 py-3">{{ row.service_type }}</td>
-							<td class="px-4 py-3 font-mono">{{ row.installed_equipment }}</td>
+							<td class="px-4 py-3 font-mono">
+								<RouterLink
+									:to="`/equipment/${row.installed_equipment}`"
+									class="text-primary hover:underline"
+									>{{ row.installed_equipment }}</RouterLink
+								>
+							</td>
 							<td class="px-4 py-3">{{ statusLabel(row.status) }}</td>
-							<td class="px-4 py-3 font-mono">{{ row.released_job || "—" }}</td>
+							<td class="px-4 py-3 font-mono">
+								<RouterLink
+									v-if="row.released_job"
+									:to="`/jobs/${row.released_job}`"
+									class="text-primary hover:underline"
+									>{{ row.released_job }}</RouterLink
+								><span v-else>—</span>
+							</td>
+							<td class="px-4 py-3">
+								<KlButton
+									v-if="
+										['Due', 'Overdue'].includes(row.status) && !row.released_job
+									"
+									size="sm"
+									variant="secondary"
+									:disabled="Boolean(savingRow)"
+									@click="releaseOccurrence(row)"
+									>{{
+										savingRow === row.name
+											? t("جارٍ الإنشاء…", "Creating…")
+											: t("إنشاء أمر خدمة", "Create job")
+									}}</KlButton
+								>
+								<RouterLink
+									v-else-if="row.released_job"
+									:to="`/jobs/${row.released_job}`"
+									class="text-sm text-primary hover:underline"
+									>{{ t("فتح ومتابعة الأمر", "Open and follow job") }}</RouterLink
+								>
+								<span v-else class="text-fg-muted">—</span>
+							</td>
 						</tr>
 					</tbody>
 				</table>

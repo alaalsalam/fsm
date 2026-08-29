@@ -10,55 +10,124 @@ import ConsoleNavIcon from "@/components/ConsoleNavIcon.vue";
 const store = useAuthStore();
 const router = useRouter();
 
+const navSections = computed(() => [
+	{
+		label: t("التشغيل اليومي", "Daily operations"),
+		items: [
+			{ name: "operations", label: t("مركز العمليات", "Operations"), to: "/", exact: true },
+			{
+				name: "dispatch",
+				label: t("لوحة التوزيع", "Dispatch"),
+				to: "/dispatch",
+				exact: true,
+			},
+			{
+				name: "requests",
+				label: t("طلبات الخدمة", "Service requests"),
+				to: "/requests",
+				exact: false,
+			},
+			{ name: "jobs", label: t("أوامر الخدمة", "Service jobs"), to: "/jobs", exact: false },
+			{
+				name: "visits",
+				label: t("الزيارات الميدانية", "Field visits"),
+				to: "/visits",
+				exact: false,
+			},
+		],
+	},
+	{
+		label: t("ما بعد البيع والصيانة", "After-sales & maintenance"),
+		items: [
+			{
+				name: "after-sales",
+				label: t("رحلة ما بعد البيع", "After-sales journey"),
+				to: "/after-sales",
+				exact: false,
+			},
+			{
+				name: "equipment",
+				label: t("المعدات المركبة", "Installed equipment"),
+				to: "/equipment",
+				exact: false,
+			},
+			{
+				name: "contracts",
+				label: t("عقود الخدمة", "Service contracts"),
+				to: "/contracts",
+				exact: false,
+			},
+			{
+				name: "maintenance",
+				label: t("الجدول والصيانة الدورية", "Schedule & maintenance"),
+				to: "/maintenance",
+				exact: false,
+			},
+		],
+	},
+	{
+		label: t("العملاء والمواقع", "Customers & sites"),
+		items: [
+			{
+				name: "customer-360",
+				label: t("العميل 360", "Customer 360"),
+				to: "/customers",
+				exact: false,
+			},
+			{
+				name: "sites",
+				label: t("مواقع العملاء", "Customer sites"),
+				to: "/sites",
+				exact: false,
+			},
+			{
+				name: "equipment-locations",
+				label: t("مواضع المعدات", "Equipment locations"),
+				to: "/equipment-locations",
+				exact: false,
+			},
+		],
+	},
+	{
+		label: t("الدعم والمتابعة", "Support & control"),
+		items: [
+			{ name: "inventory", label: t("المخزون", "Inventory"), to: "/inventory", exact: false },
+			{
+				name: "returns",
+				label: t("المرتجعات والورشة", "Returns & workshop"),
+				to: "/returns",
+				exact: false,
+			},
+			{
+				name: "subcontractors",
+				label: t("الشركاء", "Partners"),
+				to: "/subcontractors",
+				exact: false,
+			},
+			{
+				name: "exceptions",
+				label: t("الاستثناءات", "Exceptions"),
+				to: "/exceptions",
+				exact: false,
+			},
+			{
+				name: "analytics",
+				label: t("التحليلات", "Analytics"),
+				to: "/analytics",
+				exact: false,
+			},
+			{
+				name: "integrations",
+				label: t("التكاملات", "Integrations"),
+				to: "/integrations",
+				exact: false,
+			},
+		],
+	},
+]);
+
 const nav = computed(() => [
-	{ name: "operations", label: t("مركز العمليات", "Operations"), to: "/", exact: true },
-	{ name: "dispatch", label: t("لوحة التوزيع", "Dispatch"), to: "/dispatch", exact: true },
-	{ name: "requests", label: t("الطلبات", "Requests"), to: "/requests", exact: false },
-	{ name: "jobs", label: t("أوامر العمل", "Jobs"), to: "/jobs", exact: false },
-	{ name: "visits", label: t("الزيارات", "Visits"), to: "/visits", exact: false },
-	{ name: "exceptions", label: t("الاستثناءات", "Exceptions"), to: "/exceptions", exact: false },
-	{
-		name: "after-sales",
-		label: t("إعداد ما بعد البيع", "After-sales setup"),
-		to: "/after-sales",
-		exact: false,
-	},
-	{ name: "equipment", label: t("المعدات", "Equipment"), to: "/equipment", exact: false },
-	{
-		name: "customer-360",
-		label: t("العميل 360", "Customer 360"),
-		to: "/customers",
-		exact: false,
-	},
-	{ name: "sites", label: t("المواقع", "Sites"), to: "/sites", exact: false },
-	{ name: "contracts", label: t("العقود", "Contracts"), to: "/contracts", exact: false },
-	{
-		name: "maintenance",
-		label: t("الصيانة الوقائية", "Maintenance"),
-		to: "/maintenance",
-		exact: false,
-	},
-	{
-		name: "equipment-locations",
-		label: t("المواضع", "Locations"),
-		to: "/equipment-locations",
-		exact: false,
-	},
-	{ name: "inventory", label: t("المخزون", "Inventory"), to: "/inventory", exact: false },
-	{ name: "returns", label: t("المرتجعات", "Returns"), to: "/returns", exact: false },
-	{
-		name: "subcontractors",
-		label: t("الشركاء", "Partners"),
-		to: "/subcontractors",
-		exact: false,
-	},
-	{ name: "analytics", label: t("التحليلات", "Analytics"), to: "/analytics", exact: false },
-	{
-		name: "integrations",
-		label: t("التكاملات", "Integrations"),
-		to: "/integrations",
-		exact: false,
-	},
+	...navSections.value.flatMap((section) => section.items),
 	{ name: "account", label: t("الحساب", "Account"), to: "/account", exact: false },
 ]);
 
@@ -95,18 +164,25 @@ async function signOut() {
 					</p>
 				</div>
 
-				<nav class="flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto pe-1">
-					<RouterLink
-						v-for="item in nav"
-						:key="item.name"
-						:to="item.to"
-						class="group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-cmd-fg-muted transition-colors duration-200 hover:bg-white/5 hover:text-cmd-fg"
-						:active-class="item.exact ? '' : 'nav-active'"
-						:exact-active-class="item.exact ? 'nav-active' : ''"
-					>
-						<ConsoleNavIcon :name="item.name" class="size-5 shrink-0" />
-						<span>{{ item.label }}</span>
-					</RouterLink>
+				<nav class="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto pe-1">
+					<section v-for="section in navSections" :key="section.label">
+						<p
+							class="mb-1 px-3 text-[10px] font-semibold uppercase tracking-wider text-cmd-fg-muted/60"
+						>
+							{{ section.label }}
+						</p>
+						<RouterLink
+							v-for="item in section.items"
+							:key="item.name"
+							:to="item.to"
+							class="group relative mb-1 flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-cmd-fg-muted transition-colors duration-200 hover:bg-white/5 hover:text-cmd-fg"
+							:active-class="item.exact ? '' : 'nav-active'"
+							:exact-active-class="item.exact ? 'nav-active' : ''"
+						>
+							<ConsoleNavIcon :name="item.name" class="size-5 shrink-0" />
+							<span>{{ item.label }}</span>
+						</RouterLink>
+					</section>
 				</nav>
 
 				<div class="mt-3 space-y-2">
@@ -115,7 +191,16 @@ async function signOut() {
 						href="/app/field-service"
 						class="flex w-full items-center gap-3 rounded-xl border border-cmd-border bg-white/5 px-3 py-2.5 text-sm font-semibold text-cmd-fg transition-colors hover:bg-white/10"
 					>
-						<svg viewBox="0 0 24 24" class="size-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+						<svg
+							viewBox="0 0 24 24"
+							class="size-5 shrink-0"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="1.8"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							aria-hidden="true"
+						>
 							<path d="M15 18l-6-6 6-6" />
 							<path d="M9 12h11" />
 						</svg>
@@ -218,7 +303,16 @@ async function signOut() {
 						:title="t('العودة إلى Desk', 'Back to Desk')"
 						:aria-label="t('العودة إلى Desk', 'Back to Desk')"
 					>
-						<svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+						<svg
+							viewBox="0 0 24 24"
+							class="size-5"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="1.8"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							aria-hidden="true"
+						>
 							<path d="M15 18l-6-6 6-6" />
 							<path d="M9 12h11" />
 						</svg>

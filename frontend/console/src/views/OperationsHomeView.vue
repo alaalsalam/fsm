@@ -86,5 +86,35 @@ onMounted(async () => {
 				<p class="mt-2 text-3xl font-bold">{{ card.value }}</p>
 			</RouterLink>
 		</div>
+		<section class="mt-6 rounded-2xl border border-primary/20 bg-primary/5 p-5">
+			<div class="flex flex-wrap items-center justify-between gap-4">
+				<div>
+					<p class="text-xs font-semibold uppercase tracking-wide text-primary">
+						{{ t("مسار موجه", "Guided workflow") }}
+					</p>
+					<h2 class="mt-1 text-lg font-bold">
+						{{
+							t(
+								"من التسليم إلى الصيانة الدورية",
+								"From delivery to recurring maintenance",
+							)
+						}}
+					</h2>
+					<p class="mt-1 text-sm text-fg-muted">
+						{{
+							t(
+								"إشعار تسليم ← معدات مركبة ← تأكيد التركيب ← عقد ← خطة ← جدول ← أمر خدمة ← زيارة وتقرير",
+								"Delivery Note → equipment → installation → contract → plan → schedule → job → visit and report",
+							)
+						}}
+					</p>
+				</div>
+				<RouterLink
+					to="/after-sales"
+					class="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white shadow-e2 hover:brightness-110"
+					>{{ t("بدء رحلة ما بعد البيع", "Start after-sales journey") }}</RouterLink
+				>
+			</div>
+		</section>
 	</div>
 </template>
