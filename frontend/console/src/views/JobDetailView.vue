@@ -83,6 +83,39 @@ const priorityAr: Record<string, string> = {
 };
 const showPriority = (s?: string) => (s ? t(priorityAr[s] ?? s, s) : "—");
 
+// The next-action hub text arrives from the server in English; map its stable
+// code (not the free-text message) so the Arabic display never drifts.
+const nextActionAr: Record<string, string> = {
+	OPEN_REQUEST: "افتح طلب الخدمة",
+	TRIAGE_REQUEST: "فرز الطلب وتصنيفه",
+	CREATE_JOB: "التحويل إلى أمر خدمة",
+	PLAN_JOB: "خطط نطاق الأمر وجدولته",
+	SCHEDULE_JOB: "جدولة الأمر وإسناد فريق خدمة",
+	DISPATCH_JOB: "إسناد فريق الخدمة أو توزيعه",
+	COMPLETE_JOB: "إكمال أمر الخدمة",
+	DISPATCH_VISIT: "توزيع الزيارة",
+	START_TRAVEL: "بدء التنقل",
+	CHECK_IN: "تسجيل الوصول في موقع العميل",
+	START_WORK: "بدء أعمال الخدمة",
+	VIEW_NEXT_DUE: "مراجعة موعد الصيانة القادم",
+	ACTIVATE_CONTRACT: "مراجعة النطاق وتفعيل العقد",
+	RENEW_CONTRACT: "إنشاء أو فتح عرض سعر التجديد",
+	RESOLVE_MATERIAL: "معالجة نقص المواد",
+	TEST_REPAIR: "اختبار المعدة بعد الإصلاح",
+	QUALITY_CHECK: "إكمال فحص الجودة",
+	NONE: "لا يوجد إجراء إضافي مطلوب",
+};
+const showNextAction = (na?: { code?: string; message?: string; action?: string }) => {
+	if (!na) return "";
+	const en = na.message || na.action || na.code || "";
+	return t(nextActionAr[na.code ?? ""] ?? en, en);
+};
+const actorAr: Record<string, string> = {
+	"FSM Manager": "مدير الخدمة الميدانية",
+	"Assigned Team": "الفريق المسند",
+};
+const showActor = (a?: string) => (a ? t(actorAr[a] ?? a, a) : "");
+
 const roleAr: Record<string, string> = {
 	Dispatcher: "المُرسل",
 	Technician: "الفني",
@@ -484,8 +517,6 @@ onBeforeUnmount(() => offMessage?.());
 				</div>
 			</div>
 
-			<p v-if="error" class="text-sm text-danger">{{ error }}</p>
-
 			<section v-if="hub" class="rounded-2xl border border-border bg-bg p-5 shadow-card">
 				<div class="flex flex-wrap items-start justify-between gap-4">
 					<div>
@@ -493,10 +524,10 @@ onBeforeUnmount(() => offMessage?.());
 							{{ t("الإجراء التالي", "Next Action") }}
 						</p>
 						<p class="mt-1 text-lg font-semibold">
-							{{ hub.next_action.message || hub.next_action.action }}
+							{{ showNextAction(hub.next_action) }}
 						</p>
 						<p class="mt-1 text-xs text-fg-muted">
-							{{ hub.next_action.responsible_actor }}
+							{{ showActor(hub.next_action.responsible_actor) }}
 						</p>
 					</div>
 					<div class="text-sm text-fg-muted">
@@ -1373,6 +1404,20 @@ onBeforeUnmount(() => offMessage?.());
 					</div>
 				</aside>
 			</div>
+		</div>
+
+		<!-- Transient action errors surface as a bottom toast (user request):
+		     always visible regardless of scroll position, never pushing the
+		     page header around. The fatal load error keeps its full-page block. -->
+		<div
+			v-if="error && job"
+			class="pointer-events-none fixed inset-x-0 bottom-6 z-50 flex justify-center px-4"
+		>
+			<p
+				class="pointer-events-auto rounded-xl border border-danger/30 bg-danger/10 px-4 py-2.5 text-sm font-medium text-danger shadow-card backdrop-blur"
+			>
+				{{ error }}
+			</p>
 		</div>
 	</div>
 </template>
