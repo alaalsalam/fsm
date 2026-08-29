@@ -3,6 +3,7 @@ from frappe.tests.utils import FrappeTestCase
 from frappe.utils import add_to_date, now_datetime
 
 from fsm.api import _default_customer_group, _default_territory
+from fsm.process.guided import schedule_job_with_visit
 from fsm.service_operations.api import get_service_request, list_service_requests
 from fsm.service_operations.commands import (
 	cancel_job,
@@ -106,6 +107,17 @@ class TestCanonicalServiceOperations(FrappeTestCase):
 		complete_visit(visit)
 		self.assertEqual(complete_job(job).status, "Completed")
 		self.assertGreaterEqual(frappe.db.count("Service Event Log", {"service_job": job}), 10)
+
+	def test_guided_scheduling_is_retry_safe(self):
+		job = self._job()
+		start = now_datetime()
+		end = add_to_date(start, hours=2)
+		first = schedule_job_with_visit(job, start, end, primary_technician=self.technician)
+		retry = schedule_job_with_visit(job, start, end, primary_technician=self.technician)
+		self.assertTrue(first["visit_created"])
+		self.assertFalse(retry["visit_created"])
+		self.assertEqual(first["visit"], retry["visit"])
+		self.assertEqual(frappe.db.count("Service Visit", {"service_job": job}), 1)
 
 	def test_hold_resume_cancel_and_illegal_transition(self):
 		job = self._scheduled_job()
