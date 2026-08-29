@@ -163,6 +163,45 @@ export function listProcessVisits(params: Record<string, unknown> = {}): Promise
 	return client.call("fsm.process.api.list_visits", params, "GET");
 }
 
+export interface ScheduleTeam {
+	name: string;
+	team_name: string;
+	status: string;
+	territory?: string;
+	team_leader?: string;
+	default_warehouse?: string;
+	vehicle?: string;
+	capacity?: number;
+	visit_count: number;
+	members: Array<{ technician: string; role_in_team: string }>;
+}
+
+export interface ScheduleBoard {
+	company: string;
+	date_from: string;
+	date_to: string;
+	summary: { visits: number; maintenance_due: number; active_teams: number; unassigned: number };
+	visits: ProcessVisit[];
+	maintenance: Array<{
+		name: string;
+		maintenance_plan: string;
+		installed_equipment: string;
+		customer: string;
+		customer_site?: string;
+		service_type?: string;
+		due_date: string;
+		status: string;
+		released_job?: string;
+		equipment_count: number;
+	}>;
+	teams: ScheduleTeam[];
+	technicians: Array<Record<string, unknown>>;
+}
+
+export function getScheduleBoard(date_from: string, date_to: string): Promise<ScheduleBoard> {
+	return client.call("fsm.process.api.get_schedule_board", { date_from, date_to }, "GET");
+}
+
 export function listProcessExceptions(): Promise<ProcessException[]> {
 	return client.call("fsm.process.api.list_exceptions", {}, "GET");
 }

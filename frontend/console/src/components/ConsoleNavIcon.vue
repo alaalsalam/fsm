@@ -21,6 +21,10 @@ defineProps<{ name: string }>();
 			<rect x="14" y="12" width="7" height="9" rx="1.5" />
 			<rect x="3" y="16" width="7" height="5" rx="1.5" />
 		</template>
+		<template v-else-if="name === 'schedule'">
+			<path d="M7 3v3M17 3v3M4 8h16M5 5h14v16H5z" />
+			<path d="M8 12h3v3H8zM14 12h2M14 16h2" />
+		</template>
 		<template v-else-if="name === 'requests'">
 			<path d="M4 4h16v14H4zM4 14h4l2 3h4l2-3h4" />
 		</template>

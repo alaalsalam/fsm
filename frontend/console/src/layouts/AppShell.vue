@@ -16,6 +16,12 @@ const navSections = computed(() => [
 		items: [
 			{ name: "operations", label: t("مركز العمليات", "Operations"), to: "/", exact: true },
 			{
+				name: "schedule",
+				label: t("تقويم التشغيل", "Operations calendar"),
+				to: "/schedule",
+				exact: true,
+			},
+			{
 				name: "dispatch",
 				label: t("لوحة التوزيع", "Dispatch"),
 				to: "/dispatch",
