@@ -20,7 +20,10 @@ add_to_apps_screen = [
 		"name": app_name,
 		"logo": "/assets/fsm/images/fsm-logo.svg",
 		"title": "DIGIT Field Service",
-		"route": "/app/field-service",
+		# The Digit shell owns the integrated Field Service workspace and its
+		# permission-scoped quick-navigation.  Sending users to the native Desk
+		# workspace bypasses that shell and leaves them without the FSM sidebar.
+		"route": "/digit/fsm",
 		"has_permission": "fsm.check_app_permission",
 	}
 ]
