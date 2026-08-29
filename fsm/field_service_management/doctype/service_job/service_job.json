@@ -63,7 +63,7 @@
   {"fieldname":"column_break_completion","fieldtype":"Column Break"},
   {"description":"The quotation raised for chargeable work on this job.","fieldname":"quotation","fieldtype":"Link","label":"Quotation","options":"Quotation"},
   {"description":"The sales invoice generated to bill the customer for this job.","fieldname":"sales_invoice","fieldtype":"Link","label":"Sales Invoice","options":"Sales Invoice"},
-  {"fieldname":"section_break_costing","fieldtype":"Section Break","label":"Costing"},
+  {"collapsible":1,"fieldname":"section_break_costing","fieldtype":"Section Break","label":"Costing"},
   {"description":"Estimated labour hours for the job, from the estimate engine or set manually.","fieldname":"estimated_hours","fieldtype":"Float","label":"Estimated Hours","precision":"2"},
   {"description":"Actual labour hours logged by technicians against this job.","fieldname":"actual_hours","fieldtype":"Float","label":"Actual Hours","precision":"2","read_only":1},
   {"description":"Charge-out or cost rate per labour hour used to value the work.","fieldname":"labor_rate","fieldtype":"Currency","label":"Labour Rate (per hour)"},

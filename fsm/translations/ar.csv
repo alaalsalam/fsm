@@ -961,3 +961,54 @@ Service Teams,فرق الخدمة
 Service Territories,نطاقات الخدمة
 Inspection Templates,قوالب الفحص
 Checklist Templates,قوالب قوائم التحقق
+Continue after-sales setup,متابعة تجهيز ما بعد البيع
+View installed equipment,عرض المعدات المنشأة
+Field Service,الخدمة الميدانية
+{0} equipment record(s) were created automatically. Continue the after-sales setup.,تم إنشاء {0} سجل معدات تلقائيًا. تابع تجهيز ما بعد البيع.
+"Describe the request, select the customer and equipment, then save to start the guided workflow.",صف الطلب وحدد العميل والمعدة ثم احفظ لبدء مسار العمل الموجّه.
+Open service request,فتح طلب الخدمة
+Triage service request,فرز طلب الخدمة
+Create or open the linked Service Job to continue planning and execution.,أنشئ أو افتح أمر الخدمة المرتبط لمتابعة التخطيط والتنفيذ.
+Create / open Service Job,إنشاء / فتح أمر الخدمة
+Next step,الخطوة التالية
+Related records,السجلات المرتبطة
+Schedule and create visit,جدولة وإنشاء زيارة
+Schedule and open visit,جدولة وفتح الزيارة
+Continue the Service Job workflow.,تابع مسار تنفيذ أمر الخدمة.
+Generate / open Service Report,إنشاء / فتح تقرير الخدمة
+Create / open Sales Invoice,إنشاء / فتح فاتورة العميل
+Create / open Quotation,إنشاء / فتح عرض السعر
+Billing,الفوترة
+"Define the customer, contract dates and covered sites or equipment first.",حدد العميل ومدة العقد والمواقع أو المعدات المشمولة أولًا.
+"Activate the contract, then create its preventive maintenance plans.",فعّل العقد ثم أنشئ منه خطط الصيانة الوقائية.
+Activate contract,تفعيل العقد
+Create / open maintenance plans,إنشاء / فتح خطط الصيانة
+View maintenance plans,عرض خطط الصيانة
+Create preventive maintenance plans,إنشاء خطط الصيانة الوقائية
+Preventive Maintenance,صيانة وقائية
+Every,كل
+Interval Unit,وحدة التكرار
+First Due Date,أول تاريخ استحقاق
+Timezone,المنطقة الزمنية
+Create and open plans,إنشاء وفتح الخطط
+Release this scheduled occurrence when it is ready for field execution.,حوّل هذا الاستحقاق المجدول إلى أمر خدمة عندما يصبح جاهزًا للتنفيذ الميداني.
+This occurrence is linked to a Service Job. Continue planning and execution there.,هذا الاستحقاق مرتبط بأمر خدمة. تابع التخطيط والتنفيذ من هناك.
+Open linked Service Job,فتح أمر الخدمة المرتبط
+Select the physical site and confirm installation before adding the equipment to a maintenance contract.,حدد الموقع الفعلي وأكد التركيب قبل إضافة المعدة إلى عقد الصيانة.
+Confirm installation,تأكيد التركيب
+Create Service Request,إنشاء طلب خدمة
+Service,الخدمة
+System & Classification,النظام والتصنيف
+Schedule & Status,الجدول والحالة
+Customer & Equipment,العميل والمعدات
+Source Plan,الخطة المصدر
+Automation Details,تفاصيل الأتمتة
+This occurrence will create its Service Job automatically on {0}.,سينشئ هذا الاستحقاق أمر الخدمة تلقائيًا بتاريخ {0}.
+This job can no longer be scheduled from the guided action.,لا يمكن جدولة أمر العمل هذا من الإجراء الموجّه في حالته الحالية.
+This job is already scheduled at another time. Update the schedule before creating a visit.,أمر العمل مجدول في وقت مختلف. حدّث الموعد قبل إنشاء الزيارة.
+Open parent Service Job,فتح أمر الخدمة الأصل
+"Dispatch the visit, then the technician continues travel, check-in and work from the field interface.",وزّع الزيارة ثم يتابع الفني التنقل وتسجيل الوصول والعمل من الواجهة الميدانية.
+Assign a technician before dispatching this visit.,أسند فنيًا قبل توزيع هذه الزيارة.
+Dispatch visit,توزيع الزيارة
+Continue field execution from the visits screen in the operations console.,تابع التنفيذ الميداني من شاشة الزيارات في مركز العمليات.
+Open operations visits,فتح زيارات مركز العمليات

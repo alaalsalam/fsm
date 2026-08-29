@@ -63,7 +63,14 @@ web_include_css = "/assets/fsm/css/fsm_identity.css?v=20260828_digit_v1"
 # include js in doctype views
 # doctype_js = {"doctype" : "public/js/doctype.js"}
 doctype_js = {
+	"Delivery Note": "public/js/delivery_note.js",
+	"Installed Equipment": "public/js/installed_equipment.js",
 	"Maintenance Plan": "public/js/maintenance_plan.js",
+	"Maintenance Occurrence": "public/js/maintenance_occurrence.js",
+	"Service Contract": "public/js/service_contract.js",
+	"Service Job": "public/js/service_job.js",
+	"Service Request": "public/js/service_request.js",
+	"Service Visit": "public/js/service_visit.js",
 	"Service Report": "public/js/service_report.js",
 	"Service Certificate": "public/js/service_certificate.js",
 }

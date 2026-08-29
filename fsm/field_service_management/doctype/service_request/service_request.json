@@ -4,9 +4,9 @@
  "creation": "2026-08-24 00:00:00",
  "doctype": "DocType",
  "engine": "InnoDB",
- "field_order": ["details_section","naming_series","source","service_type","company","details_column","status","priority","project","customer_section","customer","customer_site","installed_equipment","customer_column","contact","phone","email","location_section","service_address","territory","location_column","latitude","longitude","request_section","subject","description","request_column","preferred_start","preferred_end","audit_section","opened_on","triaged_on","audit_column","converted_on","closed_on"],
+ "field_order": ["request_section","subject","description","request_column","source","service_type","priority","customer_section","customer","company","customer_site","installed_equipment","customer_column","contact","phone","email","location_section","service_address","territory","location_column","latitude","longitude","details_section","naming_series","project","details_column","status","audit_section","opened_on","triaged_on","audit_column","converted_on","closed_on"],
  "fields": [
-  {"fieldname":"details_section","fieldtype":"Section Break","label":"Service Request Details"},
+  {"collapsible":1,"fieldname":"details_section","fieldtype":"Section Break","label":"System & Classification"},
   {"default":"FSM-REQ-.YYYY.-","description":"Automatic numbering series for the request.","fieldname":"naming_series","fieldtype":"Select","label":"Series","options":"FSM-REQ-.YYYY.-","reqd":1},
   {"default":"Manual","description":"Channel the request arrived through.","fieldname":"source","fieldtype":"Select","in_list_view":1,"label":"Source","options":"Portal\nPhone\nEmail\nWhatsApp\nManual\nAPI","reqd":1},
   {"description":"Type of service being requested.","fieldname":"service_type","fieldtype":"Data","label":"Service Type"},
