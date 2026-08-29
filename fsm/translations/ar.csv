@@ -918,3 +918,10 @@ Customer signature or refusal is pending,توقيع العميل أو إثبات
 Unassigned Job,أمر خدمة غير مسند
 Overdue Maintenance,صيانة متأخرة
 Report Awaiting Signature,تقرير بانتظار التوقيع
+Retry provisioning,إعادة إنشاء سجلات المعدات
+Assign installation sites,تحديد مواقع التركيب
+Confirm pending installations,تأكيد عمليات التركيب المعلقة
+Create or link a service contract,إنشاء عقد خدمة أو ربطه
+Preview preventive maintenance plans,معاينة خطط الصيانة الوقائية
+Activate plans and generate the schedule,تفعيل الخطط وتوليد جدول الصيانة
+After-sales setup is operational,إعداد ما بعد البيع جاهز للتشغيل

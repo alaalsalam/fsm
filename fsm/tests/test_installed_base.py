@@ -21,6 +21,7 @@ from fsm.installed_base.commands import (
 	move_equipment_location,
 )
 from fsm.installed_base.provisioning import provision_delivery_note
+from fsm.process.after_sales import get_after_sales_setup
 from fsm.service_operations.commands import create_job_from_request
 from fsm.tests.test_security import SecurityFixture
 
@@ -210,6 +211,11 @@ class TestInstalledBaseOperations(FrappeTestCase):
 		self.assertEqual(
 			frappe.db.get_value("Delivery Note", delivery.name, "fsm_provisioning_status"), "Completed"
 		)
+		journey = get_after_sales_setup(delivery.name)
+		self.assertTrue(journey["readiness"]["equipment_provisioned"])
+		self.assertFalse(journey["readiness"]["schedule_generated"])
+		self.assertEqual(journey["occurrence_summary"]["total"], 0)
+		self.assertEqual(journey["next_action"]["code"], "ASSIGN_SITE")
 
 	def test_delivery_note_ignores_non_serviceable_item_and_cancel_preserves_records(self):
 		ignored = _item(mode="None", serviceable=0, create_equipment=0)

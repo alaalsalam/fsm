@@ -54,6 +54,43 @@ def get_after_sales_setup(delivery_note: str):
 		order_by="modified desc",
 		limit=200,
 	)
+	plan_names = [row.name for row in plans]
+	occurrences = (
+		frappe.get_list(
+			"Maintenance Occurrence",
+			filters={"maintenance_plan": ["in", plan_names]},
+			fields=[
+				"name",
+				"maintenance_plan",
+				"installed_equipment",
+				"customer_site",
+				"service_type",
+				"due_date",
+				"status",
+				"released_job",
+			],
+			order_by="due_date asc",
+			limit=1000,
+		)
+		if plan_names
+		else []
+	)
+	occurrence_summary = {
+		"total": len(occurrences),
+		"forecast": sum(1 for row in occurrences if row.status == "Forecast"),
+		"due": sum(1 for row in occurrences if row.status == "Due"),
+		"overdue": sum(1 for row in occurrences if row.status == "Overdue"),
+		"released": sum(1 for row in occurrences if row.released_job),
+		"completed": sum(1 for row in occurrences if row.status == "Completed"),
+		"next_due_date": next(
+			(
+				row.due_date
+				for row in occurrences
+				if row.status in {"Forecast", "Due", "Overdue", "Released"}
+			),
+			None,
+		),
+	}
 
 	pending_installation = sum(1 for row in equipment if row.status == "Pending Installation")
 	missing_site = sum(1 for row in equipment if not row.customer_site)
@@ -71,6 +108,8 @@ def get_after_sales_setup(delivery_note: str):
 		"sites": sites,
 		"contracts": contracts,
 		"maintenance_plans": plans,
+		"upcoming_occurrences": occurrences[:20],
+		"occurrence_summary": occurrence_summary,
 		"readiness": {
 			"equipment_provisioned": bool(equipment),
 			"pending_installation": pending_installation,
@@ -78,6 +117,7 @@ def get_after_sales_setup(delivery_note: str):
 			"missing_location": missing_location,
 			"contract_configured": bool(contracts),
 			"maintenance_configured": bool(plans),
+			"schedule_generated": bool(occurrences),
 		},
 		"next_action": (
 			{"code": "PROVISION_EQUIPMENT", "action": _("Retry provisioning")}
@@ -90,6 +130,8 @@ def get_after_sales_setup(delivery_note: str):
 			if not contracts
 			else {"code": "CONFIGURE_PM", "action": _("Preview preventive maintenance plans")}
 			if not plans
+			else {"code": "GENERATE_SCHEDULE", "action": _("Activate plans and generate the schedule")}
+			if not occurrences
 			else {"code": "READY", "action": _("After-sales setup is operational")}
 		),
 	}
