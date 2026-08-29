@@ -45,3 +45,54 @@ Quality & Documents,الجودة والمستندات
 Workforce & Setup,القوى العاملة والإعداد
 Home,الرئيسية
 Back to Desk,العودة إلى Desk
+Series,التسلسل
+Source,المصدر
+Status,الحالة
+Priority,الأولوية
+Service Type,نوع الخدمة
+Company,الشركة
+Project,المشروع
+Customer,العميل
+Contact,جهة الاتصال
+Phone,الهاتف
+Email,البريد الإلكتروني
+Location,الموقع
+Service Address,عنوان الخدمة
+Latitude,خط العرض
+Longitude,خط الطول
+Request,الطلب
+Subject,الموضوع
+Description,الوصف
+Preferred Start,البداية المفضّلة
+Preferred End,النهاية المفضّلة
+Audit,التدقيق
+Opened On,تاريخ الفتح
+Triaged On,تاريخ الفرز
+Converted On,تاريخ التحويل
+Closed On,تاريخ الإغلاق
+Service Request Details,تفاصيل طلب الخدمة
+Automatic numbering series for the request.,التسلسل التلقائي لترقيم الطلب.
+Channel the request arrived through.,القناة التي وصل عبرها الطلب.
+Current stage in the request lifecycle.,المرحلة الحالية في دورة حياة الطلب.
+Priority used to schedule the response.,الأولوية المستخدمة لجدولة الاستجابة.
+Type of service being requested.,نوع الخدمة المطلوبة.
+Company that owns this request.,الشركة المالكة لهذا الطلب.
+Project this request is tracked against.,المشروع الذي يُتابَع عليه هذا الطلب.
+Customer who raised the request.,العميل الذي قدّم الطلب.
+Customer location where the service is delivered.,موقع العميل حيث تُقدَّم الخدمة.
+The installed equipment this request concerns.,المعدة المركّبة التي يخصّها هذا الطلب.
+Person to coordinate the visit with.,الشخص الذي يُنسَّق معه لموعد الزيارة.
+Contact phone for the technician.,هاتف التواصل للفني.
+Contact email for updates.,بريد التواصل للتحديثات.
+Full address of the service location.,العنوان الكامل لموقع الخدمة.
+Service territory used for routing and assignment.,منطقة الخدمة المستخدمة للتوجيه والإسناد.
+Location latitude for maps and dispatch.,خط عرض الموقع للخرائط والتوزيع.
+Location longitude for maps and dispatch.,خط طول الموقع للخرائط والتوزيع.
+Short title summarizing the request.,عنوان مختصر يلخّص الطلب.
+Full details of the reported problem or requested service.,تفاصيل كاملة للمشكلة المبلَّغ عنها أو الخدمة المطلوبة.
+Earliest time the customer prefers the visit.,أبكر وقت يفضّله العميل للزيارة.
+Latest time the customer prefers the visit.,آخر وقت يفضّله العميل للزيارة.
+When the request was opened.,وقت فتح الطلب.
+When the request was triaged and reviewed.,وقت فرز الطلب ومراجعته.
+When the request was converted into a service job.,وقت تحويل الطلب إلى أمر خدمة.
+When the request was closed.,وقت إغلاق الطلب.
