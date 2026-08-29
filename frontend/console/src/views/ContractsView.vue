@@ -1,19 +1,22 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import type { ContractDetail, ContractStatus, ContractSummary } from "@digit/api";
 import { EmptyState, KlButton, LinkField, PageHeader, Spinner } from "@digit/ui";
-import { contracts, searchLink } from "@/lib/fsm";
+import { contracts, installedBase, searchLink } from "@/lib/fsm";
 import { lang, t } from "@/lib/i18n";
 
 const rows = ref<ContractSummary[]>([]);
 const selected = ref<ContractDetail | null>(null);
 const status = ref("");
 const route = useRoute();
+const router = useRouter();
 const loading = ref(true);
 const saving = ref(false);
 const error = ref("");
 const showCreate = ref(false);
+const scopeEquipment = ref<Array<{ name: string; label: string; customer_site: string }>>([]);
+const pendingEquipment = ref("");
 const form = reactive({
 	customer: "",
 	company: "",
@@ -95,6 +98,11 @@ async function create() {
 			emergency_visits: form.emergency_visits,
 			response_sla_hours: form.response_sla_hours,
 			resolution_sla_hours: form.resolution_sla_hours,
+			covered_equipment: scopeEquipment.value.map((row) => ({
+				customer_site: row.customer_site,
+				installed_equipment: row.name,
+				active: 1,
+			})),
 			coverage_rules: [
 				{
 					rule_name: "Standard Coverage",
@@ -125,6 +133,12 @@ async function create() {
 		showCreate.value = false;
 		selected.value = contract;
 		await load();
+		if (typeof route.query.delivery_note === "string") {
+			await router.push({
+				path: "/after-sales",
+				query: { delivery_note: route.query.delivery_note, contract: contract.name },
+			});
+		}
 	} catch {
 		error.value = t(
 			"تعذّر إنشاء العقد. راجع الحقول والنطاق.",
@@ -133,6 +147,70 @@ async function create() {
 	} finally {
 		saving.value = false;
 	}
+}
+
+async function addScopeEquipment(name = pendingEquipment.value) {
+	if (!name || scopeEquipment.value.some((row) => row.name === name)) return;
+	error.value = "";
+	try {
+		const equipment = await installedBase.getEquipment(name);
+		if (!equipment.customer_site) {
+			error.value = t(
+				"يجب تأكيد موقع تركيب المعدة قبل إضافتها إلى نطاق العقد.",
+				"Confirm the equipment installation site before adding it to the contract scope.",
+			);
+			return;
+		}
+		if (
+			(form.customer && equipment.customer !== form.customer) ||
+			(form.company && equipment.company !== form.company)
+		) {
+			error.value = t(
+				"المعدة لا تنتمي إلى عميل وشركة العقد.",
+				"The equipment does not belong to the contract customer and company.",
+			);
+			return;
+		}
+		scopeEquipment.value.push({
+			name: equipment.name,
+			label: equipment.equipment_name || equipment.equipment_id,
+			customer_site: equipment.customer_site,
+		});
+		pendingEquipment.value = "";
+	} catch {
+		error.value = t(
+			"تعذر إضافة المعدة إلى نطاق العقد.",
+			"Couldn't add equipment to the contract scope.",
+		);
+	}
+}
+
+function removeScopeEquipment(name: string) {
+	scopeEquipment.value = scopeEquipment.value.filter((row) => row.name !== name);
+}
+
+async function applyJourneyContext() {
+	if (route.query.create !== "1") return;
+	showCreate.value = true;
+	form.customer = typeof route.query.customer === "string" ? route.query.customer : "";
+	form.company = typeof route.query.company === "string" ? route.query.company : "";
+	if (typeof route.query.posting_date === "string") form.start_date = route.query.posting_date;
+	if (form.start_date && !form.end_date) {
+		const end = new Date(form.start_date);
+		end.setFullYear(end.getFullYear() + 1);
+		form.end_date = end.toISOString().slice(0, 10);
+	}
+	if (typeof route.query.delivery_note === "string") {
+		form.notes = t(
+			`عقد خدمة مرتبط بإشعار التسليم ${route.query.delivery_note}`,
+			`Service contract linked to Delivery Note ${route.query.delivery_note}`,
+		);
+	}
+	const equipment =
+		typeof route.query.equipment === "string"
+			? route.query.equipment.split(",").filter(Boolean)
+			: [];
+	for (const name of equipment) await addScopeEquipment(name);
 }
 
 async function transition(next: ContractStatus) {
@@ -148,7 +226,10 @@ async function transition(next: ContractStatus) {
 	}
 }
 
-onMounted(load);
+onMounted(async () => {
+	await applyJourneyContext();
+	await load();
+});
 </script>
 
 <template>
@@ -243,10 +324,79 @@ onMounted(load);
 					class="mt-1 w-full rounded-md border border-border bg-bg px-3 py-2"
 				/>
 			</label>
+			<section class="rounded-xl border border-border bg-surface p-4 md:col-span-2">
+				<div>
+					<h3 class="font-semibold">
+						{{ t("المعدات المشمولة بالعقد", "Covered equipment") }}
+					</h3>
+					<p class="text-xs text-fg-muted">
+						{{
+							t(
+								"هذا الربط هو الذي يسمح بإنشاء خطة وجدول الصيانة تلقائيًا من العقد.",
+								"This scope is what allows maintenance plans and schedules to be generated from the contract.",
+							)
+						}}
+					</p>
+				</div>
+				<div class="mt-3 flex items-end gap-2">
+					<div class="flex-1">
+						<LinkField
+							v-model="pendingEquipment"
+							:label="t('إضافة معدة', 'Add equipment')"
+							:search="(q) => searchLink('Installed Equipment', q, 'equipment_name')"
+						/>
+					</div>
+					<KlButton
+						type="button"
+						size="sm"
+						variant="secondary"
+						:disabled="!pendingEquipment"
+						@click="addScopeEquipment()"
+					>
+						{{ t("إضافة للنطاق", "Add to scope") }}
+					</KlButton>
+				</div>
+				<div v-if="scopeEquipment.length" class="mt-3 grid gap-2 sm:grid-cols-2">
+					<div
+						v-for="row in scopeEquipment"
+						:key="row.name"
+						class="flex items-center justify-between gap-2 rounded-lg border border-border bg-bg p-3 text-sm"
+					>
+						<div>
+							<p class="font-semibold">{{ row.label }}</p>
+							<p class="font-mono text-xs text-fg-muted">
+								{{ row.name }} · {{ row.customer_site }}
+							</p>
+						</div>
+						<button
+							type="button"
+							class="text-xs text-danger hover:underline"
+							@click="removeScopeEquipment(row.name)"
+						>
+							{{ t("إزالة", "Remove") }}
+						</button>
+					</div>
+				</div>
+				<p
+					v-else
+					class="mt-3 rounded-lg border border-warning/30 bg-warning/10 p-3 text-sm text-warning"
+				>
+					{{
+						t(
+							"لم تضف معدات إلى نطاق العقد بعد؛ لن يمكن توليد خطة صيانة من هذا العقد.",
+							"No equipment is in scope yet; a maintenance plan cannot be generated from this contract.",
+						)
+					}}
+				</p>
+			</section>
 			<div class="md:col-span-2">
-				<KlButton type="submit" :disabled="saving || !form.customer || !form.company">{{
-					saving ? t("جارٍ الحفظ…", "Saving…") : t("حفظ المسودة", "Save draft")
-				}}</KlButton>
+				<KlButton
+					type="submit"
+					:disabled="saving || !form.customer || !form.company || !scopeEquipment.length"
+					>{{
+						saving ? t("جارٍ الحفظ…", "Saving…") : t("حفظ المسودة", "Save draft")
+					}}</KlButton
+				>
 			</div>
 		</form>
 
@@ -366,6 +516,17 @@ onMounted(load);
 						><strong
 							>{{ item.remaining_quantity }} / {{ item.included_quantity }}</strong
 						>
+					</li>
+				</ul>
+				<h3 class="mb-2 mt-5 font-semibold">{{ t("نطاق المعدات", "Equipment scope") }}</h3>
+				<ul class="space-y-2 text-sm">
+					<li
+						v-for="item in selected.covered_equipment"
+						:key="`${item.customer_site}-${item.installed_equipment || item.item_group}`"
+						class="rounded-xl bg-surface p-3"
+					>
+						<strong>{{ item.installed_equipment || item.item_group }}</strong>
+						<p class="text-fg-muted">{{ item.customer_site }}</p>
 					</li>
 				</ul>
 				<div class="mt-5 flex flex-wrap gap-2">

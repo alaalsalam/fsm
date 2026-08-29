@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
-import { useRouter } from "vue-router";
+import { RouterLink, useRoute, useRouter } from "vue-router";
 import { PageHeader, Spinner, EmptyState } from "@digit/ui";
 import type { InstalledEquipmentSummary } from "@digit/api";
 import { installedBase } from "@/lib/fsm";
 import { t } from "@/lib/i18n";
 
 const router = useRouter();
+const route = useRoute();
 const rows = ref<InstalledEquipmentSummary[]>([]);
 const search = ref("");
 const status = ref("");
@@ -24,9 +25,32 @@ const filtered = computed(() =>
 					.includes(search.value.toLowerCase())),
 	),
 );
+const equipmentStatusLabel = (value: string) =>
+	({
+		"Pending Installation": t("في انتظار التركيب", "Pending Installation"),
+		Active: t("نشطة", "Active"),
+		Inactive: t("غير نشطة", "Inactive"),
+		Removed: t("مزالة", "Removed"),
+		Returned: t("مرتجعة", "Returned"),
+		Replaced: t("مستبدلة", "Replaced"),
+		Disposed: t("متخلص منها", "Disposed"),
+	})[value] || value;
+
+const warrantyLabel = (value: string) =>
+	({
+		Active: t("ساري", "Active"),
+		Expired: t("منتهي", "Expired"),
+		"Not Applicable": t("غير مطبق", "Not Applicable"),
+	})[value] || value;
+
 onMounted(async () => {
+	if (typeof route.query.status === "string") status.value = route.query.status;
 	try {
-		rows.value = await installedBase.listEquipment({ limit: 200 });
+		rows.value = await installedBase.listEquipment({
+			customer: typeof route.query.customer === "string" ? route.query.customer : undefined,
+			status: typeof route.query.status === "string" ? route.query.status : undefined,
+			limit: 500,
+		});
 	} catch {
 		error.value = t("تعذّر تحميل المعدات المركّبة.", "Couldn't load installed equipment.");
 	} finally {
@@ -41,6 +65,23 @@ onMounted(async () => {
 			:title="t('المعدات المركّبة', 'Installed Equipment')"
 			:subtitle="t(`${filtered.length} أصل مسجّل`, `${filtered.length} registered assets`)"
 		/>
+		<div
+			class="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-4"
+		>
+			<p class="text-sm text-fg-muted">
+				{{
+					t(
+						"المعدات هنا تُنشأ تلقائيًا من إشعار التسليم، ثم يؤكد مسؤول الخدمة موقع تركيبها من رحلة ما بعد البيع.",
+						"Equipment is provisioned from Delivery Notes, then its installation site is confirmed in the after-sales journey.",
+					)
+				}}
+			</p>
+			<RouterLink
+				to="/after-sales"
+				class="text-sm font-semibold text-primary hover:underline"
+				>{{ t("فتح رحلة ما بعد البيع", "Open after-sales journey") }}</RouterLink
+			>
+		</div>
 		<div class="mb-4 grid gap-3 md:grid-cols-[1fr_auto_auto]">
 			<input
 				v-model="search"
@@ -126,9 +167,9 @@ onMounted(async () => {
 								{{ r.serial_no || t("لا رقم تسلسلي", "No serial") }}
 							</p>
 						</td>
-						<td class="px-4 py-3">{{ r.status }}</td>
+						<td class="px-4 py-3">{{ equipmentStatusLabel(r.status) }}</td>
 						<td class="px-4 py-3">{{ r.installation_date || "—" }}</td>
-						<td class="px-4 py-3">{{ r.warranty_status }}</td>
+						<td class="px-4 py-3">{{ warrantyLabel(r.warranty_status) }}</td>
 						<td class="px-4 py-3">{{ r.last_service_date || "—" }}</td>
 					</tr>
 				</tbody>

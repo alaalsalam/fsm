@@ -1,10 +1,11 @@
 import { client } from "./api";
-import { ContractsApi, InstalledBaseApi, MaintenanceApi } from "@digit/api";
+import { ContractsApi, InstalledBaseApi, MaintenanceApi, ReportingApi } from "@digit/api";
 import type { JobSummary, JobStatus, LinkOption } from "@digit/ui";
 
 export const installedBase = new InstalledBaseApi(client);
 export const contracts = new ContractsApi(client);
 export const maintenance = new MaintenanceApi(client);
+export const reportingApi = new ReportingApi(client);
 
 export interface DashboardStats {
 	open_jobs: number;
@@ -166,8 +167,130 @@ export function listProcessExceptions(): Promise<ProcessException[]> {
 	return client.call("fsm.process.api.list_exceptions", {}, "GET");
 }
 
-export function getAfterSalesSetup(delivery_note: string): Promise<Record<string, unknown>> {
+export interface AfterSalesEquipment {
+	name: string;
+	equipment_id: string;
+	equipment_name: string;
+	item_code: string;
+	serial_no?: string;
+	status: string;
+	customer_site?: string;
+	equipment_location?: string;
+	warranty_status?: string;
+	installation_date?: string;
+}
+
+export interface AfterSalesContract {
+	name: string;
+	contract_no: string;
+	status: string;
+	start_date: string;
+	end_date: string;
+}
+
+export interface AfterSalesPlan {
+	name: string;
+	plan_title: string;
+	status: string;
+	customer_site: string;
+	service_contract?: string;
+}
+
+export interface AfterSalesSetup {
+	delivery_note: {
+		name: string;
+		company: string;
+		customer: string;
+		posting_date: string;
+		project?: string;
+		provisioning_status?: string;
+	};
+	equipment: AfterSalesEquipment[];
+	sites: Array<{ name: string; site_name: string; status: string }>;
+	contracts: AfterSalesContract[];
+	maintenance_plans: AfterSalesPlan[];
+	upcoming_occurrences: Array<{
+		name: string;
+		maintenance_plan: string;
+		installed_equipment: string;
+		customer_site: string;
+		service_type: string;
+		due_date: string;
+		status: string;
+		released_job?: string;
+	}>;
+	occurrence_summary: {
+		total: number;
+		forecast: number;
+		due: number;
+		overdue: number;
+		released: number;
+		completed: number;
+		next_due_date?: string;
+	};
+	readiness: {
+		equipment_provisioned: boolean;
+		pending_installation: number;
+		missing_site: number;
+		missing_location: number;
+		contract_configured: boolean;
+		maintenance_configured: boolean;
+		schedule_generated: boolean;
+	};
+	next_action: { code: string; action: string };
+}
+
+export interface MaintenancePlanSeedResult {
+	preview: boolean;
+	service_contract: string;
+	proposals?: Array<{
+		customer_site: string;
+		equipment: string[];
+		equipment_count: number;
+		existing_plan?: string;
+		action: string;
+	}>;
+	plans?: Array<{ maintenance_plan: string; created: boolean }>;
+}
+
+export function getAfterSalesSetup(delivery_note: string): Promise<AfterSalesSetup> {
 	return client.call("fsm.process.after_sales.get_after_sales_setup", { delivery_note }, "GET");
+}
+
+export function provisionAfterSalesEquipment(delivery_note: string) {
+	return client.call<{ delivery_note: string; equipment: string[]; count: number }>(
+		"fsm.installed_base.provisioning.provision_delivery_note",
+		{ delivery_note },
+	);
+}
+
+export function confirmEquipmentInstallation(
+	installed_equipment: string,
+	customer_site: string,
+	equipment_location?: string,
+) {
+	return client.call("fsm.installed_base.commands.confirm_installation", {
+		installed_equipment,
+		customer_site,
+		equipment_location,
+	});
+}
+
+export function seedMaintenancePlans(
+	service_contract: string,
+	options: {
+		service_type?: string;
+		interval_count?: number;
+		interval_unit?: string;
+		first_due_date?: string;
+		timezone?: string;
+		preview?: number;
+	} = {},
+): Promise<MaintenancePlanSeedResult> {
+	return client.call("fsm.process.maintenance_flow.create_maintenance_plans_from_contract", {
+		service_contract,
+		...options,
+	});
 }
 
 export interface ServiceRequestRow {
