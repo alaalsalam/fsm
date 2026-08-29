@@ -94,6 +94,12 @@ const routes: RouteRecordRaw[] = [
 				component: () => import("@/views/NewJobView.vue"),
 			},
 			{
+				path: "/jobs/:name/related/:type",
+				name: "job-related-records",
+				component: () => import("@/views/JobRelatedRecordsView.vue"),
+				props: true,
+			},
+			{
 				path: "/jobs/:name",
 				name: "job-detail",
 				component: () => import("@/views/JobDetailView.vue"),

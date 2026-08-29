@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from "vue";
+import { useRoute } from "vue-router";
 import type {
 	MaintenanceOccurrence,
 	MaintenanceOccurrenceStatus,
@@ -14,6 +15,7 @@ import { lang, t } from "@/lib/i18n";
 type Tab = "plans" | "schedule" | "due" | "overdue" | "occurrences" | "jobs";
 
 const plans = ref<MaintenancePlanSummary[]>([]);
+const route = useRoute();
 const occurrences = ref<MaintenanceOccurrence[]>([]);
 const summary = ref<MaintenanceSummary | null>(null);
 const tab = ref<Tab>("plans");
@@ -179,7 +181,12 @@ async function release(plan: MaintenancePlanSummary) {
 	}
 }
 
-onMounted(load);
+onMounted(() => {
+	const requestedTab = typeof route.query.tab === "string" ? route.query.tab : "";
+	if (["plans", "schedule", "due", "overdue", "occurrences", "jobs"].includes(requestedTab))
+		tab.value = requestedTab as Tab;
+	load();
+});
 </script>
 
 <template>
@@ -288,10 +295,10 @@ onMounted(load);
 						v-model="form.interval_unit"
 						class="min-w-0 flex-1 rounded-e-md border border-s-0 border-border bg-bg px-3 py-2"
 					>
-						<option>Days</option>
-						<option>Weeks</option>
-						<option>Months</option>
-						<option>Years</option>
+						<option value="Days">{{ t("أيام", "Days") }}</option>
+						<option value="Weeks">{{ t("أسابيع", "Weeks") }}</option>
+						<option value="Months">{{ t("أشهر", "Months") }}</option>
+						<option value="Years">{{ t("سنوات", "Years") }}</option>
 					</select>
 				</div></label
 			>

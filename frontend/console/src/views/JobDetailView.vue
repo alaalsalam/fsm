@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, onBeforeUnmount } from "vue";
-import { RouterLink } from "vue-router";
+import { RouterLink, useRouter } from "vue-router";
 import { StatusPill, Spinner } from "@digit/ui";
 import {
 	getJob,
@@ -23,6 +23,9 @@ import {
 	addFieldNote,
 	getJobVisits,
 	createVisit,
+	planServiceJob,
+	scheduleServiceJob,
+	dispatchServiceJob,
 	getJobHub,
 	type JobDoc,
 	type TechnicianSuggestion,
@@ -37,8 +40,15 @@ import {
 } from "@/lib/fsm";
 import { realtime, JOB_MESSAGE_EVENT, type JobMessageEvent } from "@/lib/realtime";
 import { t } from "@/lib/i18n";
+import {
+	translateActor,
+	translateBlocker,
+	translateNextAction,
+	translateProcessAction,
+} from "@/lib/translations";
 
 const props = defineProps<{ name: string }>();
+const router = useRouter();
 
 const statusAr: Record<string, string> = {
 	Draft: "مسودة",
@@ -83,38 +93,16 @@ const priorityAr: Record<string, string> = {
 };
 const showPriority = (s?: string) => (s ? t(priorityAr[s] ?? s, s) : "—");
 
-// The next-action hub text arrives from the server in English; map its stable
-// code (not the free-text message) so the Arabic display never drifts.
-const nextActionAr: Record<string, string> = {
-	OPEN_REQUEST: "افتح طلب الخدمة",
-	TRIAGE_REQUEST: "فرز الطلب وتصنيفه",
-	CREATE_JOB: "التحويل إلى أمر خدمة",
-	PLAN_JOB: "خطط نطاق الأمر وجدولته",
-	SCHEDULE_JOB: "جدولة الأمر وإسناد فريق خدمة",
-	DISPATCH_JOB: "إسناد فريق الخدمة أو توزيعه",
-	COMPLETE_JOB: "إكمال أمر الخدمة",
-	DISPATCH_VISIT: "توزيع الزيارة",
-	START_TRAVEL: "بدء التنقل",
-	CHECK_IN: "تسجيل الوصول في موقع العميل",
-	START_WORK: "بدء أعمال الخدمة",
-	VIEW_NEXT_DUE: "مراجعة موعد الصيانة القادم",
-	ACTIVATE_CONTRACT: "مراجعة النطاق وتفعيل العقد",
-	RENEW_CONTRACT: "إنشاء أو فتح عرض سعر التجديد",
-	RESOLVE_MATERIAL: "معالجة نقص المواد",
-	TEST_REPAIR: "اختبار المعدة بعد الإصلاح",
-	QUALITY_CHECK: "إكمال فحص الجودة",
-	NONE: "لا يوجد إجراء إضافي مطلوب",
-};
 const showNextAction = (na?: { code?: string; message?: string; action?: string }) => {
 	if (!na) return "";
 	const en = na.message || na.action || na.code || "";
-	return t(nextActionAr[na.code ?? ""] ?? en, en);
+	return t(translateNextAction(na), en);
 };
-const actorAr: Record<string, string> = {
-	"FSM Manager": "مدير الخدمة الميدانية",
-	"Assigned Team": "الفريق المسند",
-};
-const showActor = (a?: string) => (a ? t(actorAr[a] ?? a, a) : "");
+const showActor = (a?: string) => (a ? t(translateActor(a), a) : "");
+const showBlocker = (blocker: JobHub["completion_blockers"][number]) =>
+	t(translateBlocker(blocker), blocker.message);
+const showProcessAction = (action?: string) =>
+	action ? t(translateProcessAction(action), action) : "";
 
 const roleAr: Record<string, string> = {
 	Dispatcher: "المُرسل",
@@ -136,12 +124,70 @@ const job = ref<JobDoc | null>(null);
 const loading = ref(true);
 const error = ref("");
 const busyTask = ref<number | null>(null);
+const nextActionBusy = ref(false);
 const completing = ref(false);
 const invoicing = ref(false);
 const note = ref("");
 const visits = ref<ServiceVisitRow[]>([]);
 const creatingVisit = ref(false);
 const hub = ref<JobHub | null>(null);
+
+function relatedRoute(type: string) {
+	return `/jobs/${props.name}/related/${type}`;
+}
+
+function blockerRoute(blocker: JobHub["completion_blockers"][number]) {
+	if (blocker.code === "ACTIVE_VISITS") return `/visits?job=${props.name}`;
+	if (blocker.code === "INSPECTIONS_INCOMPLETE") return relatedRoute("inspections");
+	if (blocker.code === "CRITICAL_FAILURES_OPEN") return relatedRoute("failures");
+	if (blocker.code === "WORKSHOP_OPEN") return relatedRoute("workshop");
+	if (["SERVICE_REPORT_REQUIRED", "SERVICE_REPORT_NOT_SUBMITTED"].includes(blocker.code))
+		return relatedRoute("reports");
+	if (blocker.code === "SERVICE_CERTIFICATE_REQUIRED") return relatedRoute("certificates");
+	return blocker.route || `/jobs/${props.name}`;
+}
+
+const hubCards = computed(() => {
+	if (!hub.value) return [];
+	return [
+		{
+			key: "visits",
+			label: t("الزيارات", "Visits"),
+			value: hub.value.visits.length,
+			to: `/visits?job=${props.name}`,
+		},
+		{
+			key: "inspections",
+			label: t("الفحوصات", "Inspections"),
+			value: hub.value.inspections.length,
+			to: relatedRoute("inspections"),
+		},
+		{
+			key: "failures",
+			label: t("الأعطال", "Failures"),
+			value: hub.value.failures.length,
+			to: relatedRoute("failures"),
+		},
+		{
+			key: "workshop",
+			label: t("الورشة", "Workshop"),
+			value: hub.value.workshop.length,
+			to: relatedRoute("workshop"),
+		},
+		{
+			key: "reports",
+			label: t("التقارير", "Reports"),
+			value: hub.value.reports.length,
+			to: relatedRoute("reports"),
+		},
+		{
+			key: "certificates",
+			label: t("الشهادات", "Certificates"),
+			value: hub.value.certificates.length,
+			to: relatedRoute("certificates"),
+		},
+	];
+});
 
 async function loadVisits() {
 	try {
@@ -153,11 +199,25 @@ async function loadVisits() {
 
 async function addVisit() {
 	creatingVisit.value = true;
+	error.value = "";
 	try {
 		await createVisit(props.name);
-		await loadVisits();
+		await Promise.all([loadVisits(), refreshHub()]);
+	} catch {
+		error.value = t(
+			"تعذّر إنشاء الزيارة. يجب أن يكون أمر الخدمة مخططًا ونشطًا.",
+			"Couldn't create the visit. The service job must be planned and active.",
+		);
 	} finally {
 		creatingVisit.value = false;
+	}
+}
+
+async function refreshHub() {
+	try {
+		hub.value = await getJobHub(props.name);
+	} catch {
+		hub.value = null;
 	}
 }
 
@@ -189,6 +249,7 @@ async function assign(technician: string) {
 	try {
 		job.value = await assignTechnician(job.value.name, technician);
 		suggestions.value = [];
+		await refreshHub();
 	} catch (e) {
 		assignError.value =
 			(e as { message?: string })?.message ||
@@ -223,6 +284,7 @@ async function assignTeamTo(team: string) {
 	try {
 		job.value = await assignTeam(job.value.name, team);
 		teamSuggestions.value = [];
+		await refreshHub();
 	} catch (e) {
 		teamAssignError.value =
 			(e as { message?: string })?.message ||
@@ -394,12 +456,7 @@ async function load() {
 	error.value = "";
 	try {
 		job.value = await getJob(props.name);
-		try {
-			const projection = await getJobHub(props.name);
-			hub.value = projection?.next_action ? projection : null;
-		} catch {
-			hub.value = null;
-		}
+		await refreshHub();
 		syncCostForm();
 		loadLogistics();
 		loadMessages();
@@ -410,6 +467,63 @@ async function load() {
 		error.value = t("تعذّر تحميل أمر الخدمة.", "Couldn't load this job.");
 	} finally {
 		loading.value = false;
+	}
+}
+
+async function runNextAction() {
+	if (!job.value || !hub.value) return;
+	const action = hub.value.next_action;
+	const blocker = hub.value.completion_blockers[0];
+	if (blocker && action.code === blocker.code) {
+		await router.push(blockerRoute(blocker));
+		return;
+	}
+	if (action.route) {
+		await router.push(action.route);
+		return;
+	}
+	nextActionBusy.value = true;
+	error.value = "";
+	try {
+		if (action.code === "PLAN_JOB") {
+			job.value = await planServiceJob(job.value.name);
+		} else if (action.code === "SCHEDULE_JOB") {
+			if (!job.value.scheduled_date) {
+				error.value = t(
+					"حدد تاريخ ووقت الجدولة في أمر الخدمة أولًا.",
+					"Set the service job schedule date and time first.",
+				);
+				return;
+			}
+			job.value = await scheduleServiceJob(
+				job.value.name,
+				job.value.scheduled_date,
+				job.value.scheduled_end,
+			);
+		} else if (action.code === "DISPATCH_JOB") {
+			if (!job.value.primary_technician) {
+				error.value = t(
+					"أسند فنيًا رئيسيًا قبل توزيع أمر الخدمة.",
+					"Assign a primary technician before dispatching the service job.",
+				);
+				return;
+			}
+			job.value = await dispatchServiceJob(job.value.name);
+		} else if (action.code === "COMPLETE_JOB") {
+			await finishJob();
+			return;
+		} else {
+			error.value = t(
+				"استخدم القسم المرتبط أدناه لتنفيذ هذا الإجراء.",
+				"Use the related section below to perform this action.",
+			);
+			return;
+		}
+		await refreshHub();
+	} catch {
+		error.value = t("تعذّر تنفيذ الإجراء التالي.", "Couldn't perform the next action.");
+	} finally {
+		nextActionBusy.value = false;
 	}
 }
 
@@ -442,10 +556,20 @@ async function complete(idx: number) {
 
 async function finishJob() {
 	if (!job.value) return;
+	const blocker = hub.value?.completion_blockers[0];
+	if (blocker) {
+		error.value = t(
+			"أكمل المتطلب الموضح قبل إغلاق أمر الخدمة.",
+			"Complete the displayed requirement before closing the service job.",
+		);
+		await router.push(blockerRoute(blocker));
+		return;
+	}
 	completing.value = true;
 	error.value = "";
 	try {
 		job.value = await completeJob(job.value.name);
+		await refreshHub();
 	} catch {
 		error.value = t("تعذّر إتمام أمر الخدمة.", "Couldn't complete the job.");
 	} finally {
@@ -487,7 +611,7 @@ onBeforeUnmount(() => offMessage?.());
 <template>
 	<div>
 		<RouterLink
-			to="/"
+			to="/dispatch"
 			class="mb-4 inline-flex items-center gap-1 text-sm text-fg-muted hover:text-fg"
 		>
 			← {{ t("العودة إلى لوحة التوزيع", "Back to dispatch") }}
@@ -523,9 +647,15 @@ onBeforeUnmount(() => offMessage?.());
 						<p class="text-xs uppercase tracking-wide text-fg-muted">
 							{{ t("الإجراء التالي", "Next Action") }}
 						</p>
-						<p class="mt-1 text-lg font-semibold">
+						<button
+							type="button"
+							:disabled="nextActionBusy"
+							class="mt-1 text-start text-lg font-semibold text-primary hover:underline disabled:opacity-60"
+							@click="runNextAction"
+						>
+							<Spinner v-if="nextActionBusy" class="me-2 inline-block" :size="16" />
 							{{ showNextAction(hub.next_action) }}
-						</p>
+						</button>
 						<p class="mt-1 text-xs text-fg-muted">
 							{{ showActor(hub.next_action.responsible_actor) }}
 						</p>
@@ -540,33 +670,25 @@ onBeforeUnmount(() => offMessage?.());
 					<RouterLink
 						v-for="blocker in hub.completion_blockers"
 						:key="blocker.code"
-						:to="blocker.route || `/jobs/${job.name}`"
+						:to="blockerRoute(blocker)"
 						class="rounded-xl border border-warning/30 bg-warning/10 p-3"
-						><p class="font-medium">{{ blocker.message }}</p>
+						><p class="font-medium">{{ showBlocker(blocker) }}</p>
 						<p class="mt-1 text-xs text-fg-muted">
-							{{ blocker.action }} · {{ blocker.responsible_actor }}
+							{{ showProcessAction(blocker.action) }} ·
+							{{ showActor(blocker.responsible_actor) }}
 						</p></RouterLink
 					>
 				</div>
 				<div class="mt-4 grid grid-cols-3 gap-2 text-center text-xs sm:grid-cols-6">
-					<div
-						v-for="item in [
-							{ label: t('الزيارات', 'Visits'), value: hub.visits.length },
-							{ label: t('الفحوصات', 'Inspections'), value: hub.inspections.length },
-							{ label: t('الأعطال', 'Failures'), value: hub.failures.length },
-							{ label: t('الورشة', 'Workshop'), value: hub.workshop.length },
-							{ label: t('التقارير', 'Reports'), value: hub.reports.length },
-							{
-								label: t('الشهادات', 'Certificates'),
-								value: hub.certificates.length,
-							},
-						]"
-						:key="item.label"
-						class="rounded-xl bg-white/3 p-3"
+					<RouterLink
+						v-for="item in hubCards"
+						:key="item.key"
+						:to="item.to"
+						class="rounded-xl bg-white/3 p-3 transition hover:bg-white/8 hover:text-primary"
 					>
 						<p class="text-lg font-bold">{{ item.value }}</p>
 						<p class="text-fg-muted">{{ item.label }}</p>
-					</div>
+					</RouterLink>
 				</div>
 			</section>
 
@@ -580,16 +702,20 @@ onBeforeUnmount(() => offMessage?.());
 							<button
 								type="button"
 								class="rounded-lg border border-border px-3 py-1.5 text-sm"
-								:disabled="creatingVisit"
+								:disabled="
+									creatingVisit ||
+									['Draft', 'Completed', 'Cancelled'].includes(job.status)
+								"
 								@click="addVisit"
 							>
 								{{ t("إنشاء زيارة", "Create visit") }}
 							</button>
 						</div>
 						<div class="mt-3 space-y-2">
-							<div
+							<RouterLink
 								v-for="visit in visits"
 								:key="visit.name"
+								:to="`/visits?job=${job.name}`"
 								class="flex items-center justify-between rounded-xl bg-white/3 p-3"
 							>
 								<div>
@@ -606,7 +732,7 @@ onBeforeUnmount(() => offMessage?.());
 									</p>
 								</div>
 								<StatusPill :status="visit.status" />
-							</div>
+							</RouterLink>
 							<p v-if="!visits.length" class="text-sm text-fg-muted">
 								{{ t("لا توجد زيارات بعد.", "No service visits yet.") }}
 							</p>
@@ -757,7 +883,7 @@ onBeforeUnmount(() => offMessage?.());
 								@click="finishJob"
 							>
 								<Spinner v-if="completing" :size="14" />
-								{{ t("تحديد الزيارة كمكتملة", "Mark visit complete") }}
+								{{ t("إكمال أمر الخدمة", "Complete service job") }}
 							</button>
 						</div>
 

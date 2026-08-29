@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from "vue";
+import { useRoute } from "vue-router";
 import type { ContractDetail, ContractStatus, ContractSummary } from "@digit/api";
 import { EmptyState, KlButton, LinkField, PageHeader, Spinner } from "@digit/ui";
 import { contracts, searchLink } from "@/lib/fsm";
@@ -8,6 +9,7 @@ import { lang, t } from "@/lib/i18n";
 const rows = ref<ContractSummary[]>([]);
 const selected = ref<ContractDetail | null>(null);
 const status = ref("");
+const route = useRoute();
 const loading = ref(true);
 const saving = ref(false);
 const error = ref("");
@@ -25,9 +27,22 @@ const form = reactive({
 	notes: "",
 });
 
-const filtered = computed(() =>
-	status.value ? rows.value.filter((row) => row.status === status.value) : rows.value,
-);
+const filtered = computed(() => {
+	let result = status.value
+		? rows.value.filter((row) => row.status === status.value)
+		: rows.value;
+	if (route.query.expiry === "30") {
+		const start = new Date();
+		const end = new Date(start);
+		end.setDate(end.getDate() + 30);
+		result = result.filter((row) => {
+			if (!row.end_date) return false;
+			const date = new Date(row.end_date);
+			return row.status === "Active" && date >= start && date <= end;
+		});
+	}
+	return result;
+});
 
 const statusLabel = (value: ContractStatus) =>
 	({

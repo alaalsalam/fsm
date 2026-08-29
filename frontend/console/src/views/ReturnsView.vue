@@ -9,6 +9,7 @@ import {
 	type ServiceReturnRow,
 	type ReturnItemInput,
 } from "@/lib/fsm";
+import { t } from "@/lib/i18n";
 
 const rows = ref<ServiceReturnRow[]>([]);
 const loading = ref(true);
@@ -45,11 +46,28 @@ const RETURN_TONE: Record<string, string> = {
 function nextAction(
 	status: string,
 ): { action: "approve" | "receive" | "close"; label: string } | null {
-	if (status === "Requested") return { action: "approve", label: "Approve" };
-	if (status === "Approved") return { action: "receive", label: "Receive" };
-	if (status === "Received") return { action: "close", label: "Close" };
+	if (status === "Requested") return { action: "approve", label: t("اعتماد", "Approve") };
+	if (status === "Approved") return { action: "receive", label: t("استلام", "Receive") };
+	if (status === "Received") return { action: "close", label: t("إغلاق", "Close") };
 	return null;
 }
+
+const returnStatus = (status: string) =>
+	({
+		Draft: t("مسودة", "Draft"),
+		Requested: t("مطلوب", "Requested"),
+		Approved: t("معتمد", "Approved"),
+		Received: t("مستلم", "Received"),
+		Closed: t("مغلق", "Closed"),
+		Cancelled: t("ملغي", "Cancelled"),
+	})[status] ?? status;
+
+const dispositionLabel = (value: string) =>
+	({
+		Restock: t("إعادة للمخزون", "Restock"),
+		Refurbish: t("إعادة تأهيل", "Refurbish"),
+		Scrap: t("إتلاف", "Scrap"),
+	})[value] ?? value;
 
 async function load() {
 	loading.value = true;
@@ -57,7 +75,7 @@ async function load() {
 	try {
 		rows.value = await listReturns();
 	} catch {
-		error.value = "Couldn't load returns.";
+		error.value = t("تعذّر تحميل المرتجعات.", "Couldn't load returns.");
 	} finally {
 		loading.value = false;
 	}
@@ -73,7 +91,10 @@ function removeItem(i: number) {
 async function submit() {
 	const items = form.items.filter((i) => i.item_code && i.qty > 0);
 	if (!form.service_job || items.length === 0) {
-		error.value = "Pick a job and at least one item.";
+		error.value = t(
+			"اختر أمر خدمة وصنفًا واحدًا على الأقل.",
+			"Pick a job and at least one item.",
+		);
 		return;
 	}
 	saving.value = true;
@@ -91,8 +112,8 @@ async function submit() {
 		form.reason = "";
 		form.items = [{ item_code: "", qty: 1, disposition: "Restock" }];
 		await load();
-	} catch (e) {
-		error.value = (e as { message?: string })?.message || "Couldn't create the return.";
+	} catch {
+		error.value = t("تعذّر إنشاء المرتجع.", "Couldn't create the return.");
 	} finally {
 		saving.value = false;
 	}
@@ -104,8 +125,8 @@ async function advance(row: ServiceReturnRow, action: "approve" | "receive" | "c
 	try {
 		await processReturn(row.name, action);
 		await load();
-	} catch (e) {
-		error.value = (e as { message?: string })?.message || "Couldn't update the return.";
+	} catch {
+		error.value = t("تعذّر تحديث المرتجع.", "Couldn't update the return.");
 	} finally {
 		busy.value = null;
 	}
@@ -116,14 +137,18 @@ onMounted(load);
 
 <template>
 	<div>
-		<PageHeader eyebrow="Parts" title="Returns" subtitle="Parts coming back from jobs">
+		<PageHeader
+			:eyebrow="t('قطع الغيار', 'Parts')"
+			:title="t('المرتجعات', 'Returns')"
+			:subtitle="t('القطع المعادة من أوامر الخدمة', 'Parts coming back from jobs')"
+		>
 			<template #actions>
 				<button
 					type="button"
 					class="kl-grad-brand inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-white shadow-e2 hover:brightness-110"
 					@click="showForm = !showForm"
 				>
-					{{ showForm ? "Close" : "New return" }}
+					{{ showForm ? t("إغلاق", "Close") : t("مرتجع جديد", "New return") }}
 				</button>
 			</template>
 		</PageHeader>
@@ -140,18 +165,22 @@ onMounted(load);
 			class="mb-6 space-y-4 rounded-2xl border border-border bg-bg p-4 shadow-card backdrop-blur-xl"
 		>
 			<div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-				<LinkField v-model="form.service_job" label="Service job" :search="searchJob" />
+				<LinkField
+					v-model="form.service_job"
+					:label="t('أمر الخدمة', 'Service job')"
+					:search="searchJob"
+				/>
 				<LinkField
 					v-model="form.warehouse"
-					label="Receiving warehouse"
+					:label="t('مستودع الاستلام', 'Receiving warehouse')"
 					:search="searchWarehouse"
 				/>
 				<div>
-					<span class="mb-1 block text-sm font-medium">Reason</span>
+					<span class="mb-1 block text-sm font-medium">{{ t("السبب", "Reason") }}</span>
 					<input
 						v-model="form.reason"
 						class="w-full rounded-md border border-border bg-bg px-3 py-2 focus-visible:outline-none focus-visible:[box-shadow:var(--kl-elevation-focus)]"
-						placeholder="Optional"
+						:placeholder="t('اختياري', 'Optional')"
 					/>
 				</div>
 			</div>
@@ -162,9 +191,13 @@ onMounted(load);
 					:key="i"
 					class="grid grid-cols-1 items-end gap-2 sm:grid-cols-[1fr_5rem_8rem_auto]"
 				>
-					<LinkField v-model="it.item_code" label="Item" :search="searchItem" />
+					<LinkField
+						v-model="it.item_code"
+						:label="t('الصنف', 'Item')"
+						:search="searchItem"
+					/>
 					<div>
-						<span class="mb-1 block text-sm font-medium">Qty</span>
+						<span class="mb-1 block text-sm font-medium">{{ t("الكمية", "Qty") }}</span>
 						<input
 							v-model.number="it.qty"
 							type="number"
@@ -173,14 +206,20 @@ onMounted(load);
 						/>
 					</div>
 					<div>
-						<span class="mb-1 block text-sm font-medium">Disposition</span>
+						<span class="mb-1 block text-sm font-medium">{{
+							t("التصرف", "Disposition")
+						}}</span>
 						<select
 							v-model="it.disposition"
 							class="w-full rounded-md border border-border bg-bg px-3 py-2"
 						>
-							<option value="Restock">Restock</option>
-							<option value="Refurbish">Refurbish</option>
-							<option value="Scrap">Scrap</option>
+							<option
+								v-for="value in ['Restock', 'Refurbish', 'Scrap']"
+								:key="value"
+								:value="value"
+							>
+								{{ dispositionLabel(value) }}
+							</option>
 						</select>
 					</div>
 					<button
@@ -189,7 +228,7 @@ onMounted(load);
 						:disabled="form.items.length === 1"
 						@click="removeItem(i)"
 					>
-						Remove
+						{{ t("إزالة", "Remove") }}
 					</button>
 				</div>
 				<button
@@ -197,7 +236,7 @@ onMounted(load);
 					class="text-sm font-medium text-brand hover:underline"
 					@click="addItem"
 				>
-					+ Add item
+					{{ t("+ إضافة صنف", "+ Add item") }}
 				</button>
 			</div>
 
@@ -209,7 +248,7 @@ onMounted(load);
 					@click="submit"
 				>
 					<Spinner v-if="saving" :size="14" />
-					Create return
+					{{ t("إنشاء المرتجع", "Create return") }}
 				</button>
 			</div>
 		</section>
@@ -223,8 +262,13 @@ onMounted(load);
 		</div>
 		<EmptyState
 			v-else-if="rows.length === 0"
-			title="No returns yet"
-			description="Returns from jobs will appear here. Create one to restock, refurbish or scrap parts."
+			:title="t('لا توجد مرتجعات بعد', 'No returns yet')"
+			:description="
+				t(
+					'ستظهر هنا القطع المرتجعة من أوامر الخدمة. أنشئ مرتجعًا لإعادتها للمخزون أو تأهيلها أو إتلافها.',
+					'Returns from jobs will appear here. Create one to restock, refurbish or scrap parts.',
+				)
+			"
 		/>
 		<div
 			v-else
@@ -233,11 +277,13 @@ onMounted(load);
 			<table class="w-full min-w-md text-left text-sm">
 				<thead class="border-b border-border text-fg-muted">
 					<tr>
-						<th class="px-4 py-2.5 font-medium">Return</th>
-						<th class="px-4 py-2.5 font-medium">Job</th>
-						<th class="px-4 py-2.5 font-medium">Customer</th>
-						<th class="px-4 py-2.5 font-medium">Status</th>
-						<th class="px-4 py-2.5 text-right font-medium">Action</th>
+						<th class="px-4 py-2.5 font-medium">{{ t("المرتجع", "Return") }}</th>
+						<th class="px-4 py-2.5 font-medium">{{ t("أمر الخدمة", "Job") }}</th>
+						<th class="px-4 py-2.5 font-medium">{{ t("العميل", "Customer") }}</th>
+						<th class="px-4 py-2.5 font-medium">{{ t("الحالة", "Status") }}</th>
+						<th class="px-4 py-2.5 text-right font-medium">
+							{{ t("الإجراء", "Action") }}
+						</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -256,7 +302,7 @@ onMounted(load);
 								class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
 								:class="RETURN_TONE[r.status] || RETURN_TONE.Draft"
 							>
-								{{ r.status }}
+								{{ returnStatus(r.status) }}
 							</span>
 						</td>
 						<td class="px-4 py-2.5 text-right">

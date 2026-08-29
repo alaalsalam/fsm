@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
-import { useRouter } from "vue-router";
+import { ref, computed, onMounted, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import {
 	PageHeader,
 	StatusPill,
@@ -15,6 +15,7 @@ import { getDispatchJobs } from "@/lib/fsm";
 import { t } from "@/lib/i18n";
 
 const router = useRouter();
+const route = useRoute();
 
 const jobs = ref<JobSummary[]>([]);
 const loading = ref(true);
@@ -76,7 +77,16 @@ function open(name: string) {
 	router.push({ name: "job-detail", params: { name } });
 }
 
-onMounted(load);
+function applyRouteFilter() {
+	const value = typeof route.query.status === "string" ? route.query.status : "";
+	statusFilter.value = STATUSES.includes(value as JobStatus) ? (value as JobStatus) : "";
+}
+
+watch(() => route.query.status, applyRouteFilter);
+onMounted(() => {
+	applyRouteFilter();
+	load();
+});
 </script>
 
 <template>

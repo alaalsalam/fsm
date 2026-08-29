@@ -10,18 +10,29 @@ const router = useRouter();
 const request = ref<ServiceRequestDoc>();
 const loading = ref(true);
 const busy = ref(false);
+const error = ref("");
 onMounted(async () => {
 	try {
 		request.value = await getServiceRequest(props.name);
+	} catch {
+		error.value = t("تعذّر تحميل طلب الخدمة.", "Couldn't load this service request.");
 	} finally {
 		loading.value = false;
 	}
 });
 async function convert() {
 	busy.value = true;
+	error.value = "";
 	try {
 		const job = await createJobFromRequest(props.name, crypto.randomUUID());
-		router.push(`/jobs/${job.name}`);
+		await router.push(`/jobs/${job.name}`);
+	} catch (e) {
+		error.value =
+			(e as { message?: string })?.message ||
+			t(
+				"تعذّر إنشاء أمر الخدمة من الطلب.",
+				"Couldn't create a service job from this request.",
+			);
 	} finally {
 		busy.value = false;
 	}
@@ -29,7 +40,14 @@ async function convert() {
 </script>
 <template>
 	<main class="p-4 sm:p-6" data-testid="service-request-detail">
-		<Spinner v-if="loading" :size="28" /><template v-else-if="request"
+		<Spinner v-if="loading" :size="28" />
+		<p
+			v-else-if="error && !request"
+			class="rounded-xl border border-danger/30 bg-danger/10 p-4 text-danger"
+		>
+			{{ error }}
+		</p>
+		<template v-else-if="request"
 			><div class="flex flex-wrap items-center justify-between gap-3">
 				<div>
 					<p class="text-sm text-cmd-fg-muted">{{ request.name }}</p>
@@ -38,6 +56,12 @@ async function convert() {
 				<StatusPill :status="request.status" />
 			</div>
 			<p class="mt-4 text-cmd-fg-muted">{{ request.description }}</p>
+			<p
+				v-if="error"
+				class="mt-4 rounded-xl border border-danger/30 bg-danger/10 p-3 text-sm text-danger"
+			>
+				{{ error }}
+			</p>
 			<button
 				v-if="['Open', 'Triaged', 'Converted'].includes(request.status)"
 				class="kl-grad-brand mt-5 rounded-xl px-4 py-2 font-semibold text-white"

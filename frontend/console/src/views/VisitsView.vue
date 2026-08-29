@@ -1,22 +1,36 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
-import { RouterLink } from "vue-router";
-import { PageHeader, Spinner, StatusPill } from "@digit/ui";
+import { onMounted, ref, watch } from "vue";
+import { RouterLink, useRoute } from "vue-router";
+import { formatDate, PageHeader, Spinner, StatusPill } from "@digit/ui";
 import { listProcessVisits, type ProcessVisit } from "@/lib/fsm";
 import { t } from "@/lib/i18n";
 
 const rows = ref<ProcessVisit[]>([]);
+const route = useRoute();
 const loading = ref(true);
 const error = ref("");
-onMounted(async () => {
+
+async function load() {
+	loading.value = true;
+	error.value = "";
 	try {
-		rows.value = await listProcessVisits({ limit: 200 });
+		const params: Record<string, unknown> = { limit: 200 };
+		if (typeof route.query.job === "string") params.job = route.query.job;
+		if (route.query.date_scope === "today") {
+			const today = new Date().toISOString().slice(0, 10);
+			params.date_from = today;
+			params.date_to = today;
+		}
+		rows.value = await listProcessVisits(params);
 	} catch {
 		error.value = t("تعذر تحميل الزيارات.", "Couldn't load visits.");
 	} finally {
 		loading.value = false;
 	}
-});
+}
+
+watch(() => route.fullPath, load);
+onMounted(load);
 </script>
 
 <template>
@@ -51,7 +65,7 @@ onMounted(async () => {
 							}}</RouterLink>
 						</td>
 						<td class="p-4">{{ row.customer_name || "—" }}</td>
-						<td class="p-4">{{ row.scheduled_start || "—" }}</td>
+						<td class="p-4">{{ formatDate(row.scheduled_start, true) }}</td>
 						<td class="p-4">{{ row.service_team || row.primary_technician || "—" }}</td>
 						<td class="p-4"><StatusPill :status="row.status" /></td>
 					</tr>

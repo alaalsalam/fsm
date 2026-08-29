@@ -14,33 +14,37 @@ const cards = computed(() =>
 				{
 					label: t("زيارات اليوم", "Visits today"),
 					value: data.value.visits_today,
-					to: "/visits",
+					to: { path: "/visits", query: { date_scope: "today" } },
 				},
 				{
 					label: t("أوامر غير مسندة", "Unassigned jobs"),
 					value: data.value.unassigned_jobs,
-					to: "/exceptions",
+					to: { path: "/exceptions", query: { type: "unassigned" } },
 				},
 				{
 					label: t("قيد التنفيذ", "In progress"),
 					value: data.value.in_progress,
-					to: "/jobs",
+					to: { path: "/jobs", query: { status: "In Progress" } },
 				},
-				{ label: t("موقوفة", "On hold"), value: data.value.on_hold, to: "/jobs" },
+				{
+					label: t("موقوفة", "On hold"),
+					value: data.value.on_hold,
+					to: { path: "/jobs", query: { status: "On Hold" } },
+				},
 				{
 					label: t("صيانة متأخرة", "Overdue PM"),
 					value: data.value.overdue_pm,
-					to: "/maintenance",
+					to: { path: "/maintenance", query: { tab: "overdue" } },
 				},
 				{
 					label: t("تقارير بانتظار التوقيع", "Reports awaiting signature"),
 					value: data.value.reports_awaiting_signature,
-					to: "/exceptions",
+					to: { path: "/exceptions", query: { type: "reports" } },
 				},
 				{
 					label: t("عقود تنتهي خلال 30 يومًا", "Contracts expiring in 30 days"),
 					value: data.value.contracts_expiring_30_days,
-					to: "/contracts",
+					to: { path: "/contracts", query: { expiry: "30" } },
 				},
 			]
 		: [],

@@ -229,6 +229,27 @@ export function createVisit(job: string): Promise<ServiceVisitRow> {
 	return client.call("fsm.service_operations.commands.create_visit", { job, source: "Console" });
 }
 
+export function planServiceJob(job: string): Promise<JobDoc> {
+	return client.call("fsm.service_operations.commands.plan_job", { job, source: "Console" });
+}
+
+export function scheduleServiceJob(
+	job: string,
+	scheduled_start: string,
+	scheduled_end?: string,
+): Promise<JobDoc> {
+	return client.call("fsm.service_operations.commands.schedule_job", {
+		job,
+		scheduled_start,
+		scheduled_end,
+		source: "Console",
+	});
+}
+
+export function dispatchServiceJob(job: string): Promise<JobDoc> {
+	return client.call("fsm.service_operations.commands.dispatch_job", { job, source: "Console" });
+}
+
 export type TaskStatus = "Pending" | "In Progress" | "Done";
 
 export interface JobTask {
