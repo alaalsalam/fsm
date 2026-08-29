@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { PageHeader, Spinner } from "@digit/ui";
 import {
 	generateApiKeys,
@@ -8,6 +8,7 @@ import {
 	type ApiKeys,
 	type WebhookRow,
 } from "@/lib/fsm";
+import { t } from "@/lib/i18n";
 
 const keys = ref<ApiKeys | null>(null);
 const generating = ref(false);
@@ -19,7 +20,9 @@ async function genKeys() {
 	try {
 		keys.value = await generateApiKeys();
 	} catch (e) {
-		keyError.value = (e as { message?: string })?.message || "Couldn't generate keys.";
+		keyError.value =
+			(e as { message?: string })?.message ||
+			t("تعذّر إنشاء المفاتيح.", "Couldn't generate keys.");
 	} finally {
 		generating.value = false;
 	}
@@ -48,34 +51,42 @@ async function addWebhook() {
 		newUrl.value = "";
 		await loadWebhooks();
 	} catch (e) {
-		hookError.value = (e as { message?: string })?.message || "Couldn't register webhook.";
+		hookError.value =
+			(e as { message?: string })?.message ||
+			t("تعذّر تسجيل الويب هوك.", "Couldn't register webhook.");
 	} finally {
 		adding.value = false;
 	}
 }
 
-const endpoints = [
+const endpoints = computed(() => [
 	{
 		method: "POST",
 		path: "/api/method/fsm.integrations.create_job",
-		desc: "Create a job (customer, service_type, items…)",
+		desc: t(
+			"إنشاء أمر خدمة (customer, service_type, items…)",
+			"Create a job (customer, service_type, items…)",
+		),
 	},
 	{
 		method: "GET",
 		path: "/api/method/fsm.integrations.get_job_status",
-		desc: "Poll a job's status (job)",
+		desc: t("الاستعلام عن حالة أمر الخدمة (job)", "Poll a job's status (job)"),
 	},
 	{
 		method: "GET",
 		path: "/api/method/fsm.integrations.list_jobs",
-		desc: "List jobs (status?, customer?, limit?)",
+		desc: t(
+			"عرض أوامر الخدمة (status?, customer?, limit?)",
+			"List jobs (status?, customer?, limit?)",
+		),
 	},
 	{
 		method: "POST",
 		path: "/api/method/fsm.api.request_service",
-		desc: "Public service request intake",
+		desc: t("استقبال طلبات الخدمة العامة", "Public service request intake"),
 	},
-];
+]);
 
 onMounted(loadWebhooks);
 </script>
@@ -83,9 +94,9 @@ onMounted(loadWebhooks);
 <template>
 	<div>
 		<PageHeader
-			eyebrow="Connect"
-			title="Integrations & API"
-			subtitle="API keys, webhooks and endpoints"
+			:eyebrow="t('الربط', 'Connect')"
+			:title="t('التكاملات وواجهة البرمجة', 'Integrations & API')"
+			:subtitle="t('مفاتيح API والويب هوك ونقاط النهاية', 'API keys, webhooks and endpoints')"
 		/>
 
 		<div class="space-y-6">
@@ -94,9 +105,14 @@ onMounted(loadWebhooks);
 			>
 				<div class="flex items-center justify-between">
 					<div>
-						<h2 class="text-lg font-bold">API keys</h2>
+						<h2 class="text-lg font-bold">{{ t("مفاتيح API", "API keys") }}</h2>
 						<p class="text-sm text-fg-muted">
-							Issue a key/secret for an external system. The secret is shown once.
+							{{
+								t(
+									"أصدر مفتاحاً وسراً لنظام خارجي. يُعرض السر مرة واحدة فقط.",
+									"Issue a key/secret for an external system. The secret is shown once.",
+								)
+							}}
 						</p>
 					</div>
 					<button
@@ -106,7 +122,11 @@ onMounted(loadWebhooks);
 						@click="genKeys"
 					>
 						<Spinner v-if="generating" :size="14" />
-						{{ keys ? "Regenerate" : "Generate keys" }}
+						{{
+							keys
+								? t("إعادة الإنشاء", "Regenerate")
+								: t("إنشاء المفاتيح", "Generate keys")
+						}}
 					</button>
 				</div>
 				<p v-if="keyError" class="mt-2 text-sm text-danger">{{ keyError }}</p>
@@ -123,7 +143,7 @@ onMounted(loadWebhooks);
 			</section>
 			<section class="rounded-2xl border border-border bg-bg shadow-card backdrop-blur-xl">
 				<h2 class="border-b border-border px-4 py-3 text-lg font-bold">
-					Public API endpoints
+					{{ t("نقاط النهاية العامة", "Public API endpoints") }}
 				</h2>
 				<ul class="divide-y divide-border">
 					<li v-for="e in endpoints" :key="e.path" class="px-4 py-2.5">
@@ -147,11 +167,19 @@ onMounted(loadWebhooks);
 			<section
 				class="rounded-2xl border border-border bg-bg p-4 shadow-card backdrop-blur-xl"
 			>
-				<h2 class="text-lg font-bold">Outbound webhooks</h2>
-				<p class="text-sm text-fg-muted">POST Service Job changes to an external URL.</p>
+				<h2 class="text-lg font-bold">{{ t("الويب هوك الصادرة", "Outbound webhooks") }}</h2>
+				<p class="text-sm text-fg-muted">
+					{{
+						t(
+							"إرسال تغييرات أمر الخدمة (POST) إلى رابط خارجي.",
+							"POST Service Job changes to an external URL.",
+						)
+					}}
+				</p>
 				<div class="mt-3 flex gap-2">
 					<input
 						v-model="newUrl"
+						:aria-label="t('رابط الويب هوك', 'Webhook URL')"
 						placeholder="https://example.com/hooks/fsm"
 						class="flex-1 rounded-lg border border-border bg-white/5 px-3 py-2 text-sm"
 						@keydown.enter="addWebhook"
@@ -163,7 +191,7 @@ onMounted(loadWebhooks);
 						@click="addWebhook"
 					>
 						<Spinner v-if="adding" :size="14" />
-						Add
+						{{ t("إضافة", "Add") }}
 					</button>
 				</div>
 				<p v-if="hookError" class="mt-2 text-sm text-danger">{{ hookError }}</p>
@@ -175,7 +203,8 @@ onMounted(loadWebhooks);
 					>
 						<span class="truncate font-mono text-xs text-fg">{{ w.request_url }}</span>
 						<span class="ml-3 shrink-0 text-xs text-fg-muted">
-							{{ w.webhook_docevent }} · {{ w.enabled ? "on" : "off" }}
+							{{ w.webhook_docevent }} ·
+							{{ w.enabled ? t("مفعل", "on") : t("معطل", "off") }}
 						</span>
 					</li>
 				</ul>

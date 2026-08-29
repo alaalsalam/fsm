@@ -36,8 +36,68 @@ import {
 	type JobHub,
 } from "@/lib/fsm";
 import { realtime, JOB_MESSAGE_EVENT, type JobMessageEvent } from "@/lib/realtime";
+import { t } from "@/lib/i18n";
 
 const props = defineProps<{ name: string }>();
+
+const statusAr: Record<string, string> = {
+	Draft: "مسودة",
+	Planned: "مخطط",
+	Scheduled: "مجدول",
+	Dispatched: "موزع",
+	"In Progress": "قيد التنفيذ",
+	"On Hold": "معلق",
+	Completed: "مكتمل",
+	Cancelled: "ملغي",
+	Pending: "قيد الانتظار",
+	Submitted: "معتمد",
+	Ordered: "تم الطلب",
+	Received: "مستلم",
+	Transferred: "منقول",
+	"Partially Ordered": "مطلوب جزئياً",
+	"Partially Received": "مستلم جزئياً",
+	Stopped: "متوقف",
+	"To Bill": "بانتظار الفوترة",
+};
+const showStatus = (s?: string) => (s ? t(statusAr[s] ?? s, s) : "—");
+
+const phaseAr: Record<string, string> = {
+	Planning: "التخطيط",
+	Travel: "التنقل",
+	"Check-In": "تسجيل الوصول",
+	Inspection: "الفحص",
+	Diagnosis: "التشخيص",
+	"On-Site Service": "الخدمة الميدانية",
+	Workshop: "الورشة",
+	Testing: "الاختبار",
+	"Customer Verification": "تحقق العميل",
+	Closeout: "الإقفال",
+};
+const showPhase = (s?: string) => (s ? t(phaseAr[s] ?? s, s) : "—");
+
+const priorityAr: Record<string, string> = {
+	Low: "منخفضة",
+	Medium: "متوسطة",
+	High: "عالية",
+	Urgent: "عاجلة",
+};
+const showPriority = (s?: string) => (s ? t(priorityAr[s] ?? s, s) : "—");
+
+const roleAr: Record<string, string> = {
+	Dispatcher: "المُرسل",
+	Technician: "الفني",
+	Customer: "العميل",
+	System: "النظام",
+};
+const showRole = (s?: string) => (s ? t(roleAr[s] ?? s, s) : "—");
+
+const mrTypeAr: Record<string, string> = {
+	"Material Transfer": "نقل مواد",
+	"Material Issue": "صرف مواد",
+	Purchase: "شراء",
+	Manufacture: "تصنيع",
+};
+const showMrType = (s?: string) => (s ? t(mrTypeAr[s] ?? s, s) : "—");
 
 const job = ref<JobDoc | null>(null);
 const loading = ref(true);
@@ -80,7 +140,10 @@ async function loadSuggestions() {
 	try {
 		suggestions.value = await suggestTechnicians(job.value.name);
 	} catch {
-		assignError.value = "Couldn't load technician suggestions.";
+		assignError.value = t(
+			"تعذّر تحميل اقتراحات الفنيين.",
+			"Couldn't load technician suggestions.",
+		);
 	} finally {
 		loadingSuggestions.value = false;
 	}
@@ -95,7 +158,8 @@ async function assign(technician: string) {
 		suggestions.value = [];
 	} catch (e) {
 		assignError.value =
-			(e as { message?: string })?.message || "Couldn't assign this technician.";
+			(e as { message?: string })?.message ||
+			t("تعذّر إسناد هذا الفني.", "Couldn't assign this technician.");
 	} finally {
 		assigningTo.value = null;
 	}
@@ -113,7 +177,7 @@ async function loadTeamSuggestions() {
 	try {
 		teamSuggestions.value = await suggestTeams(job.value.name);
 	} catch {
-		teamAssignError.value = "Couldn't load team suggestions.";
+		teamAssignError.value = t("تعذّر تحميل اقتراحات الفرق.", "Couldn't load team suggestions.");
 	} finally {
 		loadingTeamSuggestions.value = false;
 	}
@@ -128,7 +192,8 @@ async function assignTeamTo(team: string) {
 		teamSuggestions.value = [];
 	} catch (e) {
 		teamAssignError.value =
-			(e as { message?: string })?.message || "Couldn't assign this team.";
+			(e as { message?: string })?.message ||
+			t("تعذّر إسناد هذا الفريق.", "Couldn't assign this team.");
 	} finally {
 		assigningTeamTo.value = null;
 	}
@@ -172,7 +237,10 @@ async function requestJobParts() {
 	} catch (e) {
 		error.value =
 			(e as { message?: string })?.message ||
-			"Couldn't request parts. Set a van/default warehouse first.";
+			t(
+				"تعذّر طلب القطع. حدد مستودع المركبة أو المستودع الافتراضي أولاً.",
+				"Couldn't request parts. Set a van/default warehouse first.",
+			);
 	} finally {
 		requesting.value = false;
 	}
@@ -201,7 +269,7 @@ async function saveCosts() {
 		});
 		syncCostForm();
 	} catch {
-		error.value = "Couldn't save costing.";
+		error.value = t("تعذّر حفظ التكاليف.", "Couldn't save costing.");
 	} finally {
 		savingCost.value = false;
 	}
@@ -245,7 +313,7 @@ async function sendMessage() {
 		newMessage.value = "";
 		await loadMessages();
 	} catch {
-		error.value = "Couldn't send the message.";
+		error.value = t("تعذّر إرسال الرسالة.", "Couldn't send the message.");
 	} finally {
 		postingMsg.value = false;
 	}
@@ -282,7 +350,7 @@ async function saveFieldNote() {
 		newNote.value = "";
 		await loadFieldNotes();
 	} catch {
-		error.value = "Couldn't save the note.";
+		error.value = t("تعذّر حفظ الملاحظة.", "Couldn't save the note.");
 	} finally {
 		savingNote.value = false;
 	}
@@ -306,7 +374,7 @@ async function load() {
 		loadFieldNotes();
 		loadVisits();
 	} catch {
-		error.value = "Couldn't load this job.";
+		error.value = t("تعذّر تحميل أمر الخدمة.", "Couldn't load this job.");
 	} finally {
 		loading.value = false;
 	}
@@ -319,7 +387,7 @@ async function start(idx: number) {
 	try {
 		job.value = await startJobTask(job.value.name, idx);
 	} catch {
-		error.value = "Couldn't start this step.";
+		error.value = t("تعذّر بدء هذه الخطوة.", "Couldn't start this step.");
 	} finally {
 		busyTask.value = null;
 	}
@@ -333,7 +401,7 @@ async function complete(idx: number) {
 		job.value = await completeJobTask(job.value.name, idx, note.value || undefined);
 		note.value = "";
 	} catch {
-		error.value = "Couldn't complete this step.";
+		error.value = t("تعذّر إتمام هذه الخطوة.", "Couldn't complete this step.");
 	} finally {
 		busyTask.value = null;
 	}
@@ -346,7 +414,7 @@ async function finishJob() {
 	try {
 		job.value = await completeJob(job.value.name);
 	} catch {
-		error.value = "Couldn't complete the job.";
+		error.value = t("تعذّر إتمام أمر الخدمة.", "Couldn't complete the job.");
 	} finally {
 		completing.value = false;
 	}
@@ -360,8 +428,10 @@ async function generateInvoice() {
 		const res = await createInvoiceFromJob(job.value.name);
 		job.value = { ...job.value, sales_invoice: res.name };
 	} catch {
-		error.value =
-			"Couldn't create the invoice. Ensure the job has items and a default company.";
+		error.value = t(
+			"تعذّر إنشاء الفاتورة. تأكد من وجود بنود في أمر الخدمة وشركة افتراضية.",
+			"Couldn't create the invoice. Ensure the job has items and a default company.",
+		);
 	} finally {
 		invoicing.value = false;
 	}
@@ -387,7 +457,7 @@ onBeforeUnmount(() => offMessage?.());
 			to="/"
 			class="mb-4 inline-flex items-center gap-1 text-sm text-fg-muted hover:text-fg"
 		>
-			← Back to dispatch
+			← {{ t("العودة إلى لوحة التوزيع", "Back to dispatch") }}
 		</RouterLink>
 
 		<div v-if="loading" class="flex justify-center py-16"><Spinner :size="28" /></div>
@@ -419,7 +489,9 @@ onBeforeUnmount(() => offMessage?.());
 			<section v-if="hub" class="rounded-2xl border border-border bg-bg p-5 shadow-card">
 				<div class="flex flex-wrap items-start justify-between gap-4">
 					<div>
-						<p class="text-xs uppercase tracking-wide text-fg-muted">Next Action</p>
+						<p class="text-xs uppercase tracking-wide text-fg-muted">
+							{{ t("الإجراء التالي", "Next Action") }}
+						</p>
 						<p class="mt-1 text-lg font-semibold">
 							{{ hub.next_action.message || hub.next_action.action }}
 						</p>
@@ -428,8 +500,9 @@ onBeforeUnmount(() => offMessage?.());
 						</p>
 					</div>
 					<div class="text-sm text-fg-muted">
-						<span v-if="job.project">Project: {{ job.project }} · </span
-						><span>Phase: {{ job.phase || "—" }}</span>
+						<span v-if="job.project"
+							>{{ t("المشروع", "Project") }}: {{ job.project }} · </span
+						><span>{{ t("المرحلة", "Phase") }}: {{ showPhase(job.phase) }}</span>
 					</div>
 				</div>
 				<div v-if="hub.completion_blockers.length" class="mt-4 grid gap-2 md:grid-cols-2">
@@ -447,12 +520,15 @@ onBeforeUnmount(() => offMessage?.());
 				<div class="mt-4 grid grid-cols-3 gap-2 text-center text-xs sm:grid-cols-6">
 					<div
 						v-for="item in [
-							{ label: 'Visits', value: hub.visits.length },
-							{ label: 'Inspections', value: hub.inspections.length },
-							{ label: 'Failures', value: hub.failures.length },
-							{ label: 'Workshop', value: hub.workshop.length },
-							{ label: 'Reports', value: hub.reports.length },
-							{ label: 'Certificates', value: hub.certificates.length },
+							{ label: t('الزيارات', 'Visits'), value: hub.visits.length },
+							{ label: t('الفحوصات', 'Inspections'), value: hub.inspections.length },
+							{ label: t('الأعطال', 'Failures'), value: hub.failures.length },
+							{ label: t('الورشة', 'Workshop'), value: hub.workshop.length },
+							{ label: t('التقارير', 'Reports'), value: hub.reports.length },
+							{
+								label: t('الشهادات', 'Certificates'),
+								value: hub.certificates.length,
+							},
 						]"
 						:key="item.label"
 						class="rounded-xl bg-white/3 p-3"
@@ -467,14 +543,16 @@ onBeforeUnmount(() => offMessage?.());
 				<div class="space-y-6 lg:col-span-2">
 					<section class="rounded-2xl border border-border bg-bg p-4 shadow-card">
 						<div class="flex items-center justify-between">
-							<h2 class="text-lg font-bold">Service Visits</h2>
+							<h2 class="text-lg font-bold">
+								{{ t("زيارات الخدمة", "Service Visits") }}
+							</h2>
 							<button
 								type="button"
 								class="rounded-lg border border-border px-3 py-1.5 text-sm"
 								:disabled="creatingVisit"
 								@click="addVisit"
 							>
-								Create visit
+								{{ t("إنشاء زيارة", "Create visit") }}
 							</button>
 						</div>
 						<div class="mt-3 space-y-2">
@@ -484,7 +562,14 @@ onBeforeUnmount(() => offMessage?.());
 								class="flex items-center justify-between rounded-xl bg-white/3 p-3"
 							>
 								<div>
-									<p class="font-medium">Visit {{ visit.visit_number }}</p>
+									<p class="font-medium">
+										{{
+											t(
+												`الزيارة ${visit.visit_number}`,
+												`Visit ${visit.visit_number}`,
+											)
+										}}
+									</p>
 									<p class="text-xs text-fg-muted">
 										{{ visit.name }} · {{ datetime(visit.scheduled_start) }}
 									</p>
@@ -492,7 +577,7 @@ onBeforeUnmount(() => offMessage?.());
 								<StatusPill :status="visit.status" />
 							</div>
 							<p v-if="!visits.length" class="text-sm text-fg-muted">
-								No service visits yet.
+								{{ t("لا توجد زيارات بعد.", "No service visits yet.") }}
 							</p>
 						</div>
 					</section>
@@ -502,7 +587,7 @@ onBeforeUnmount(() => offMessage?.());
 						<div
 							class="flex items-center justify-between border-b border-border px-4 py-3"
 						>
-							<h2 class="text-lg font-bold">Checklist</h2>
+							<h2 class="text-lg font-bold">{{ t("قائمة المهام", "Checklist") }}</h2>
 							<span
 								v-if="tasks.length"
 								class="rounded-full bg-white/5 px-2.5 py-0.5 font-mono text-xs text-fg-muted tabular-nums"
@@ -513,25 +598,25 @@ onBeforeUnmount(() => offMessage?.());
 
 						<ul v-if="tasks.length" class="divide-y divide-border">
 							<li
-								v-for="t in tasks"
-								:key="t.idx"
+								v-for="task in tasks"
+								:key="task.idx"
 								class="flex items-start gap-3 px-4 py-3"
 								:class="{
-									'opacity-50': t.status !== 'Done' && t.idx !== activeIdx,
+									'opacity-50': task.status !== 'Done' && task.idx !== activeIdx,
 								}"
 							>
 								<span
 									class="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full border"
 									:class="
-										t.status === 'Done'
+										task.status === 'Done'
 											? 'border-brand bg-brand text-white'
-											: t.idx === activeIdx
+											: task.idx === activeIdx
 												? 'border-brand text-brand'
 												: 'border-border text-fg-muted'
 									"
 								>
 									<svg
-										v-if="t.status === 'Done'"
+										v-if="task.status === 'Done'"
 										viewBox="0 0 24 24"
 										class="size-3.5"
 										fill="none"
@@ -543,62 +628,68 @@ onBeforeUnmount(() => offMessage?.());
 									>
 										<path d="M20 6 9 17l-5-5" />
 									</svg>
-									<span v-else class="font-mono text-xs">{{ t.idx }}</span>
+									<span v-else class="font-mono text-xs">{{ task.idx }}</span>
 								</span>
 
 								<div class="min-w-0 flex-1">
 									<p
 										class="text-base"
 										:class="{
-											'text-fg-muted line-through': t.status === 'Done',
+											'text-fg-muted line-through': task.status === 'Done',
 										}"
 									>
-										{{ t.task }}
+										{{ task.task }}
 									</p>
 									<p
-										v-if="t.note"
+										v-if="task.note"
 										class="text-sm text-fg-muted"
-										:class="{ 'line-through': t.status === 'Done' }"
+										:class="{ 'line-through': task.status === 'Done' }"
 									>
-										{{ t.note }}
+										{{ task.note }}
 									</p>
 									<p
-										v-if="t.status === 'Done' && t.completed_on"
+										v-if="task.status === 'Done' && task.completed_on"
 										class="mt-0.5 text-xs text-fg-muted"
 									>
-										Done at {{ time(t.completed_on) }}
+										{{ t("أُنجزت في", "Done at") }}
+										{{ time(task.completed_on) }}
 									</p>
 
-									<div v-if="t.idx === activeIdx" class="mt-2">
+									<div v-if="task.idx === activeIdx" class="mt-2">
 										<button
-											v-if="t.status === 'Pending'"
+											v-if="task.status === 'Pending'"
 											type="button"
-											:disabled="busyTask === t.idx"
+											:disabled="busyTask === task.idx"
 											class="kl-grad-brand inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-semibold text-white shadow-e2 transition-[filter] hover:brightness-110 disabled:opacity-60"
-											@click="start(t.idx)"
+											@click="start(task.idx)"
 										>
-											<Spinner v-if="busyTask === t.idx" :size="14" />
-											Start step
+											<Spinner v-if="busyTask === task.idx" :size="14" />
+											{{ t("بدء الخطوة", "Start step") }}
 										</button>
 										<div v-else class="space-y-2">
 											<input
 												v-model="note"
-												placeholder="Add a note (optional)"
+												:placeholder="
+													t(
+														'أضف ملاحظة (اختياري)',
+														'Add a note (optional)',
+													)
+												"
 												class="w-full rounded-lg border border-border bg-white/5 px-3 py-1.5 text-sm focus-visible:outline-none focus-visible:[box-shadow:var(--kl-elevation-focus)]"
 											/>
 											<button
 												type="button"
-												:disabled="busyTask === t.idx"
+												:disabled="busyTask === task.idx"
 												class="kl-grad-brand inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-semibold text-white shadow-e2 transition-[filter] hover:brightness-110 disabled:opacity-60"
-												@click="complete(t.idx)"
+												@click="complete(task.idx)"
 											>
-												<Spinner v-if="busyTask === t.idx" :size="14" />
-												Complete step
+												<Spinner v-if="busyTask === task.idx" :size="14" />
+												{{ t("إتمام الخطوة", "Complete step") }}
 											</button>
 										</div>
 									</div>
 									<p
-										v-else-if="t.status !== 'Done'"
+										v-else-if="task.status !== 'Done'"
 										class="mt-1 inline-flex items-center gap-1 text-xs text-fg-muted"
 									>
 										<svg
@@ -612,7 +703,7 @@ onBeforeUnmount(() => offMessage?.());
 											<rect x="5" y="11" width="14" height="9" rx="2" />
 											<path d="M8 11V8a4 4 0 0 1 8 0v3" />
 										</svg>
-										Locked
+										{{ t("مقفلة", "Locked") }}
 									</p>
 								</div>
 							</li>
@@ -620,7 +711,12 @@ onBeforeUnmount(() => offMessage?.());
 
 						<div v-else class="px-4 py-6">
 							<p class="text-sm text-fg-muted">
-								No checklist on this job. Mark it complete when the work is done.
+								{{
+									t(
+										"لا توجد قائمة مهام لهذا الأمر. حدده كمكتمل عند انتهاء العمل.",
+										"No checklist on this job. Mark it complete when the work is done.",
+									)
+								}}
 							</p>
 							<button
 								v-if="job.status !== 'Completed'"
@@ -630,7 +726,7 @@ onBeforeUnmount(() => offMessage?.());
 								@click="finishJob"
 							>
 								<Spinner v-if="completing" :size="14" />
-								Mark visit complete
+								{{ t("تحديد الزيارة كمكتملة", "Mark visit complete") }}
 							</button>
 						</div>
 
@@ -638,7 +734,12 @@ onBeforeUnmount(() => offMessage?.());
 							v-if="allDone"
 							class="border-t border-border px-4 py-3 text-sm font-medium text-success"
 						>
-							All steps complete — job marked completed.
+							{{
+								t(
+									"اكتملت جميع الخطوات — تم تحديد أمر الخدمة كمكتمل.",
+									"All steps complete — job marked completed.",
+								)
+							}}
 						</p>
 					</section>
 
@@ -646,7 +747,7 @@ onBeforeUnmount(() => offMessage?.());
 						class="rounded-2xl border border-border bg-bg shadow-card backdrop-blur-xl"
 					>
 						<h2 class="border-b border-border px-4 py-3 text-lg font-bold">
-							Parts &amp; services
+							{{ t("قطع الغيار والخدمات", "Parts & services") }}
 						</h2>
 						<div class="overflow-x-auto">
 							<table
@@ -655,10 +756,18 @@ onBeforeUnmount(() => offMessage?.());
 							>
 								<thead class="border-b border-border text-fg-muted">
 									<tr>
-										<th class="px-4 py-2 font-medium">Item</th>
-										<th class="px-4 py-2 text-right font-medium">Qty</th>
-										<th class="px-4 py-2 text-right font-medium">Rate</th>
-										<th class="px-4 py-2 text-right font-medium">Amount</th>
+										<th class="px-4 py-2 font-medium">
+											{{ t("الصنف", "Item") }}
+										</th>
+										<th class="px-4 py-2 text-right font-medium">
+											{{ t("الكمية", "Qty") }}
+										</th>
+										<th class="px-4 py-2 text-right font-medium">
+											{{ t("السعر", "Rate") }}
+										</th>
+										<th class="px-4 py-2 text-right font-medium">
+											{{ t("المبلغ", "Amount") }}
+										</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -683,7 +792,9 @@ onBeforeUnmount(() => offMessage?.());
 								</tbody>
 								<tfoot>
 									<tr class="border-t border-border">
-										<td class="px-4 py-2 font-medium" colspan="3">Total</td>
+										<td class="px-4 py-2 font-medium" colspan="3">
+											{{ t("الإجمالي", "Total") }}
+										</td>
 										<td
 											class="px-4 py-2 text-right font-mono font-medium tabular-nums"
 										>
@@ -694,7 +805,7 @@ onBeforeUnmount(() => offMessage?.());
 							</table>
 						</div>
 						<p v-if="!job.items?.length" class="px-4 py-6 text-sm text-fg-muted">
-							No items added.
+							{{ t("لم تتم إضافة بنود.", "No items added.") }}
 						</p>
 					</section>
 					<section
@@ -703,7 +814,9 @@ onBeforeUnmount(() => offMessage?.());
 						<div
 							class="flex items-center justify-between border-b border-border px-4 py-3"
 						>
-							<h2 class="text-lg font-bold">Parts &amp; logistics</h2>
+							<h2 class="text-lg font-bold">
+								{{ t("القطع والخدمات اللوجستية", "Parts & logistics") }}
+							</h2>
 							<button
 								type="button"
 								:disabled="requesting || !job.items?.length"
@@ -711,7 +824,7 @@ onBeforeUnmount(() => offMessage?.());
 								@click="requestJobParts"
 							>
 								<Spinner v-if="requesting" :size="14" />
-								Request parts
+								{{ t("طلب قطع", "Request parts") }}
 							</button>
 						</div>
 
@@ -731,15 +844,17 @@ onBeforeUnmount(() => offMessage?.());
 								<div>
 									<p class="font-mono text-xs text-fg">{{ mr.name }}</p>
 									<p class="text-xs text-fg-muted">
-										{{ mr.material_request_type }} · ordered
-										{{ Math.round(mr.per_ordered) }}% · received
+										{{ showMrType(mr.material_request_type) }} ·
+										{{ t("طُلب", "ordered") }}
+										{{ Math.round(mr.per_ordered) }}% ·
+										{{ t("استُلم", "received") }}
 										{{ Math.round(mr.per_received) }}%
 									</p>
 								</div>
 								<span
 									class="rounded-full bg-white/5 px-2.5 py-0.5 text-xs text-fg-muted"
 								>
-									{{ mr.status }}
+									{{ showStatus(mr.status) }}
 								</span>
 							</div>
 							<div
@@ -750,47 +865,57 @@ onBeforeUnmount(() => offMessage?.());
 								<div>
 									<p class="font-mono text-xs text-fg">{{ dn.name }}</p>
 									<p class="text-xs text-fg-muted">
-										Delivery · {{ dn.posting_date }}
+										{{ t("توصيل", "Delivery") }} · {{ dn.posting_date }}
 									</p>
 								</div>
 								<span
 									class="rounded-full bg-white/5 px-2.5 py-0.5 text-xs text-fg-muted"
 								>
-									{{ dn.status }}
+									{{ showStatus(dn.status) }}
 								</span>
 							</div>
 						</div>
 						<p v-else class="px-4 py-6 text-sm text-fg-muted">
-							No parts requests yet. Use “Request parts” to transfer this job's items
-							to the technician's van.
+							{{
+								t(
+									"لا توجد طلبات قطع بعد. استخدم «طلب قطع» لنقل بنود هذا الأمر إلى مركبة الفني.",
+									"No parts requests yet. Use “Request parts” to transfer this job's items to the technician's van.",
+								)
+							}}
 						</p>
 					</section>
 
 					<section
 						class="rounded-2xl border border-border bg-bg shadow-card backdrop-blur-xl"
 					>
-						<h2 class="border-b border-border px-4 py-3 text-lg font-bold">Costing</h2>
+						<h2 class="border-b border-border px-4 py-3 text-lg font-bold">
+							{{ t("التكاليف", "Costing") }}
+						</h2>
 						<div class="grid grid-cols-2 gap-px bg-border sm:grid-cols-4">
 							<div class="bg-bg px-4 py-3">
-								<p class="text-xs text-fg-muted">Actual hours</p>
+								<p class="text-xs text-fg-muted">
+									{{ t("الساعات الفعلية", "Actual hours") }}
+								</p>
 								<p class="font-mono text-lg tabular-nums text-fg">
 									{{ (job.actual_hours ?? 0).toFixed(2) }}
 								</p>
 							</div>
 							<div class="bg-bg px-4 py-3">
-								<p class="text-xs text-fg-muted">Labour</p>
+								<p class="text-xs text-fg-muted">{{ t("العمالة", "Labour") }}</p>
 								<p class="font-mono text-lg tabular-nums text-fg">
 									{{ currency(job.labor_cost) }}
 								</p>
 							</div>
 							<div class="bg-bg px-4 py-3">
-								<p class="text-xs text-fg-muted">Materials</p>
+								<p class="text-xs text-fg-muted">{{ t("المواد", "Materials") }}</p>
 								<p class="font-mono text-lg tabular-nums text-fg">
 									{{ currency(job.materials_cost) }}
 								</p>
 							</div>
 							<div class="bg-bg px-4 py-3">
-								<p class="text-xs text-fg-muted">Total cost</p>
+								<p class="text-xs text-fg-muted">
+									{{ t("إجمالي التكلفة", "Total cost") }}
+								</p>
 								<p class="font-mono text-lg font-semibold tabular-nums text-brand">
 									{{ currency(job.total_cost) }}
 								</p>
@@ -800,9 +925,9 @@ onBeforeUnmount(() => offMessage?.());
 						<div class="space-y-3 border-t border-border p-4">
 							<div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
 								<label class="block">
-									<span class="mb-1 block text-xs text-fg-muted"
-										>Labour rate /hr</span
-									>
+									<span class="mb-1 block text-xs text-fg-muted">{{
+										t("أجر الساعة", "Labour rate /hr")
+									}}</span>
 									<input
 										v-model.number="costForm.labor_rate"
 										type="number"
@@ -811,7 +936,9 @@ onBeforeUnmount(() => offMessage?.());
 									/>
 								</label>
 								<label class="block">
-									<span class="mb-1 block text-xs text-fg-muted">Overhead</span>
+									<span class="mb-1 block text-xs text-fg-muted">{{
+										t("التكاليف غير المباشرة", "Overhead")
+									}}</span>
 									<input
 										v-model.number="costForm.overhead_cost"
 										type="number"
@@ -820,9 +947,9 @@ onBeforeUnmount(() => offMessage?.());
 									/>
 								</label>
 								<label class="block">
-									<span class="mb-1 block text-xs text-fg-muted"
-										>Estimated hours</span
-									>
+									<span class="mb-1 block text-xs text-fg-muted">{{
+										t("الساعات المقدّرة", "Estimated hours")
+									}}</span>
 									<input
 										v-model.number="costForm.estimated_hours"
 										type="number"
@@ -840,7 +967,7 @@ onBeforeUnmount(() => offMessage?.());
 									@click="saveCosts"
 								>
 									<Spinner v-if="savingCost" :size="14" />
-									Save costing
+									{{ t("حفظ التكاليف", "Save costing") }}
 								</button>
 								<button
 									v-if="job.service_type"
@@ -850,23 +977,30 @@ onBeforeUnmount(() => offMessage?.());
 									@click="runEstimate"
 								>
 									<Spinner v-if="estimating" :size="14" />
-									Estimate from history
+									{{ t("تقدير من السجل", "Estimate from history") }}
 								</button>
 								<p v-if="estimate" class="text-sm text-fg-muted">
 									<template v-if="estimate.avg_hours != null">
-										~{{ estimate.avg_hours }}h avg over
-										{{ estimate.sample_size }} {{ estimate.basis }} job(s)
+										{{
+											t(
+												`~${estimate.avg_hours} ساعة وسطياً عبر ${estimate.sample_size} أمر (${estimate.basis})`,
+												`~${estimate.avg_hours}h avg over ${estimate.sample_size} ${estimate.basis} job(s)`,
+											)
+										}}
 										<button
 											type="button"
 											class="ml-1 font-medium text-brand hover:underline"
 											@click="useEstimate"
 										>
-											Use
+											{{ t("استخدام", "Use") }}
 										</button>
 									</template>
-									<template v-else
-										>No history yet for “{{ estimate.service_type }}”.</template
-									>
+									<template v-else>{{
+										t(
+											`لا يوجد سجل بعد لـ «${estimate.service_type}».`,
+											`No history yet for “${estimate.service_type}”.`,
+										)
+									}}</template>
 								</p>
 							</div>
 						</div>
@@ -874,10 +1008,17 @@ onBeforeUnmount(() => offMessage?.());
 					<section
 						class="rounded-2xl border border-border bg-bg shadow-card backdrop-blur-xl"
 					>
-						<h2 class="border-b border-border px-4 py-3 text-lg font-bold">Messages</h2>
+						<h2 class="border-b border-border px-4 py-3 text-lg font-bold">
+							{{ t("الرسائل", "Messages") }}
+						</h2>
 						<div class="max-h-80 space-y-3 overflow-y-auto px-4 py-3">
 							<p v-if="messages.length === 0" class="text-sm text-fg-muted">
-								No messages yet. Reach the customer or technician here.
+								{{
+									t(
+										"لا توجد رسائل بعد. تواصل مع العميل أو الفني من هنا.",
+										"No messages yet. Reach the customer or technician here.",
+									)
+								}}
 							</p>
 							<div v-for="m in messages" :key="m.name" class="text-sm">
 								<div class="flex items-center gap-2">
@@ -893,7 +1034,7 @@ onBeforeUnmount(() => offMessage?.());
 												m.author_role === 'System',
 										}"
 									>
-										{{ m.author_role }}
+										{{ showRole(m.author_role) }}
 									</span>
 									<span class="text-xs text-fg-muted">
 										{{ m.author_name }} · {{ datetime(m.creation) }}
@@ -905,7 +1046,7 @@ onBeforeUnmount(() => offMessage?.());
 						<div class="flex gap-2 border-t border-border p-3">
 							<input
 								v-model="newMessage"
-								placeholder="Write a message…"
+								:placeholder="t('اكتب رسالة…', 'Write a message…')"
 								class="flex-1 rounded-lg border border-border bg-white/5 px-3 py-2 text-sm focus-visible:outline-none focus-visible:[box-shadow:var(--kl-elevation-focus)]"
 								@keydown.enter="sendMessage"
 							/>
@@ -916,7 +1057,7 @@ onBeforeUnmount(() => offMessage?.());
 								@click="sendMessage"
 							>
 								<Spinner v-if="postingMsg" :size="14" />
-								Send
+								{{ t("إرسال", "Send") }}
 							</button>
 						</div>
 					</section>
@@ -924,7 +1065,7 @@ onBeforeUnmount(() => offMessage?.());
 						class="rounded-2xl border border-border bg-bg shadow-card backdrop-blur-xl"
 					>
 						<h2 class="border-b border-border px-4 py-3 text-lg font-bold">
-							Customer field notes
+							{{ t("ملاحظات ميدانية عن العميل", "Customer field notes") }}
 						</h2>
 						<ul v-if="fieldNotes.length" class="divide-y divide-border">
 							<li v-for="n in fieldNotes" :key="n.name" class="px-4 py-2.5 text-sm">
@@ -932,18 +1073,28 @@ onBeforeUnmount(() => offMessage?.());
 								<p class="mt-0.5 text-xs text-fg-muted">
 									{{ n.technician || "—" }} · {{ n.visit_date }}
 									<span v-if="n.service_job === job.name" class="text-brand"
-										>· this job</span
+										>· {{ t("هذا الأمر", "this job") }}</span
 									>
 								</p>
 							</li>
 						</ul>
 						<p v-else class="px-4 py-3 text-sm text-fg-muted">
-							No field notes for this customer.
+							{{
+								t(
+									"لا توجد ملاحظات ميدانية لهذا العميل.",
+									"No field notes for this customer.",
+								)
+							}}
 						</p>
 						<div class="flex gap-2 border-t border-border p-3">
 							<input
 								v-model="newNote"
-								placeholder="Add a field note (e.g. access code, equipment quirk)…"
+								:placeholder="
+									t(
+										'أضف ملاحظة ميدانية (مثل رمز الدخول أو خصوصية المعدة)…',
+										'Add a field note (e.g. access code, equipment quirk)…',
+									)
+								"
 								class="flex-1 rounded-lg border border-border bg-white/5 px-3 py-2 text-sm focus-visible:outline-none focus-visible:[box-shadow:var(--kl-elevation-focus)]"
 								@keydown.enter="saveFieldNote"
 							/>
@@ -954,7 +1105,7 @@ onBeforeUnmount(() => offMessage?.());
 								@click="saveFieldNote"
 							>
 								<Spinner v-if="savingNote" :size="14" />
-								Add
+								{{ t("إضافة", "Add") }}
 							</button>
 						</div>
 					</section>
@@ -963,7 +1114,7 @@ onBeforeUnmount(() => offMessage?.());
 						v-if="job.notes"
 						class="rounded-2xl border border-border bg-bg p-4 shadow-card backdrop-blur-xl"
 					>
-						<h2 class="mb-2 text-lg font-bold">Notes</h2>
+						<h2 class="mb-2 text-lg font-bold">{{ t("الملاحظات", "Notes") }}</h2>
 						<p class="whitespace-pre-line text-sm text-fg">{{ job.notes }}</p>
 					</section>
 				</div>
@@ -973,27 +1124,32 @@ onBeforeUnmount(() => offMessage?.());
 				>
 					<dl class="space-y-3 text-sm">
 						<div>
-							<dt class="text-fg-muted">Scheduled</dt>
+							<dt class="text-fg-muted">{{ t("الموعد المجدول", "Scheduled") }}</dt>
 							<dd class="text-fg">{{ datetime(job.scheduled_date) }}</dd>
 						</div>
 						<div>
-							<dt class="text-fg-muted">Technician</dt>
-							<dd class="text-fg">{{ job.primary_technician || "Unassigned" }}</dd>
+							<dt class="text-fg-muted">{{ t("الفني", "Technician") }}</dt>
+							<dd class="text-fg">
+								{{ job.primary_technician || t("غير مسند", "Unassigned") }}
+							</dd>
 						</div>
 						<div>
-							<dt class="text-fg-muted">Service Team</dt>
+							<dt class="text-fg-muted">{{ t("فريق الخدمة", "Service Team") }}</dt>
 							<dd class="text-fg">
-								{{ job.assigned_service_team || "Unassigned"
+								{{ job.assigned_service_team || t("غير مسند", "Unassigned")
 								}}<span v-if="job.team_leader" class="text-fg-muted">
-									· Lead: {{ job.team_leader }}</span
+									· {{ t("القائد", "Lead") }}: {{ job.team_leader }}</span
 								>
 							</dd>
 						</div>
 						<div>
-							<dt class="text-fg-muted">Response SLA</dt>
+							<dt class="text-fg-muted">
+								{{ t("اتفاقية زمن الاستجابة", "Response SLA") }}
+							</dt>
 							<dd class="text-fg">
 								<span v-if="job.responded_on" class="text-success"
-									>Responded {{ datetime(job.responded_on) }}</span
+									>{{ t("تمت الاستجابة", "Responded") }}
+									{{ datetime(job.responded_on) }}</span
 								>
 								<span
 									v-else-if="job.sla_breached"
@@ -1003,24 +1159,26 @@ onBeforeUnmount(() => offMessage?.());
 										class="size-1.5 rounded-full bg-danger"
 										aria-hidden="true"
 									/>
-									Breached · due {{ datetime(job.promised_response_by) }}
+									{{ t("متجاوزة · الاستحقاق", "Breached · due") }}
+									{{ datetime(job.promised_response_by) }}
 								</span>
 								<span v-else-if="job.promised_response_by"
-									>Due {{ datetime(job.promised_response_by) }}</span
+									>{{ t("الاستحقاق", "Due") }}
+									{{ datetime(job.promised_response_by) }}</span
 								>
 								<span v-else class="text-fg-muted">—</span>
 							</dd>
 						</div>
 						<div>
-							<dt class="text-fg-muted">Priority</dt>
-							<dd class="text-fg">{{ job.priority || "—" }}</dd>
+							<dt class="text-fg-muted">{{ t("الأولوية", "Priority") }}</dt>
+							<dd class="text-fg">{{ showPriority(job.priority) }}</dd>
 						</div>
 						<div>
-							<dt class="text-fg-muted">Service type</dt>
+							<dt class="text-fg-muted">{{ t("نوع الخدمة", "Service type") }}</dt>
 							<dd class="text-fg">{{ job.service_type || "—" }}</dd>
 						</div>
 						<div>
-							<dt class="text-fg-muted">Address</dt>
+							<dt class="text-fg-muted">{{ t("العنوان", "Address") }}</dt>
 							<dd class="whitespace-pre-line text-fg">
 								{{ job.address_display || "—" }}
 							</dd>
@@ -1028,7 +1186,7 @@ onBeforeUnmount(() => offMessage?.());
 					</dl>
 
 					<div class="border-t border-border pt-3">
-						<p class="mb-1 text-fg-muted">Invoice</p>
+						<p class="mb-1 text-fg-muted">{{ t("الفاتورة", "Invoice") }}</p>
 						<p v-if="job.sales_invoice" class="font-mono text-sm text-brand">
 							{{ job.sales_invoice }}
 						</p>
@@ -1040,15 +1198,21 @@ onBeforeUnmount(() => offMessage?.());
 							@click="generateInvoice"
 						>
 							<Spinner v-if="invoicing" :size="16" />
-							{{ invoicing ? "Creating…" : "Create invoice" }}
+							{{
+								invoicing
+									? t("جارٍ الإنشاء…", "Creating…")
+									: t("إنشاء فاتورة", "Create invoice")
+							}}
 						</button>
 					</div>
 
 					<!-- Customer feedback (Feature 12) -->
 					<div class="border-t border-border pt-3">
-						<p class="mb-1 text-fg-muted">Customer feedback</p>
+						<p class="mb-1 text-fg-muted">
+							{{ t("التغذية الراجعة من العميل", "Customer feedback") }}
+						</p>
 						<div v-if="feedback">
-							<p class="text-lg" aria-label="rating">
+							<p class="text-lg" :aria-label="t('التقييم', 'rating')">
 								<span class="text-warning">{{ "★".repeat(feedback.rating) }}</span>
 								<span class="text-fg-muted">{{
 									"★".repeat(5 - feedback.rating)
@@ -1067,8 +1231,11 @@ onBeforeUnmount(() => offMessage?.());
 						<p v-else class="text-sm text-fg-muted">
 							{{
 								job.status === "Completed"
-									? "Awaiting customer rating."
-									: "Available after the job is completed."
+									? t("بانتظار تقييم العميل.", "Awaiting customer rating.")
+									: t(
+											"متاحة بعد إتمام أمر الخدمة.",
+											"Available after the job is completed.",
+										)
 							}}
 						</p>
 					</div>
@@ -1081,8 +1248,8 @@ onBeforeUnmount(() => offMessage?.());
 							<p class="text-fg-muted">
 								{{
 									job.primary_technician
-										? "Reassign technician"
-										: "Assign technician"
+										? t("إعادة إسناد الفني", "Reassign technician")
+										: t("إسناد فني", "Assign technician")
 								}}
 							</p>
 							<button
@@ -1091,7 +1258,11 @@ onBeforeUnmount(() => offMessage?.());
 								class="text-xs font-medium text-brand hover:underline disabled:opacity-50"
 								@click="loadSuggestions"
 							>
-								{{ loadingSuggestions ? "Finding…" : "Suggest" }}
+								{{
+									loadingSuggestions
+										? t("جارٍ البحث…", "Finding…")
+										: t("اقتراح", "Suggest")
+								}}
 							</button>
 						</div>
 
@@ -1119,14 +1290,18 @@ onBeforeUnmount(() => offMessage?.());
 										@click="assign(s.technician)"
 									>
 										<Spinner v-if="assigningTo === s.technician" :size="12" />
-										Assign
+										{{ t("إسناد", "Assign") }}
 									</button>
 								</div>
 							</li>
 						</ul>
 						<p v-else-if="!loadingSuggestions" class="text-xs text-fg-muted">
-							Tap “Suggest” to rank available technicians by skill, territory and
-							proximity.
+							{{
+								t(
+									"اضغط «اقتراح» لترتيب الفنيين المتاحين حسب المهارة والمنطقة والقرب.",
+									"Tap “Suggest” to rank available technicians by skill, territory and proximity.",
+								)
+							}}
 						</p>
 					</div>
 
@@ -1136,7 +1311,11 @@ onBeforeUnmount(() => offMessage?.());
 					>
 						<div class="mb-2 flex items-center justify-between">
 							<p class="text-fg-muted">
-								{{ job.assigned_service_team ? "Reassign team" : "Assign team" }}
+								{{
+									job.assigned_service_team
+										? t("إعادة إسناد الفريق", "Reassign team")
+										: t("إسناد فريق", "Assign team")
+								}}
 							</p>
 							<button
 								type="button"
@@ -1144,7 +1323,11 @@ onBeforeUnmount(() => offMessage?.());
 								class="text-xs font-medium text-brand hover:underline disabled:opacity-50"
 								@click="loadTeamSuggestions"
 							>
-								{{ loadingTeamSuggestions ? "Finding…" : "Suggest" }}
+								{{
+									loadingTeamSuggestions
+										? t("جارٍ البحث…", "Finding…")
+										: t("اقتراح", "Suggest")
+								}}
 							</button>
 						</div>
 
@@ -1174,13 +1357,18 @@ onBeforeUnmount(() => offMessage?.());
 										@click="assignTeamTo(s.team)"
 									>
 										<Spinner v-if="assigningTeamTo === s.team" :size="12" />
-										Assign
+										{{ t("إسناد", "Assign") }}
 									</button>
 								</div>
 							</li>
 						</ul>
 						<p v-else-if="!loadingTeamSuggestions" class="text-xs text-fg-muted">
-							Tap “Suggest” to rank service teams by skill, territory and capacity.
+							{{
+								t(
+									"اضغط «اقتراح» لترتيب فرق الخدمة حسب المهارة والمنطقة والسعة.",
+									"Tap “Suggest” to rank service teams by skill, territory and capacity.",
+								)
+							}}
 						</p>
 					</div>
 				</aside>
