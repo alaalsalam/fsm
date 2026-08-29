@@ -87,22 +87,26 @@ def _migrate_legacy_labels():
 		frappe.db.set_value("Service Job", job, "request_idempotency_key", f"{SCENARIO_KEY}-أمر-01")
 
 
-def seed_presentation_data():
+def seed_presentation_data(company=None, customer=None):
 	"""Create a safe, linked FSM demonstration scenario and return its records.
 
 	Run through ``bench --site <demo-site> execute fsm.demo.seed_presentation_data``.
-	The method is safe to run repeatedly on a designated demo site.
+	The method is safe to run repeatedly on a designated demo site. Pass ``company``
+	(and optionally ``customer``) to seed the scenario under the site's ACTIVE company
+	so it shows on the company-scoped Digit/FSM screens.
 	"""
 	frappe.set_user("Administrator")
 	_migrate_legacy_labels()
 
-	_rename_if_needed("Company", "Digit Basic", PRESENTATION_COMPANY)
-	_rename_if_needed("Company", "Digit Basic Demo", "شركة نماء لإدارة الأعمال")
-	company = _first("Company", {"name": PRESENTATION_COMPANY}) or _first("Company")
+	if not company:
+		_rename_if_needed("Company", "Digit Basic", PRESENTATION_COMPANY)
+		_rename_if_needed("Company", "Digit Basic Demo", "شركة نماء لإدارة الأعمال")
+		company = _first("Company", {"name": PRESENTATION_COMPANY}) or _first("Company")
 	if not company:
 		frappe.throw("A Company is required before FSM demo data can be created.")
 
-	customer = _first("Customer", {"disabled": 0})
+	if not customer:
+		customer = _first("Customer", {"disabled": 0})
 	if not customer:
 		customer = _get_or_create(
 			"Customer",
