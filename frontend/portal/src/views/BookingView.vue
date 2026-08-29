@@ -5,13 +5,19 @@ import { Spinner, t } from "@digit/ui";
 import { requestService } from "@/lib/api";
 import { session } from "@/lib/session";
 
-type ServiceId = "hvac" | "plumbing" | "electrical" | "appliance" | "pest" | "other";
+type ServiceId =
+	| "preventive"
+	| "corrective"
+	| "inspection"
+	| "installation"
+	| "emergency"
+	| "other";
 const services: { id: ServiceId; key: string; ar: string }[] = [
-	{ id: "hvac", key: "HVAC repair", ar: "إصلاح التكييف" },
-	{ id: "plumbing", key: "Plumbing", ar: "السباكة" },
-	{ id: "electrical", key: "Electrical", ar: "الكهرباء" },
-	{ id: "appliance", key: "Appliance repair", ar: "إصلاح الأجهزة" },
-	{ id: "pest", key: "Pest control", ar: "مكافحة الآفات" },
+	{ id: "preventive", key: "Preventive Maintenance", ar: "صيانة وقائية" },
+	{ id: "corrective", key: "Corrective Maintenance", ar: "صيانة تصحيحية" },
+	{ id: "inspection", key: "Equipment Inspection", ar: "فحص معدات" },
+	{ id: "installation", key: "Installation", ar: "تركيب وتشغيل" },
+	{ id: "emergency", key: "Emergency Service", ar: "خدمة طارئة" },
 	{ id: "other", key: "Other", ar: "أخرى" },
 ];
 
@@ -104,22 +110,22 @@ async function submit() {
 								stroke-linejoin="round"
 								aria-hidden="true"
 							>
-								<template v-if="s.id === 'hvac'">
+								<template v-if="s.id === 'preventive'">
 									<path d="M12 2v20M4 7l16 10M20 7 4 17" />
 								</template>
-								<template v-else-if="s.id === 'plumbing'">
+								<template v-else-if="s.id === 'corrective'">
 									<path
 										d="M14.7 6.3a4 4 0 0 1 0 5.6l-1.4 1.4-5.6-5.6 1.4-1.4a4 4 0 0 1 5.6 0zM7.7 7.7 3 12.4V18h5.6l4.7-4.7"
 									/>
 								</template>
-								<template v-else-if="s.id === 'electrical'">
+								<template v-else-if="s.id === 'inspection'">
 									<path d="M13 2 3 14h8l-1 8 10-12h-8z" />
 								</template>
-								<template v-else-if="s.id === 'appliance'">
+								<template v-else-if="s.id === 'installation'">
 									<rect x="5" y="3" width="14" height="18" rx="2" />
 									<path d="M9 7h.01M9 11h.01" />
 								</template>
-								<template v-else-if="s.id === 'pest'">
+								<template v-else-if="s.id === 'emergency'">
 									<path
 										d="M12 8a4 4 0 0 1 4 4v3a4 4 0 0 1-8 0v-3a4 4 0 0 1 4-4zM9 4l1.5 2M15 4l-1.5 2M4 12h2M18 12h2M5 17l2-1M19 17l-2-1"
 									/>

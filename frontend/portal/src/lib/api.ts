@@ -94,6 +94,23 @@ export interface PortalHub {
 	certificates: Array<Record<string, string | number>>;
 	quotations: Array<Record<string, string | number>>;
 	invoices: Array<Record<string, string | number>>;
+	visits: Array<Record<string, string | number>>;
+	items: Array<Record<string, string | number>>;
+	services: string[];
+	calendar: Array<{
+		type: "visit" | "maintenance";
+		name: string;
+		service_job?: string;
+		start: string;
+		end?: string;
+		status: string;
+		title: string;
+		site?: string;
+		team?: string;
+		technician?: string;
+		equipment?: string;
+		equipment_count?: number;
+	}>;
 }
 
 export function getMyPortalHub(): Promise<PortalHub> {

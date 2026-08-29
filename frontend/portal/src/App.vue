@@ -19,7 +19,7 @@ async function handleSignOut() {
 	<div class="kl-command flex min-h-screen flex-col">
 		<header class="sticky top-0 z-20">
 			<div
-				class="kl-glass mx-auto mt-3 flex max-w-3xl items-center justify-between rounded-2xl px-4 py-3"
+				class="kl-glass mx-auto mt-3 flex max-w-6xl items-center justify-between rounded-2xl px-4 py-3"
 			>
 				<RouterLink to="/" class="flex items-center gap-2.5">
 					<DigitBrand
@@ -80,6 +80,16 @@ async function handleSignOut() {
 							>{{ t("المواقع", "Sites") }}</RouterLink
 						>
 						<RouterLink
+							to="/my-schedule"
+							class="hidden rounded-lg px-2 py-1.5 font-medium text-cmd-fg-muted transition-colors hover:text-cmd-fg sm:inline-flex"
+							>{{ t("جدول الصيانة", "Schedule") }}</RouterLink
+						>
+						<RouterLink
+							to="/my-services"
+							class="hidden rounded-lg px-2 py-1.5 font-medium text-cmd-fg-muted transition-colors hover:text-cmd-fg sm:inline-flex"
+							>{{ t("الخدمات", "Services") }}</RouterLink
+						>
+						<RouterLink
 							to="/my-equipment"
 							class="hidden rounded-lg px-2 py-1.5 font-medium text-cmd-fg-muted transition-colors hover:text-cmd-fg sm:inline-flex"
 							>{{ t("المعدات", "Equipment") }}</RouterLink
@@ -117,12 +127,12 @@ async function handleSignOut() {
 			</div>
 		</header>
 
-		<main class="mx-auto w-full max-w-3xl flex-1 px-4 py-8">
+		<main class="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
 			<RouterView />
 		</main>
 
 		<footer
-			class="mx-auto flex w-full max-w-3xl flex-col items-center justify-between gap-2 px-4 py-6 text-sm text-cmd-fg-muted sm:flex-row"
+			class="mx-auto flex w-full max-w-6xl flex-col items-center justify-between gap-2 px-4 py-6 text-sm text-cmd-fg-muted sm:flex-row"
 		>
 			<span dir="ltr">© DIGIT</span>
 			<span>{{ t("خدمة ميدانية سريعة وموثوقة.", "Fast, friendly field service.") }}</span>

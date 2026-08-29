@@ -54,14 +54,70 @@ onMounted(async () => {
 		<p v-else-if="error" class="rounded-xl bg-danger/10 p-4 text-danger">{{ error }}</p>
 		<template v-else-if="hub">
 			<section class="grid grid-cols-2 gap-3 md:grid-cols-3">
-				<div
+				<RouterLink
 					v-for="(value, key) in hub.dashboard"
 					:key="key"
+					:to="
+						String(key).includes('maintenance')
+							? '/my-schedule'
+							: String(key) === 'equipment'
+								? '/my-equipment'
+								: String(key) === 'sites'
+									? '/my-sites'
+									: '/my-services'
+					"
 					class="kl-glass rounded-2xl p-4"
 				>
 					<p class="text-xs text-cmd-fg-muted">{{ label(String(key)) }}</p>
 					<p class="mt-1 text-2xl font-bold tabular-nums text-cmd-fg">{{ value }}</p>
-				</div>
+				</RouterLink>
+			</section>
+
+			<section class="grid gap-4 md:grid-cols-3">
+				<RouterLink
+					to="/my-schedule"
+					class="rounded-2xl border border-brand/20 bg-brand/5 p-5 transition hover:shadow-glass"
+					><p class="text-xs font-semibold text-brand">
+						{{ t("الموعد التالي", "Next appointment") }}
+					</p>
+					<strong class="mt-2 block text-lg text-cmd-fg">{{
+						hub.calendar[0]
+							? statusLabel(hub.calendar[0].title)
+							: t("لا يوجد موعد قريب", "No upcoming appointment")
+					}}</strong>
+					<p v-if="hub.calendar[0]" class="mt-1 text-sm text-cmd-fg-muted">
+						{{ date(hub.calendar[0].start) }} ·
+						{{ hub.calendar[0].site || hub.calendar[0].equipment }}
+					</p></RouterLink
+				>
+				<RouterLink to="/my-services" class="kl-glass rounded-2xl p-5"
+					><p class="text-xs font-semibold text-brand">
+						{{ t("الخدمات والبنود", "Services & items") }}
+					</p>
+					<strong class="mt-2 block text-lg text-cmd-fg"
+						>{{ hub.services.length }}
+						{{ t("خدمات مرتبطة بملفك", "services in your account") }}</strong
+					>
+					<p class="mt-1 text-sm text-cmd-fg-muted">
+						{{ t("الأعمال وقطع الغيار والتقارير", "Jobs, parts and reports") }}
+					</p></RouterLink
+				>
+				<RouterLink to="/" class="kl-grad-brand rounded-2xl p-5 text-white"
+					><p class="text-xs font-semibold opacity-80">
+						{{ t("تحتاج مساعدة؟", "Need help?") }}
+					</p>
+					<strong class="mt-2 block text-lg">{{
+						t("طلب خدمة جديدة", "Request a new service")
+					}}</strong>
+					<p class="mt-1 text-sm opacity-80">
+						{{
+							t(
+								"أرسل الطلب وسنتولى الجدولة",
+								"Send the request and we will schedule it",
+							)
+						}}
+					</p></RouterLink
+				>
 			</section>
 
 			<section id="maintenance" class="space-y-3">
