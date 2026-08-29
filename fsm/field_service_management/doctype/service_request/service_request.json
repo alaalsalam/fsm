@@ -11,7 +11,7 @@
   {"default":"Draft","fieldname":"status","fieldtype":"Select","in_list_view":1,"in_standard_filter":1,"label":"Status","options":"Draft\nOpen\nTriaged\nConverted\nClosed\nCancelled","read_only":1},
   {"default":"Medium","fieldname":"priority","fieldtype":"Select","label":"Priority","options":"Low\nMedium\nHigh\nUrgent"},
   {"fieldname":"service_type","fieldtype":"Data","label":"Service Type"},
-  {"default":"company:Global Defaults:default_company","fieldname":"company","fieldtype":"Link","in_standard_filter":1,"label":"Company","options":"Company","reqd":1,"search_index":1},
+  {"default":"__default","fieldname":"company","fieldtype":"Link","in_standard_filter":1,"label":"Company","options":"Company","reqd":1,"search_index":1},
   {"fieldname":"project","fieldtype":"Link","in_standard_filter":1,"label":"Project","options":"Project","search_index":1},
   {"fieldname":"customer_section","fieldtype":"Section Break","label":"Customer"},
   {"fieldname":"customer","fieldtype":"Link","in_list_view":1,"label":"Customer","options":"Customer","search_index":1},

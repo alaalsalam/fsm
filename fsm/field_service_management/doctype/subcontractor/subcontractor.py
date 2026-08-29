@@ -1,6 +1,7 @@
 # Copyright (c) 2026, DIGIT and contributors
 # For license information, please see license.txt
 
+import frappe
 from frappe.model.document import Document
 
 
@@ -23,4 +24,8 @@ class Subcontractor(Document):
 		territory: DF.Link | None
 	# end: auto-generated types
 
-	pass
+	def before_validate(self):
+		if not self.company:
+			self.company = frappe.defaults.get_user_default("Company") or frappe.defaults.get_global_default(
+				"company"
+			)

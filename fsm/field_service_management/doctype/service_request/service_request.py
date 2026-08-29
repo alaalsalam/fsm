@@ -5,6 +5,16 @@ from frappe.utils import now_datetime
 
 
 class ServiceRequest(Document):
+	def before_validate(self):
+		self._set_default_company()
+
+	def _set_default_company(self):
+		"""Keep Desk, imports, and API-created requests on the active Company."""
+		if not self.company:
+			self.company = frappe.defaults.get_user_default("Company") or frappe.defaults.get_global_default(
+				"company"
+			)
+
 	def before_insert(self):
 		if not self.status:
 			self.status = "Draft"

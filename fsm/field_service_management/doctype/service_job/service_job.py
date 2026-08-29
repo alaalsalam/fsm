@@ -66,6 +66,12 @@ class ServiceJob(Document):
 		total_amount: DF.Currency
 	# end: auto-generated types
 
+	def before_validate(self):
+		if not self.company:
+			self.company = frappe.defaults.get_user_default("Company") or frappe.defaults.get_global_default(
+				"company"
+			)
+
 	def before_insert(self):
 		if self.status not in (None, "", "Draft") and not self.flags.fsm_command:
 			frappe.throw(_("Service Jobs must enter the lifecycle in Draft through an application command."))

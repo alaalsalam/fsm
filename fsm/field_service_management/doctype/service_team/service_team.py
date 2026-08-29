@@ -35,6 +35,12 @@ class ServiceTeam(Document):
 		vehicle: DF.Data | None
 	# end: auto-generated types
 
+	def before_validate(self):
+		if not self.company:
+			self.company = frappe.defaults.get_user_default("Company") or frappe.defaults.get_global_default(
+				"company"
+			)
+
 	def validate(self):
 		self._validate_team_window()
 		self._validate_members()
