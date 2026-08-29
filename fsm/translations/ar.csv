@@ -925,3 +925,39 @@ Create or link a service contract,إنشاء عقد خدمة أو ربطه
 Preview preventive maintenance plans,معاينة خطط الصيانة الوقائية
 Activate plans and generate the schedule,تفعيل الخطط وتوليد جدول الصيانة
 After-sales setup is operational,إعداد ما بعد البيع جاهز للتشغيل
+Service Journey,رحلة الخدمة
+Sale to Collection Workflow,مسار العمل من البيع إلى التحصيل
+Operations Calendar,تقويم التشغيل
+Delivery Notes,إشعارات التسليم
+Active Service Jobs,أوامر الخدمة النشطة
+Maintenance Due,الصيانة المستحقة
+Sales Invoices,فواتير العملاء
+Payments,سندات القبض والدفع
+1. Sale & After-Sales,١. البيع وما بعد البيع
+2. Coverage & Planning,٢. التغطية والتخطيط
+3. Request & Execution,٣. الطلب والتنفيذ
+4. Reports & Quality,٤. التقارير والجودة
+5. Billing & Collection,٥. الفوترة والتحصيل
+6. Teams & Setup,٦. الفرق والإعداد
+Customers,العملاء
+Customer Sites,مواقع العملاء
+Service Contracts,عقود الخدمة
+Maintenance Plans,خطط الصيانة
+Maintenance Schedule,جدول الصيانة
+Service Requests,طلبات الخدمة
+Service Jobs,أوامر الخدمة
+Service Visits,زيارات الخدمة
+Equipment Inspections,فحوصات المعدات
+Service Time Logs,سجلات وقت الخدمة
+Service Reports,تقارير الخدمة
+Service Certificates,شهادات الخدمة
+Workshop Returns,مرتجعات الورشة
+Quotations,عروض الأسعار
+Payment Entries,سندات القبض والدفع
+Material Requests,طلبات المواد
+Stock Entries,حركات المخزون
+Technicians,الفنيون
+Service Teams,فرق الخدمة
+Service Territories,نطاقات الخدمة
+Inspection Templates,قوالب الفحص
+Checklist Templates,قوالب قوائم التحقق
