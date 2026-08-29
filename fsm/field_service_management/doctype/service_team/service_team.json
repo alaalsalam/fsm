@@ -11,7 +11,7 @@
   {"description":"Unique name identifying this field service crew.","fieldname":"team_name","fieldtype":"Data","in_list_view":1,"label":"Team Name","reqd":1,"unique":1},
   {"default":"Active","description":"Operational state of the team: Active, Inactive, or Suspended.","fieldname":"status","fieldtype":"Select","in_list_view":1,"in_standard_filter":1,"label":"Status","options":"Active\nInactive\nSuspended"},
   {"fieldname":"column_break_head","fieldtype":"Column Break"},
-  {"default":"__default","description":"The operating company this team belongs to.","fieldname":"company","fieldtype":"Link","in_standard_filter":1,"label":"Company","options":"Company","reqd":1,"search_index":1},
+  {"description":"The operating company this team belongs to.","fieldname":"company","fieldtype":"Link","in_standard_filter":1,"label":"Company","options":"Company","reqd":1,"search_index":1},
   {"description":"The service territory or geographic area this team is responsible for covering.","fieldname":"territory","fieldtype":"Link","in_standard_filter":1,"label":"Service Territory","options":"Service Territory","search_index":1},
   {"description":"The technician who leads the crew; must be one of the team members.","fieldname":"team_leader","fieldtype":"Link","label":"Team Leader","options":"Technician"},
   {"collapsible":1,"fieldname":"section_break_logistics","fieldtype":"Section Break","label":"Capacity & Logistics"},

@@ -14,7 +14,7 @@
   {"description":"The system user account linked to this technician for login and mobile app access.","fieldname":"user","fieldtype":"Link","label":"User","options":"User"},
   {"default":"Employee","description":"Whether the technician is an in-house employee or an external contractor.","fieldname":"worker_type","fieldtype":"Select","in_standard_filter":1,"label":"Worker Type","options":"Employee\nContractor"},
   {"depends_on":"eval:doc.worker_type==\"Contractor\"","description":"The subcontracting company this technician works for when they are a contractor.","fieldname":"subcontractor","fieldtype":"Link","label":"Subcontractor","options":"Subcontractor"},
-  {"default":"__default","description":"The company that employs or engages this technician, used for access scoping.","fieldname":"company","fieldtype":"Link","in_standard_filter":1,"label":"Company","options":"Company","reqd":1,"search_index":1},
+  {"description":"The company that employs or engages this technician, used for access scoping.","fieldname":"company","fieldtype":"Link","in_standard_filter":1,"label":"Company","options":"Company","reqd":1,"search_index":1},
   {"fieldname":"section_break_contact","fieldtype":"Section Break","label":"Contact & Coverage"},
   {"description":"Contact phone number for reaching the technician in the field.","fieldname":"phone","fieldtype":"Data","label":"Phone","options":"Phone"},
   {"description":"The service territory or region this technician is assigned to cover.","fieldname":"territory","fieldtype":"Link","in_standard_filter":1,"label":"Service Territory","options":"Service Territory","search_index":1},

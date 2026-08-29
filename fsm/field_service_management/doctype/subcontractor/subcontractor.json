@@ -10,7 +10,7 @@
   {"fieldname":"details_section","fieldtype":"Section Break","label":"Details"},
   {"description":"Business name of the external subcontractor who performs field work on your behalf.","fieldname":"subcontractor_name","fieldtype":"Data","in_list_view":1,"label":"Subcontractor Name","reqd":1,"unique":1},
   {"default":"Active","description":"Whether this subcontractor is currently active and available for assignments.","fieldname":"status","fieldtype":"Select","in_list_view":1,"in_standard_filter":1,"label":"Status","options":"Active\nInactive"},
-  {"default":"__default","description":"Operating company that engages this subcontractor.","fieldname":"company","fieldtype":"Link","in_standard_filter":1,"label":"Company","options":"Company","reqd":1,"search_index":1},
+  {"description":"Operating company that engages this subcontractor.","fieldname":"company","fieldtype":"Link","in_standard_filter":1,"label":"Company","options":"Company","reqd":1,"search_index":1},
   {"fieldname":"column_break_main","fieldtype":"Column Break"},
   {"description":"Service territory this subcontractor covers.","fieldname":"territory","fieldtype":"Link","in_standard_filter":1,"label":"Service Territory","options":"Service Territory"},
   {"description":"Default labour rate billed by this subcontractor per hour.","fieldname":"hourly_rate","fieldtype":"Currency","label":"Hourly Rate"},

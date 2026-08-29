@@ -15,7 +15,7 @@
   {"description":"The customer who owns the equipment or site being serviced and will be billed.","fieldname":"customer","fieldtype":"Link","in_list_view":1,"in_standard_filter":1,"label":"Customer","options":"Customer","reqd":1},
   {"description":"The customer's display name, fetched automatically from the customer record.","fetch_from":"customer.customer_name","fieldname":"customer_name","fieldtype":"Data","label":"Customer Name","read_only":1},
   {"description":"The person to reach on site or by phone for coordinating this job.","fieldname":"contact","fieldtype":"Link","label":"Contact","options":"Contact"},
-  {"default":"__default","description":"The operating company responsible for delivering and invoicing this job.","fieldname":"company","fieldtype":"Link","in_standard_filter":1,"label":"Company","options":"Company","reqd":1,"search_index":1},
+  {"description":"The operating company responsible for delivering and invoicing this job.","fieldname":"company","fieldtype":"Link","in_standard_filter":1,"label":"Company","options":"Company","reqd":1,"search_index":1},
   {"description":"The project this job is booked against for tracking and cost roll-up.","fieldname":"project","fieldtype":"Link","in_standard_filter":1,"label":"Project","options":"Project","search_index":1},
   {"fieldname":"column_break_head","fieldtype":"Column Break"},
   {"default":"Draft","description":"Current lifecycle stage of the job, from Draft through Completed or Cancelled.","fieldname":"status","fieldtype":"Select","in_list_view":1,"in_standard_filter":1,"label":"Status","options":"Draft\nPlanned\nScheduled\nDispatched\nIn Progress\nOn Hold\nCompleted\nCancelled","read_only":1},
