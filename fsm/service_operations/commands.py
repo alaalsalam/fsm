@@ -205,7 +205,7 @@ def _visit_read_access(name: str):
 
 @frappe.whitelist()
 def create_visit(job: str, scheduled_start: str | None = None, scheduled_end: str | None = None,
-	primary_technician: str | None = None, service_team: str | None = None, source="API", correlation_id=None):
+	primary_technician: str | None = None, source="API", correlation_id=None):
 	job_doc = require_job_access(job, "write", manager_only=True)
 	if job_doc.status in {"Draft", "Completed", "Cancelled"}:
 		frappe.throw(_("Visits can only be created for an active planned job."))
@@ -218,7 +218,7 @@ def create_visit(job: str, scheduled_start: str | None = None, scheduled_end: st
 	count = frappe.db.count("Service Visit", {"service_job": job})
 	visit = frappe.get_doc({"doctype": "Service Visit", "service_job": job, "project": job_doc.project,
 		"visit_number": count + 1, "scheduled_start": scheduled_start, "scheduled_end": scheduled_end,
-		"service_team": service_team or job_doc.assigned_service_team,
+		"service_team": job_doc.assigned_service_team,
 		"primary_technician": primary_technician or job_doc.primary_technician,
 		"service_address": job_doc.service_address, "latitude": job_doc.service_latitude,
 		"longitude": job_doc.service_longitude, "status": "Planned"})

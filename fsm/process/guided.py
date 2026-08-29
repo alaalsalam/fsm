@@ -79,7 +79,6 @@ def schedule_job_with_visit(
 		scheduled_start=scheduled_start,
 		scheduled_end=scheduled_end,
 		primary_technician=primary_technician,
-		service_team=service_team,
 		source="Console",
 		correlation_id=f"guided:{job}",
 	)
