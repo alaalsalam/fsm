@@ -48,6 +48,8 @@ CORE adds no unscoped `get_all`. Request→Job and Job→Visit reads remain perm
 
 FLOW-GATE adds no guest endpoint. Operations/Visits/Exceptions/Customer 360 are Manager/System-Manager company projections. After-Sales requires both Delivery Note read permission and company scope. Contract→PM is rooted in an authorized contract and creates only same-customer/company/site equipment rows through the existing validated Maintenance command.
 
+The commercial after-sales delta adds no Guest API. `search_submitted_delivery_notes` requires FSM Manager/System Manager and applies native read permission plus allowed-company filtering. `retry_contract_from_delivery` requires the exact Delivery Note company scope and rejects drafts/returns. Invoice/Delivery submission handlers are internal system operations rooted in a submitted ERPNext document; their `ignore_permissions` insert is not user-callable and the resulting Contract controller revalidates Customer, Company, source references, equipment, and site ownership.
+
 ## Phase 15 HARDENING delta (2026-08-26)
 
 | Data/read path | Query form | Scope applied before/inside query | Fields/output control | Leakage decision |

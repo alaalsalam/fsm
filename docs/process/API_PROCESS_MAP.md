@@ -2,8 +2,8 @@
 
 | Flow | Read/projection APIs | Mutation owners |
 |---|---|---|
-| After-sales | `fsm.process.after_sales.get_after_sales_setup`, installed-base APIs | Delivery Note provisioning; installed-base commands |
-| Contract → PM | contract/maintenance APIs, preview in `maintenance_flow` | `create_maintenance_plans_from_contract`, maintenance commands |
+| After-sales | `get_after_sales_setup`, `search_submitted_delivery_notes`, installed-base APIs | submitted Invoice/Delivery hooks, guarded contract retry, installation confirmation |
+| Contract → PM | contract/maintenance APIs, review projection in `maintenance_flow` | Contract activation creates Draft plans; Plan activation approves and generates occurrences |
 | Request → Job | service-operations APIs, `get_next_action` | service-operation command handlers |
 | Job hub | `get_job_hub`, visits, logistics, reporting and commercial projections | domain command modules only |
 | PM | maintenance list/summary APIs | generate/release/reschedule/skip commands |
