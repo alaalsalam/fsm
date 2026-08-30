@@ -1,4 +1,21 @@
 frappe.ui.form.on("Service Contract", {
+	setup(frm) {
+		frm.set_query("customer_site", "covered_equipment", () => ({
+			filters: {
+				company: frm.doc.company || "",
+				customer: frm.doc.customer || "",
+				status: "Active",
+			},
+		}));
+		frm.set_query("installed_equipment", "covered_equipment", () => ({
+			filters: {
+				company: frm.doc.company || "",
+				customer: frm.doc.customer || "",
+				customer_site: ["is", "set"],
+				status: ["not in", ["Returned", "Replaced", "Disposed"]],
+			},
+		}));
+	},
 	refresh(frm) {
 		if (frm.is_new()) {
 			frm.set_intro(
@@ -8,17 +25,30 @@ frappe.ui.form.on("Service Contract", {
 			return;
 		}
 		if (frm.doc.status === "Draft") {
+			const commercialScopeReady =
+				!frm.doc.automation_key || frm.doc.covered_equipment?.length;
 			frm.set_intro(
 				frm.doc.automation_key
-					? __("Review the sales source, equipment scope, service terms, and cadence. Activation will prepare draft maintenance plans automatically.")
+					? __(
+							"Review the sales source, equipment scope, service terms, and cadence. Activation will prepare draft maintenance plans automatically.",
+						)
 					: __("Review the scope and service terms before activation."),
 				"orange",
 			);
-			frm.add_custom_button(
-				__("Activate contract"),
-				() => transition_contract(frm, "Active"),
-				__("Next step"),
-			);
+			if (commercialScopeReady) {
+				frm.add_custom_button(
+					__("Activate contract"),
+					() => transition_contract(frm, "Active"),
+					__("Next step"),
+				);
+			}
+			if (frm.doc.automation_key && frm.doc.delivery_note) {
+				frm.add_custom_button(
+					__("Complete installation and contract scope"),
+					() => open_after_sales(frm),
+					__("Next step"),
+				);
+			}
 		}
 		if (frm.doc.status === "Active") {
 			frm.add_custom_button(
@@ -30,9 +60,7 @@ frappe.ui.form.on("Service Contract", {
 		if (frm.doc.delivery_note) {
 			frm.add_custom_button(
 				__("Continue after-sales journey"),
-				() => {
-					window.location.href = `/fsm-console/after-sales?delivery_note=${encodeURIComponent(frm.doc.delivery_note)}&contract=${encodeURIComponent(frm.doc.name)}`;
-				},
+				() => open_after_sales(frm),
 				__("Next step"),
 			);
 		}
@@ -45,6 +73,10 @@ frappe.ui.form.on("Service Contract", {
 		);
 	},
 });
+
+function open_after_sales(frm) {
+	window.location.href = `/fsm-console/after-sales?delivery_note=${encodeURIComponent(frm.doc.delivery_note)}&contract=${encodeURIComponent(frm.doc.name)}`;
+}
 
 async function transition_contract(frm, status) {
 	await frappe.call({

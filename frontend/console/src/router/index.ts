@@ -147,6 +147,7 @@ const routes: RouteRecordRaw[] = [
 const router = createRouter({
 	history: createWebHistory("/fsm-console/"),
 	routes,
+	scrollBehavior: () => ({ top: 0, left: 0 }),
 });
 
 export function authGuardDecision(

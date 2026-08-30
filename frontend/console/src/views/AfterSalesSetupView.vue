@@ -5,6 +5,7 @@ import type { MaintenancePlanStatus } from "@digit/api";
 import { KlButton, LinkField, PageHeader, Spinner, statusLabel } from "@digit/ui";
 import {
 	confirmEquipmentInstallation,
+	confirmDeliveryInstallations,
 	getAfterSalesSetup,
 	maintenance,
 	provisionAfterSalesEquipment,
@@ -94,21 +95,40 @@ const nextActionText = computed(() => {
 	);
 });
 
-async function load() {
+async function load(preserveFeedback = false) {
 	if (!deliveryNote.value) return;
 	loading.value = true;
-	error.value = "";
-	success.value = "";
+	if (!preserveFeedback) {
+		error.value = "";
+		success.value = "";
+	}
 	try {
 		data.value = await getAfterSalesSetup(deliveryNote.value);
-		selectedSite.value ||= data.value.sites.find((row) => row.status === "Active")?.name || "";
-		selectedContract.value ||=
-			(typeof route.query.contract === "string" ? route.query.contract : "") ||
-			data.value.contracts.find((row) => row.status === "Active")?.name ||
-			data.value.contracts[0]?.name ||
-			"";
+		if (!data.value.sites.some((row) => row.name === selectedSite.value)) {
+			const activeSites = data.value.sites.filter((row) => row.status === "Active");
+			selectedSite.value = activeSites.length === 1 ? activeSites[0]?.name || "" : "";
+		}
+		const requestedContract =
+			typeof route.query.contract === "string" &&
+			data.value.contracts.some((row) => row.name === route.query.contract)
+				? route.query.contract
+				: "";
+		if (!data.value.contracts.some((row) => row.name === selectedContract.value)) {
+			selectedContract.value =
+				requestedContract ||
+				data.value.contracts.find((row) => row.status === "Active")?.name ||
+				data.value.contracts[0]?.name ||
+				"";
+		}
+		planPreview.value = null;
 		cadence.first_due_date = data.value.delivery_note.posting_date || cadence.first_due_date;
-		await router.replace({ query: { ...route.query, delivery_note: deliveryNote.value } });
+		await router.replace({
+			query: {
+				...route.query,
+				delivery_note: deliveryNote.value,
+				contract: selectedContract.value || undefined,
+			},
+		});
 	} catch (e) {
 		error.value =
 			(e as { message?: string })?.message ||
@@ -121,6 +141,34 @@ async function load() {
 	}
 }
 
+async function confirmAllInstallations() {
+	if (!selectedSite.value) {
+		error.value = t("اختر موقع التركيب أولًا.", "Select an installation site first.");
+		return;
+	}
+	busy.value = "install-all";
+	error.value = "";
+	success.value = "";
+	try {
+		const result = await confirmDeliveryInstallations(deliveryNote.value, selectedSite.value);
+		data.value = result.journey;
+		success.value = t(
+			`تم تأكيد تركيب ${result.count} معدة وربطها بالعقد.`,
+			`${result.count} equipment installations were confirmed and linked to the contract.`,
+		);
+		await load(true);
+	} catch (e) {
+		error.value =
+			(e as { message?: string })?.message ||
+			t(
+				"تعذر تأكيد تركيب معدات التسليم.",
+				"Couldn't confirm the delivered equipment installations.",
+			);
+	} finally {
+		busy.value = "";
+	}
+}
+
 async function provision() {
 	busy.value = "provision";
 	error.value = "";
@@ -130,7 +178,7 @@ async function provision() {
 			"تم إنشاء سجلات المعدات وربطها بإشعار التسليم.",
 			"Equipment records were created and linked to the Delivery Note.",
 		);
-		await load();
+		await load(true);
 	} catch (e) {
 		error.value =
 			(e as { message?: string })?.message ||
@@ -154,7 +202,7 @@ async function confirmInstallation(row: AfterSalesEquipment) {
 			`تم تأكيد تركيب ${row.equipment_id}.`,
 			`${row.equipment_id} installation confirmed.`,
 		);
-		await load();
+		await load(true);
 	} catch (e) {
 		error.value =
 			(e as { message?: string })?.message ||
@@ -229,7 +277,7 @@ async function createPlans() {
 			"Maintenance plans were created and linked to the contract and equipment.",
 		);
 		planPreview.value = null;
-		await load();
+		await load(true);
 	} catch (e) {
 		error.value =
 			(e as { message?: string })?.message ||
@@ -254,7 +302,7 @@ async function generateSchedule() {
 			"تم تفعيل الخطط وتوليد جدول الصيانة الدوري.",
 			"Plans were activated and the recurring schedule was generated.",
 		);
-		await load();
+		await load(true);
 	} catch (e) {
 		error.value =
 			(e as { message?: string })?.message ||
@@ -301,7 +349,7 @@ onMounted(() => {
 
 		<form
 			class="mb-6 flex max-w-3xl items-end gap-3 rounded-2xl border border-border bg-bg p-5 shadow-card"
-			@submit.prevent="load"
+			@submit.prevent="load()"
 		>
 			<div class="flex-1">
 				<LinkField
@@ -371,6 +419,21 @@ onMounted(() => {
 						:disabled="Boolean(busy)"
 						@click="provision"
 						>{{ t("إعادة إنشاء المعدات", "Retry equipment provisioning") }}</KlButton
+					>
+					<KlButton
+						v-if="
+							['ASSIGN_SITE', 'CONFIRM_INSTALLATION'].includes(
+								data.next_action.code,
+							) && pendingEquipment.length
+						"
+						:disabled="Boolean(busy) || !selectedSite"
+						@click="confirmAllInstallations"
+						>{{
+							t(
+								`تأكيد تركيب ${pendingEquipment.length} معدة في الموقع المحدد`,
+								`Confirm ${pendingEquipment.length} installations at the selected site`,
+							)
+						}}</KlButton
 					>
 					<KlButton
 						v-if="

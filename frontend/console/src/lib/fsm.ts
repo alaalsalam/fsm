@@ -340,6 +340,19 @@ export function confirmEquipmentInstallation(
 	});
 }
 
+export function confirmDeliveryInstallations(delivery_note: string, customer_site: string) {
+	return client.call<{
+		delivery_note: string;
+		customer_site: string;
+		confirmed: string[];
+		count: number;
+		journey: AfterSalesSetup;
+	}>("fsm.process.after_sales.confirm_delivery_installations", {
+		delivery_note,
+		customer_site,
+	});
+}
+
 export function seedMaintenancePlans(
 	service_contract: string,
 	options: {

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed } from "vue";
-import { RouterView, RouterLink, useRouter } from "vue-router";
+import { computed, nextTick, ref, watch } from "vue";
+import { RouterView, RouterLink, useRoute, useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import { theme, toggleTheme } from "@/lib/theme";
 import { lang, toggleLang, t } from "@/lib/i18n";
@@ -9,6 +9,16 @@ import ConsoleNavIcon from "@/components/ConsoleNavIcon.vue";
 
 const store = useAuthStore();
 const router = useRouter();
+const route = useRoute();
+const mainContent = ref<HTMLElement | null>(null);
+
+watch(
+	() => route.fullPath,
+	async () => {
+		await nextTick();
+		mainContent.value?.scrollTo({ top: 0, left: 0 });
+	},
+);
 
 const navSections = computed(() => [
 	{
@@ -371,7 +381,7 @@ async function signOut() {
 				</div>
 			</header>
 
-			<main class="flex-1 overflow-auto p-4 pb-28 sm:p-6 md:pb-6">
+			<main ref="mainContent" class="flex-1 overflow-auto p-4 pb-28 sm:p-6 md:pb-6">
 				<RouterView />
 			</main>
 

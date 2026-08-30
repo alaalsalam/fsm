@@ -1012,3 +1012,8 @@ Assign a technician before dispatching this visit.,أسند فنيًا قبل ت
 Dispatch visit,توزيع الزيارة
 Continue field execution from the visits screen in the operations console.,تابع التنفيذ الميداني من شاشة الزيارات في مركز العمليات.
 Open operations visits,فتح زيارات مركز العمليات
+Installation Site must belong to the Delivery Customer and Company.,يجب أن ينتمي موقع التركيب إلى عميل وشركة إشعار التسليم.
+Select an active installation site.,اختر موقع تركيب نشطًا.
+Confirm all delivered equipment installations before activating the Contract.,أكد تركيب جميع المعدات المسلّمة قبل تفعيل العقد.
+Synchronize all delivered equipment into the Contract scope before activation.,اربط جميع المعدات المسلّمة بنطاق العقد قبل التفعيل.
+Complete installation and contract scope,إكمال التركيب ونطاق العقد
