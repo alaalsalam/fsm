@@ -228,6 +228,8 @@ def get_schedule_board(
 def get_operations_home(company: str | None = None):
 	company = _manager_company(company)
 	today = nowdate()
+	month_start = today[:8] + "01"
+	next_month = add_days(add_days(month_start, 32)[:8] + "01", 0)
 	visits_today = frappe.db.sql(
 		"""select count(*) from `tabService Visit` visit
 		inner join `tabService Job` job on job.name = visit.service_job
@@ -236,9 +238,36 @@ def get_operations_home(company: str | None = None):
 		and visit.scheduled_start < date_add(%(today)s, interval 1 day)""",
 		{"company": company, "today": today},
 	)[0][0]
+	visits_this_month = frappe.db.sql(
+		"""select count(*) from `tabService Visit` visit
+		inner join `tabService Job` job on job.name = visit.service_job
+		where job.company = %(company)s and visit.status != 'Cancelled'
+		and visit.scheduled_start >= %(month_start)s
+		and visit.scheduled_start < %(next_month)s""",
+		{"company": company, "month_start": month_start, "next_month": next_month},
+	)[0][0]
+	upcoming_visits = frappe.db.sql(
+		"""select count(*) from `tabService Visit` visit
+		inner join `tabService Job` job on job.name = visit.service_job
+		where job.company = %(company)s and visit.status not in ('Completed', 'Cancelled')
+		and visit.scheduled_start >= %(today)s
+		and visit.scheduled_start < date_add(%(today)s, interval 31 day)""",
+		{"company": company, "today": today},
+	)[0][0]
 	return {
 		"company": company,
 		"visits_today": visits_today,
+		"visits_this_month": visits_this_month,
+		"upcoming_visits": upcoming_visits,
+		"open_jobs": frappe.db.count(
+			"Service Job", {"company": company, "status": ["not in", ["Completed", "Cancelled"]]}
+		),
+		"active_contracts": frappe.db.count(
+			"Service Contract", {"company": company, "status": "Active"}
+		),
+		"active_equipment": frappe.db.count(
+			"Installed Equipment", {"company": company, "status": "Active"}
+		),
 		"unassigned_jobs": frappe.db.count(
 			"Service Job",
 			{

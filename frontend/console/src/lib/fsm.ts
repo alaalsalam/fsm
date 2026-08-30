@@ -88,6 +88,11 @@ export interface JobDoc {
 export interface OperationsHome {
 	company: string;
 	visits_today: number;
+	visits_this_month: number;
+	upcoming_visits: number;
+	open_jobs: number;
+	active_contracts: number;
+	active_equipment: number;
 	unassigned_jobs: number;
 	in_progress: number;
 	on_hold: number;

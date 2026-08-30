@@ -12,6 +12,31 @@ const cards = computed(() =>
 	data.value
 		? [
 				{
+					label: t("أوامر الخدمة المفتوحة", "Open service jobs"),
+					value: data.value.open_jobs,
+					to: { path: "/jobs" },
+				},
+				{
+					label: t("زيارات الشهر", "Visits this month"),
+					value: data.value.visits_this_month,
+					to: { path: "/visits", query: { date_scope: "month" } },
+				},
+				{
+					label: t("الزيارات القادمة", "Upcoming visits"),
+					value: data.value.upcoming_visits,
+					to: { path: "/visits", query: { date_scope: "upcoming" } },
+				},
+				{
+					label: t("العقود النشطة", "Active contracts"),
+					value: data.value.active_contracts,
+					to: { path: "/contracts" },
+				},
+				{
+					label: t("المعدات تحت الخدمة", "Active equipment"),
+					value: data.value.active_equipment,
+					to: { path: "/equipment" },
+				},
+				{
 					label: t("زيارات اليوم", "Visits today"),
 					value: data.value.visits_today,
 					to: { path: "/visits", query: { date_scope: "today" } },
@@ -95,7 +120,7 @@ onMounted(async () => {
 					<h2 class="mt-1 text-lg font-bold">
 						{{
 							t(
-								"من التسليم إلى الصيانة الدورية",
+								"من التسليم إلى التشغيل والصيانة",
 								"From delivery to recurring maintenance",
 							)
 						}}
