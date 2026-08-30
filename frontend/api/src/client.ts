@@ -44,9 +44,7 @@ export class FrappeClient {
 		const text = await res.text();
 		const data = text ? safeParse(text) : null;
 		if (!res.ok) {
-			const message =
-				(data as { exception?: string; _server_messages?: string })?.exception ||
-				`Request failed (${res.status})`;
+			const message = extractFrappeErrorMessage(data) || `Request failed (${res.status})`;
 			throw new FrappeError(message, res.status, data);
 		}
 		return data as T;
@@ -150,6 +148,39 @@ export class FrappeClient {
 		);
 		return res.message;
 	}
+}
+
+export function extractFrappeErrorMessage(data: unknown): string {
+	if (!data || typeof data !== "object") return "";
+	const payload = data as {
+		message?: unknown;
+		exception?: unknown;
+		_server_messages?: unknown;
+	};
+	const serverMessages = parseServerMessages(payload._server_messages);
+	return (
+		serverMessages.find(Boolean) ||
+		(typeof payload.message === "string" ? payload.message : "") ||
+		(typeof payload.exception === "string" ? payload.exception : "")
+	);
+}
+
+function parseServerMessages(value: unknown): string[] {
+	if (!value) return [];
+	let rows: unknown = value;
+	if (typeof rows === "string") rows = safeParse(rows);
+	const messages: unknown[] = Array.isArray(rows) ? rows : [rows];
+	return messages.flatMap((row: unknown) => {
+		let message: unknown = row;
+		if (typeof message === "string") {
+			const parsed = safeParse(message);
+			if (parsed !== null) message = parsed;
+		}
+		if (message && typeof message === "object") {
+			message = (message as { message?: unknown }).message;
+		}
+		return typeof message === "string" && message.trim() ? [message] : [];
+	});
 }
 
 function safeParse(text: string): unknown {

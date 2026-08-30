@@ -25,6 +25,7 @@ watch(
 	() => props.modelValue,
 	(v) => {
 		if (!v) query.value = "";
+		else if (!query.value) query.value = v;
 	},
 );
 
