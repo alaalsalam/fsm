@@ -176,7 +176,7 @@ async function signOut() {
 				<div class="mb-7 px-1">
 					<DigitBrand compact tone="light" :locale="lang" />
 					<p class="mt-1 text-xs font-medium text-cmd-fg-muted">
-						{{ t("الخدمة الميدانية", "Field Service") }}
+						{{ t("التشغيل والصيانة", "Operations & Maintenance") }}
 					</p>
 				</div>
 

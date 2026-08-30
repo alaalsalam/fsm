@@ -7,7 +7,7 @@
  "icon": "wrench",
  "icon_type": "Link",
  "idx": 0,
- "label": "DIGIT Field Service",
+ "label": "DIGIT Operations & Maintenance",
  "link_to": "Field Service",
  "link_type": "Workspace Sidebar",
  "logo_url": "/assets/fsm/images/fsm-logo.svg",

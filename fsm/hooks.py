@@ -1,5 +1,5 @@
 app_name = "fsm"
-app_title = "DIGIT Field Service"
+app_title = "DIGIT Operations & Maintenance"
 app_publisher = "DIGIT"
 app_description = "DIGIT after-sales and field service operations for ERPNext"
 app_email = "alaalsalam101@gmail.com"
@@ -19,7 +19,7 @@ add_to_apps_screen = [
 	{
 		"name": app_name,
 		"logo": "/assets/fsm/images/fsm-logo.svg",
-		"title": "DIGIT Field Service",
+		"title": "DIGIT Operations & Maintenance",
 		# The Digit shell owns the integrated Field Service workspace and its
 		# permission-scoped quick-navigation.  Sending users to the native Desk
 		# workspace bypasses that shell and leaves them without the FSM sidebar.

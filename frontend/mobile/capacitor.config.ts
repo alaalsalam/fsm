@@ -3,7 +3,7 @@ import type { CapacitorConfig } from "@capacitor/cli";
 // Native chrome mirrors the canonical DIGIT identity.
 const config: CapacitorConfig = {
 	appId: "com.digit.fsm",
-	appName: "DIGIT Field Service",
+	appName: "DIGIT Operations & Maintenance",
 	webDir: "dist",
 	server: {
 		androidScheme: "https",

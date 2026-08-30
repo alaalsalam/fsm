@@ -27,7 +27,7 @@ describe("console process translations", () => {
 	});
 
 	it("translates server actors and exception reasons", () => {
-		expect(translateActor("FSM Manager")).toBe("مدير الخدمة الميدانية");
+		expect(translateActor("FSM Manager")).toBe("مدير التشغيل والصيانة");
 		expect(translateExceptionReason("No service team is assigned")).toBe(
 			"لم يتم إسناد فريق خدمة",
 		);

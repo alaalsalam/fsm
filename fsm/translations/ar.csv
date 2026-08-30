@@ -1,6 +1,8 @@
 English,Arabic
-Field Service,الخدمة الميدانية
-DIGIT Field Service,خدمة DIGIT الميدانية
+Field Service,التشغيل والصيانة
+DIGIT Field Service,التشغيل والصيانة
+Operations & Maintenance,التشغيل والصيانة
+DIGIT Operations & Maintenance,التشغيل والصيانة
 Service Operations,عمليات الخدمة
 Installed Base,قاعدة المعدات المركبة
 Contracts & Maintenance,العقود والصيانة
@@ -910,7 +912,7 @@ Open Workshop,فتح الورشة
 Generate Report,إنشاء التقرير
 Open Reports,فتح التقارير
 Open Certificates,فتح الشهادات
-FSM Manager,مدير الخدمة الميدانية
+FSM Manager,مدير التشغيل والصيانة
 Assigned Team,فريق الخدمة المسند
 Assigned Technician,الفني المسند
 No service team is assigned,لم يتم إسناد فريق خدمة
@@ -963,7 +965,7 @@ Inspection Templates,قوالب الفحص
 Checklist Templates,قوالب قوائم التحقق
 Continue after-sales setup,متابعة تجهيز ما بعد البيع
 View installed equipment,عرض المعدات المنشأة
-Field Service,الخدمة الميدانية
+Field Service,التشغيل والصيانة
 {0} equipment record(s) were created automatically. Continue the after-sales setup.,تم إنشاء {0} سجل معدات تلقائيًا. تابع تجهيز ما بعد البيع.
 "Describe the request, select the customer and equipment, then save to start the guided workflow.",صف الطلب وحدد العميل والمعدة ثم احفظ لبدء مسار العمل الموجّه.
 Open service request,فتح طلب الخدمة

@@ -225,12 +225,12 @@ def ensure_visual_identity():
 	"""
 	identity_values = {
 		"Desktop Icon": {
-			"label": "DIGIT Field Service",
+			"label": "DIGIT Operations & Maintenance",
 			"icon": "wrench",
 			"logo_url": "/assets/fsm/images/fsm-logo.svg",
 		},
 		"Workspace Sidebar": {
-			"title": "DIGIT Field Service",
+			"title": "DIGIT Operations & Maintenance",
 			"header_icon": "wrench",
 		},
 		"Workspace": {
@@ -244,8 +244,8 @@ def ensure_visual_identity():
 		# A standard Desktop Icon can coexist with the branded icon created by the
 		# workspace fixture.  Update the branded record when it is present rather
 		# than attempting to give both records the same unique label.
-		name = "DIGIT Field Service" if doctype == "Desktop Icon" and frappe.db.exists(
-			doctype, "DIGIT Field Service"
+		name = "DIGIT Operations & Maintenance" if doctype == "Desktop Icon" and frappe.db.exists(
+			doctype, "DIGIT Operations & Maintenance"
 		) else "Field Service"
 		if frappe.db.exists(doctype, name):
 			frappe.db.set_value(doctype, name, values, update_modified=False)

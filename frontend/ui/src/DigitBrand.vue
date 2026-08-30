@@ -10,8 +10,8 @@ withDefaults(
 	{
 		tone: "light",
 		compact: false,
-		productAr: "الخدمة الميدانية",
-		productEn: "Field Service",
+		productAr: "التشغيل والصيانة",
+		productEn: "Operations & Maintenance",
 		locale: "ar",
 	},
 );
@@ -21,7 +21,7 @@ withDefaults(
 	<div
 		class="digit-brand"
 		:class="[`digit-brand--${tone}`, { 'digit-brand--compact': compact }]"
-		aria-label="DIGIT Field Service"
+		aria-label="DIGIT Operations & Maintenance"
 	>
 		<svg
 			class="digit-brand__wordmark"

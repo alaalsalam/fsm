@@ -323,7 +323,7 @@ onMounted(() => {
 <template>
 	<div>
 		<PageHeader
-			:eyebrow="t('من البيع إلى الخدمة الدورية', 'From sale to recurring service')"
+			:eyebrow="t('من البيع إلى التشغيل والصيانة', 'From sale to operations and maintenance')"
 			:title="t('رحلة ما بعد البيع', 'After-sales journey')"
 			:subtitle="
 				t(

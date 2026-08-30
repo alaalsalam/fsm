@@ -67,7 +67,7 @@ const ACTION_AR: Record<string, string> = {
 };
 
 const ACTOR_AR: Record<string, string> = {
-	"FSM Manager": "مدير الخدمة الميدانية",
+	"FSM Manager": "مدير التشغيل والصيانة",
 	"Assigned Team": "فريق الخدمة المسند",
 	"Assigned Technician": "الفني المسند",
 	Dispatcher: "مسؤول التوزيع",
