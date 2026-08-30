@@ -25,6 +25,11 @@ CONTRACT_FIELDS = {
 	"quotation",
 	"sales_order",
 	"sales_invoice",
+	"delivery_note",
+	"maintenance_service_type",
+	"maintenance_interval_count",
+	"maintenance_interval_unit",
+	"first_maintenance_date",
 	"renewal_recommended",
 	"renewal_quotation",
 	"notes",
@@ -80,9 +85,27 @@ def transition_contract(service_contract: str, status: str, reason: str | None =
 	if status not in TRANSITIONS.get(doc.status, set()):
 		frappe.throw(_("Illegal Contract transition from {0} to {1}.").format(doc.status, status))
 	previous = doc.status
+	if status == "Active" and doc.automation_key and not doc.covered_equipment:
+		frappe.throw(
+			_("Confirm installation and add the delivered equipment to the Contract before activation."),
+			frappe.ValidationError,
+		)
 	doc.flags.fsm_command = True
 	doc.status = status
 	doc.save()
+	plans = []
+	if status == "Active" and doc.automation_key and doc.maintenance_service_type:
+		from fsm.process.maintenance_flow import create_maintenance_plans_from_contract
+
+		result = create_maintenance_plans_from_contract(
+			doc.name,
+			service_type=doc.maintenance_service_type,
+			interval_count=doc.maintenance_interval_count,
+			interval_unit=doc.maintenance_interval_unit,
+			first_due_date=doc.first_maintenance_date or doc.start_date,
+			preview=0,
+		)
+		plans = result.get("plans") or []
 	append_event(
 		"ServiceContractStatusChanged",
 		doc,
@@ -91,7 +114,9 @@ def transition_contract(service_contract: str, status: str, reason: str | None =
 		source=source,
 		metadata={"reason": reason} if reason else None,
 	)
-	return _result(doc)
+	result = _result(doc)
+	result["maintenance_plans"] = plans
+	return result
 
 
 @frappe.whitelist()
@@ -102,18 +127,39 @@ def renew_contract(service_contract: str, start_date: str, end_date: str):
 		values[table] = []
 		for row in old.get(table):
 			row_values = row.as_dict(no_nulls=False)
-			for field in ("name", "parent", "parentfield", "parenttype", "doctype", "idx", "creation", "modified", "owner", "modified_by"):
+			for field in (
+				"name",
+				"parent",
+				"parentfield",
+				"parenttype",
+				"doctype",
+				"idx",
+				"creation",
+				"modified",
+				"owner",
+				"modified_by",
+			):
 				row_values.pop(field, None)
 			if table == "entitlements":
 				row_values["used_quantity"] = 0
 				row_values["remaining_quantity"] = row_values.get("included_quantity") or 0
+				if row_values.get("period_start"):
+					row_values["period_start"] = start_date
+				if row_values.get("period_end"):
+					row_values["period_end"] = end_date
 			values[table].append(row_values)
-	values.update({"start_date": start_date, "end_date": end_date})
+	values.update({"start_date": start_date, "end_date": end_date, "first_maintenance_date": start_date})
 	doc = frappe.get_doc({"doctype": "Service Contract", "status": "Draft", **values})
 	doc.renewed_from = old.name
 	doc.flags.fsm_command = True
 	doc.insert(ignore_permissions=True)
-	append_event("ServiceContractRenewalCreated", doc, to_status="Draft", source="Console", metadata={"renewed_from": old.name})
+	append_event(
+		"ServiceContractRenewalCreated",
+		doc,
+		to_status="Draft",
+		source="Console",
+		metadata={"renewed_from": old.name},
+	)
 	return _result(doc)
 
 
@@ -153,7 +199,9 @@ def consume_entitlement(
 	contract = require_contract_access(service_contract, "write", manager_only=True)
 	job = require_job_access(service_job, "write", manager_only=True)
 	if contract.customer != job.customer or contract.company != job.company:
-		frappe.throw(_("Contract and Service Job must have the same Customer and Company."), frappe.ValidationError)
+		frappe.throw(
+			_("Contract and Service Job must have the same Customer and Company."), frappe.ValidationError
+		)
 	if service_visit and frappe.db.get_value("Service Visit", service_visit, "service_job") != job.name:
 		frappe.throw(_("Service Visit must belong to the Service Job."), frappe.ValidationError)
 	quantity = flt(quantity)
@@ -178,7 +226,9 @@ def consume_entitlement(
 	if not entitlement or not entitlement.active:
 		frappe.throw(_("The Contract entitlement is missing or inactive."), frappe.ValidationError)
 	if flt(entitlement.remaining_quantity) < quantity:
-		frappe.throw(_("The Contract entitlement does not have enough remaining quantity."), frappe.ValidationError)
+		frappe.throw(
+			_("The Contract entitlement does not have enough remaining quantity."), frappe.ValidationError
+		)
 
 	entitlement.used_quantity = flt(entitlement.used_quantity) + quantity
 	contract.flags.fsm_command = True
@@ -203,6 +253,10 @@ def consume_entitlement(
 		job,
 		source="API",
 		correlation_id=idempotency_key,
-		metadata={"service_contract": contract.name, "entitlement_row": entitlement.name, "quantity": quantity},
+		metadata={
+			"service_contract": contract.name,
+			"entitlement_row": entitlement.name,
+			"quantity": quantity,
+		},
 	)
 	return consumption.as_dict()

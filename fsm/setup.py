@@ -176,6 +176,14 @@ FSM_CUSTOM_FIELDS = {
 			"insert_after": "fsm_provisioning_status",
 			"read_only": 1,
 		},
+		{
+			"fieldname": "fsm_service_contract",
+			"label": "Service Contract",
+			"fieldtype": "Link",
+			"options": "Service Contract",
+			"insert_after": "fsm_installed_equipment_count",
+			"read_only": 1,
+		},
 	],
 	"Quotation": [
 		{
@@ -195,7 +203,15 @@ FSM_CUSTOM_FIELDS = {
 			"options": "Service Job",
 			"insert_after": "company",
 			"read_only": 1,
-		}
+		},
+		{
+			"fieldname": "fsm_service_contract",
+			"label": "Service Contract",
+			"fieldtype": "Link",
+			"options": "Service Contract",
+			"insert_after": "fsm_service_job",
+			"read_only": 1,
+		},
 	],
 }
 

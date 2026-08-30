@@ -168,6 +168,10 @@ def confirm_installation(
 	doc.save()
 	append_event("InstallationConfirmed", doc, from_status=old, to_status="Active", source="Console")
 	append_event("EquipmentActivated", doc, from_status=old, to_status="Active", source="System")
+	if doc.delivery_note:
+		from fsm.process.commercial_after_sales import sync_delivery_contract_scope
+
+		sync_delivery_contract_scope(doc.delivery_note, system_operation=True)
 	return _result(doc)
 
 

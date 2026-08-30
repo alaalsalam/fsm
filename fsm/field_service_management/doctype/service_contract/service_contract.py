@@ -5,7 +5,7 @@ import json
 import frappe
 from frappe import _
 from frappe.model.document import Document
-from frappe.utils import add_days, flt, getdate, nowdate
+from frappe.utils import add_days, cint, flt, getdate, nowdate
 
 
 class ServiceContract(Document):
@@ -26,6 +26,7 @@ class ServiceContract(Document):
 		self._guard_status_change()
 		validate_project_company(self.project, self.company)
 		self._validate_period()
+		self._validate_maintenance_schedule()
 		self._validate_scope()
 		self._validate_coverage_rules()
 		self._validate_entitlements()
@@ -51,6 +52,29 @@ class ServiceContract(Document):
 	def _validate_period(self):
 		if self.start_date and self.end_date and getdate(self.start_date) > getdate(self.end_date):
 			frappe.throw(_("Contract Start Date cannot be after End Date."), frappe.ValidationError)
+
+	def _validate_maintenance_schedule(self):
+		if not self.maintenance_service_type:
+			return
+		if cint(self.maintenance_interval_count) < 1:
+			frappe.throw(_("Maintenance Interval must be at least one."), frappe.ValidationError)
+		if self.maintenance_interval_unit not in {"Days", "Weeks", "Months", "Years"}:
+			frappe.throw(_("Select a valid Maintenance Interval Unit."), frappe.ValidationError)
+		self.first_maintenance_date = self.first_maintenance_date or self.start_date
+		if self.first_maintenance_date and getdate(self.first_maintenance_date) < getdate(self.start_date):
+			frappe.throw(
+				_("First Maintenance Date cannot be before the Contract Start Date."),
+				frappe.ValidationError,
+			)
+		if (
+			self.end_date
+			and self.first_maintenance_date
+			and getdate(self.first_maintenance_date) > getdate(self.end_date)
+		):
+			frappe.throw(
+				_("First Maintenance Date cannot be after the Contract End Date."),
+				frappe.ValidationError,
+			)
 
 	def _validate_scope(self):
 		seen: set[tuple[str, str, str]] = set()
@@ -131,6 +155,7 @@ class ServiceContract(Document):
 			("quotation", "Quotation"),
 			("sales_order", "Sales Order"),
 			("sales_invoice", "Sales Invoice"),
+			("delivery_note", "Delivery Note"),
 			("renewal_quotation", "Quotation"),
 		):
 			name = self.get(fieldname)

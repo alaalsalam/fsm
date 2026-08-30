@@ -5,6 +5,7 @@ from frappe.tests.utils import FrappeTestCase
 from frappe.utils import add_days, getdate, nowdate
 
 from fsm.api import _default_customer_group, _default_territory
+from fsm.contracts.commands import transition_contract
 from fsm.installed_base.api import (
 	get_customer_equipment,
 	get_equipment,
@@ -216,6 +217,47 @@ class TestInstalledBaseOperations(FrappeTestCase):
 		self.assertFalse(journey["readiness"]["schedule_generated"])
 		self.assertEqual(journey["occurrence_summary"]["total"], 0)
 		self.assertEqual(journey["next_action"]["code"], "ASSIGN_SITE")
+
+	def test_submitted_delivery_drives_contract_plan_and_schedule_review(self):
+		delivery = frappe.get_doc(
+			{
+				"doctype": "Delivery Note",
+				"company": self.company,
+				"customer": self.customer,
+				"items": [{"item_code": self.item, "qty": 2, "rate": 100}],
+			}
+		).insert(ignore_permissions=True)
+		delivery.submit()
+		contract_name = frappe.db.get_value("Delivery Note", delivery.name, "fsm_service_contract")
+		self.assertTrue(contract_name)
+		self.assertEqual(
+			frappe.db.count("Service Contract", {"delivery_note": delivery.name}),
+			1,
+		)
+
+		# Retrying the commercial workflow reuses the same contract.
+		from fsm.process.commercial_after_sales import sync_delivery_contract_scope
+
+		self.assertEqual(sync_delivery_contract_scope(delivery.name).name, contract_name)
+		self.assertEqual(
+			frappe.db.count("Service Contract", {"delivery_note": delivery.name}),
+			1,
+		)
+		for equipment in frappe.get_all(
+			"Installed Equipment", filters={"delivery_note": delivery.name}, pluck="name"
+		):
+			confirm_installation(equipment, self.site.name, installation_date=nowdate())
+
+		contract = frappe.get_doc("Service Contract", contract_name)
+		self.assertEqual(len(contract.covered_equipment), 2)
+		transition_contract(contract.name, "Active")
+		plans = frappe.get_all(
+			"Maintenance Plan", filters={"service_contract": contract.name}, fields=["name", "status"]
+		)
+		self.assertEqual(len(plans), 1)
+		self.assertEqual(plans[0].status, "Draft")
+		journey = get_after_sales_setup(delivery.name)
+		self.assertEqual(journey["next_action"]["code"], "APPROVE_PLANS")
 
 	def test_delivery_note_ignores_non_serviceable_item_and_cancel_preserves_records(self):
 		ignored = _item(mode="None", serviceable=0, create_equipment=0)

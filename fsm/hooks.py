@@ -64,6 +64,7 @@ web_include_css = "/assets/fsm/css/fsm_identity.css?v=20260828_digit_v1"
 # doctype_js = {"doctype" : "public/js/doctype.js"}
 doctype_js = {
 	"Delivery Note": "public/js/delivery_note.js",
+	"Sales Invoice": "public/js/sales_invoice.js",
 	"Installed Equipment": "public/js/installed_equipment.js",
 	"Maintenance Plan": "public/js/maintenance_plan.js",
 	"Maintenance Occurrence": "public/js/maintenance_occurrence.js",
@@ -234,8 +235,14 @@ doc_events = {
 		"on_update": "fsm.realtime.on_technician_update",
 	},
 	"Delivery Note": {
-		"on_submit": "fsm.installed_base.provisioning.on_delivery_note_submit",
+		"on_submit": [
+			"fsm.installed_base.provisioning.on_delivery_note_submit",
+			"fsm.process.commercial_after_sales.on_delivery_note_submit",
+		],
 		"on_cancel": "fsm.installed_base.provisioning.on_delivery_note_cancel",
+	},
+	"Sales Invoice": {
+		"on_submit": "fsm.process.commercial_after_sales.on_sales_invoice_submit",
 	},
 }
 
