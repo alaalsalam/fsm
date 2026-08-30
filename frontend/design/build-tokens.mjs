@@ -190,6 +190,10 @@ function buildTailwindTheme() {
 	lines.push("@theme {");
 	lines.push("\t/* Brand + status colors */");
 	lines.push("\t--color-brand: var(--kl-brand);");
+	lines.push("\t/* `primary` = solid action color. Views use bg-primary with white");
+	lines.push("\t   text, so it must stay the DEEP brand green in BOTH themes — the");
+	lines.push("\t   mint accent would make white labels unreadable in light mode. */");
+	lines.push(`\t--color-primary: ${get("color.brand.500")};`);
 	lines.push(`\t--color-brand-50: ${get("color.brand.50")};`);
 	lines.push(`\t--color-brand-100: ${get("color.brand.100")};`);
 	lines.push(`\t--color-brand-500: ${get("color.brand.500")};`);

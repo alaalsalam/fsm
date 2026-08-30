@@ -5,6 +5,10 @@
 @theme {
 	/* Brand + status colors */
 	--color-brand: var(--kl-brand);
+	/* `primary` = solid action color. Views use bg-primary with white
+	   text, so it must stay the DEEP brand green in BOTH themes — the
+	   mint accent would make white labels unreadable in light mode. */
+	--color-primary: #0A8754;
 	--color-brand-50: #E6F3EC;
 	--color-brand-100: #C7E5D5;
 	--color-brand-500: #0A8754;
