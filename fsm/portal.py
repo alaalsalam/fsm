@@ -20,7 +20,7 @@ def get_my_portal_hub():
 	jobs = frappe.get_list(
 		"Service Job",
 		filters={"customer": customer},
-		fields=["name", "status", "phase", "service_type", "scheduled_date", "scheduled_end", "completed_on", "coverage_status", "service_contract", "quotation", "sales_invoice", "customer_site", "primary_technician", "assigned_service_team", "address_display"],
+		fields=["name", "status", "phase", "service_type", "scheduled_date", "scheduled_end", "completed_on", "coverage_status", "service_contract", "quotation", "sales_invoice", "primary_technician", "assigned_service_team", "address_display"],
 		order_by="creation desc",
 		limit=500,
 	)
@@ -45,6 +45,27 @@ def get_my_portal_hub():
 		)
 		if job_names else []
 	)
+	job_equipment = (
+		frappe.get_all(
+			"Service Job Equipment",
+			filters={"parent": ["in", job_names]},
+			fields=["parent", "installed_equipment", "customer_site"],
+			order_by="parent asc, idx asc",
+			limit=1000,
+		)
+		if job_names else []
+	)
+	job_context = {}
+	for row in job_equipment:
+		context = job_context.setdefault(row.parent, {"sites": [], "equipment": []})
+		if row.customer_site and row.customer_site not in context["sites"]:
+			context["sites"].append(row.customer_site)
+		if row.installed_equipment:
+			context["equipment"].append(row.installed_equipment)
+	for job in jobs:
+		context = job_context.get(job.name, {})
+		job.customer_site = next(iter(context.get("sites") or []), None)
+		job.equipment_count = len(context.get("equipment") or [])
 	requests = frappe.get_list("Service Request", filters={"customer": customer}, fields=["name", "subject", "service_type", "status", "preferred_start", "creation"], order_by="creation desc", limit=200)
 	maintenance = frappe.get_list("Maintenance Occurrence", filters={"customer": customer, "status": ["not in", ["Cancelled", "Skipped"]]}, fields=["name", "installed_equipment", "customer_site", "service_type", "due_date", "status", "released_job"], order_by="due_date asc", limit=500)
 	contracts = frappe.get_list("Service Contract", filters={"customer": customer}, fields=["name", "status", "start_date", "end_date", "included_visits", "renewal_recommended", "renewal_quotation"], order_by="end_date asc", limit=100)
@@ -64,12 +85,15 @@ def get_my_portal_hub():
 	jobs_by_name = {row.name: row for row in jobs}
 	for visit in visits:
 		job = jobs_by_name.get(visit.service_job, {})
+		context = job_context.get(visit.service_job, {})
 		calendar.append({
 			"type": "visit", "name": visit.name, "service_job": visit.service_job,
 			"start": visit.scheduled_start, "end": visit.scheduled_end, "status": visit.status,
 			"title": job.get("service_type") or visit.service_job,
 			"site": job.get("customer_site"), "team": visit.service_team,
 			"technician": visit.primary_technician,
+			"equipment": next(iter(context.get("equipment") or []), None),
+			"equipment_count": len(context.get("equipment") or []),
 		})
 	maintenance_groups = {}
 	for occurrence in maintenance:
