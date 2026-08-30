@@ -237,14 +237,27 @@ def _ensure_installed_base(company: str, customer: str) -> tuple[str, list[str]]
 				customer=customer,
 				customer_site=site,
 				item_code=item_code,
+				delivery_date=add_days(nowdate(), -90),
 				notes="معدات تشغيلية مسجلة ضمن برنامج الصيانة الوقائية للمصنع.",
 			)["name"]
 			confirm_installation(name, site, installation_date=add_days(nowdate(), -90))
+		else:
+			equipment_doc = frappe.get_doc("Installed Equipment", name)
+			if not equipment_doc.delivery_date:
+				equipment_doc.delivery_date = add_days(nowdate(), -90)
+				equipment_doc.flags.fsm_command = True
+				equipment_doc.save()
 		equipment.append(name)
 	return site, equipment
 
 
 def _ensure_operations(company: str, customer: str, site: str, equipment: list[str]) -> dict:
+	team = frappe.db.get_value(
+		"Service Team", {"name": "فريق صيانة الرياض", "company": company, "active": 1}, "name"
+	) or frappe.db.get_value("Service Team", {"company": company, "active": 1}, "name")
+	technician = frappe.db.get_value("Service Team", team, "team_leader") or frappe.db.get_value(
+		"Technician", {"company": company, "active": 1}, "name"
+	)
 	request = frappe.db.get_value(
 		"Service Request", {"company": company, "subject": "فحص جاهزية أنظمة السلامة والتشغيل"}, "name"
 	)
@@ -270,8 +283,6 @@ def _ensure_operations(company: str, customer: str, site: str, equipment: list[s
 	if not job:
 		job = create_job_from_request(request, idempotency_key=OPERATION_KEY, source="System")["name"]
 		job_doc = frappe.get_doc("Service Job", job)
-		team = frappe.db.get_value("Service Team", {"company": company, "active": 1}, "name")
-		technician = frappe.db.get_value("Technician", {"company": company, "active": 1}, "name")
 		job_doc.assigned_service_team = team
 		job_doc.primary_technician = technician
 		job_doc.notes = "أمر عمل لعرض دورة الفحص والتوزيع والتقرير الميداني."
@@ -284,10 +295,15 @@ def _ensure_operations(company: str, customer: str, site: str, equipment: list[s
 			source="System",
 			correlation_id=f"{OPERATION_KEY}-جدولة",
 		)
+	else:
+		job_doc = frappe.get_doc("Service Job", job)
+		if job_doc.assigned_service_team != team or job_doc.primary_technician != technician:
+			job_doc.assigned_service_team = team
+			job_doc.primary_technician = technician
+			job_doc.save()
 
 	visits = frappe.get_all("Service Visit", filters={"service_job": job}, pluck="name")
 	if not visits:
-		technician = frappe.db.get_value("Technician", {"company": company, "active": 1}, "name")
 		visit = create_visit(
 			job,
 			scheduled_start=add_days(now_datetime(), 2),
@@ -298,6 +314,13 @@ def _ensure_operations(company: str, customer: str, site: str, equipment: list[s
 		)["name"]
 		dispatch_visit(visit, source="System", correlation_id=f"{OPERATION_KEY}-توزيع")
 		visits = [visit]
+	else:
+		for visit in visits:
+			visit_doc = frappe.get_doc("Service Visit", visit)
+			if visit_doc.service_team != team or visit_doc.primary_technician != technician:
+				visit_doc.service_team = team
+				visit_doc.primary_technician = technician
+				visit_doc.save()
 	return {"request": request, "job": job, "visits": visits}
 
 
