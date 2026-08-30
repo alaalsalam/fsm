@@ -9,7 +9,9 @@ frappe.ui.form.on("Service Contract", {
 		}
 		if (frm.doc.status === "Draft") {
 			frm.set_intro(
-				__("Activate the contract, then create its preventive maintenance plans."),
+				frm.doc.automation_key
+					? __("Review the sales source, equipment scope, service terms, and cadence. Activation will prepare draft maintenance plans automatically.")
+					: __("Review the scope and service terms before activation."),
 				"orange",
 			);
 			frm.add_custom_button(
@@ -22,6 +24,15 @@ frappe.ui.form.on("Service Contract", {
 			frm.add_custom_button(
 				__("Create / open maintenance plans"),
 				() => seed_plans(frm),
+				__("Next step"),
+			);
+		}
+		if (frm.doc.delivery_note) {
+			frm.add_custom_button(
+				__("Continue after-sales journey"),
+				() => {
+					window.location.href = `/fsm-console/after-sales?delivery_note=${encodeURIComponent(frm.doc.delivery_note)}&contract=${encodeURIComponent(frm.doc.name)}`;
+				},
 				__("Next step"),
 			);
 		}
@@ -42,6 +53,9 @@ async function transition_contract(frm, status) {
 		freeze: true,
 	});
 	await frm.reload_doc();
+	if (status === "Active" && frm.doc.delivery_note) {
+		window.location.href = `/fsm-console/after-sales?delivery_note=${encodeURIComponent(frm.doc.delivery_note)}&contract=${encodeURIComponent(frm.doc.name)}`;
+	}
 }
 
 function seed_plans(frm) {

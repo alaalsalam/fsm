@@ -8,7 +8,8 @@ import {
 	getAfterSalesSetup,
 	maintenance,
 	provisionAfterSalesEquipment,
-	searchLink,
+	retryAfterSalesContract,
+	searchSubmittedDeliveryNotes,
 	seedMaintenancePlans,
 	type AfterSalesEquipment,
 	type AfterSalesSetup,
@@ -41,7 +42,7 @@ const steps = computed(() => {
 		Boolean(d),
 		Boolean(d?.readiness.equipment_provisioned),
 		Boolean(d?.readiness.equipment_provisioned && d.readiness.pending_installation === 0),
-		Boolean(d?.readiness.contract_configured),
+		Boolean(d?.readiness.contract_active),
 		Boolean(d?.readiness.maintenance_configured),
 		Boolean(d?.readiness.schedule_generated),
 	];
@@ -75,8 +76,13 @@ const nextActionText = computed(() => {
 			),
 			ASSIGN_SITE: t("تحديد موقع تركيب المعدات", "Assign equipment installation sites"),
 			CONFIRM_INSTALLATION: t("تأكيد تركيب المعدات", "Confirm equipment installation"),
-			CONFIGURE_CONTRACT: t("إنشاء عقد وربط المعدات", "Create a contract and link equipment"),
-			CONFIGURE_PM: t("إنشاء خطط الصيانة من العقد", "Create maintenance plans from contract"),
+			PREPARE_CONTRACT: t("تجهيز مسودة عقد الخدمة", "Prepare the draft service contract"),
+			REVIEW_CONTRACT: t(
+				"مراجعة واعتماد عقد الخدمة",
+				"Review and activate the service contract",
+			),
+			PREPARE_PM: t("تجهيز مسودات خطط الصيانة", "Prepare draft maintenance plans"),
+			APPROVE_PLANS: t("مراجعة واعتماد خطط الصيانة", "Review and activate maintenance plans"),
 			GENERATE_SCHEDULE: t(
 				"تفعيل الخطط وتوليد الجدول",
 				"Activate plans and generate schedule",
@@ -160,17 +166,32 @@ async function confirmInstallation(row: AfterSalesEquipment) {
 
 async function openContractSetup() {
 	if (!data.value) return;
-	await router.push({
-		path: "/contracts",
-		query: {
-			create: "1",
-			delivery_note: deliveryNote.value,
-			customer: data.value.delivery_note.customer,
-			company: data.value.delivery_note.company,
-			posting_date: data.value.delivery_note.posting_date,
-			equipment: data.value.equipment.map((row) => row.name).join(","),
-		},
-	});
+	const existing = data.value.contracts[0];
+	if (existing) {
+		await router.push({
+			path: "/contracts",
+			query: { contract: existing.name, delivery_note: deliveryNote.value },
+		});
+		return;
+	}
+	busy.value = "contract";
+	error.value = "";
+	try {
+		const contract = await retryAfterSalesContract(deliveryNote.value);
+		await router.push({
+			path: "/contracts",
+			query: { contract: contract.name, delivery_note: deliveryNote.value },
+		});
+	} catch (e) {
+		error.value =
+			(e as { message?: string })?.message ||
+			t(
+				"تعذر تجهيز مسودة العقد من إشعار التسليم.",
+				"Couldn't prepare the draft contract from the delivery.",
+			);
+	} finally {
+		busy.value = "";
+	}
 }
 
 async function previewPlans() {
@@ -271,8 +292,8 @@ onMounted(() => {
 			<p class="mt-1 text-sm text-fg-muted">
 				{{
 					t(
-						"عند اعتماد إشعار التسليم ينشئ النظام المعدات القابلة للخدمة تلقائيًا. يبقى تحديد موقع التركيب، نطاق العقد ودورية الصيانة قرارات يجب تأكيدها من هذه الرحلة.",
-						"Submitting a Delivery Note automatically provisions serviceable equipment. Installation site, contract scope and maintenance cadence remain explicit decisions confirmed here.",
+						"عند اعتماد الفاتورة أو إشعار التسليم ينشئ النظام مسودة العقد، وعند التسليم ينشئ المعدات. بعد تأكيد التركيب تراجع العقد ودورية الصيانة، ثم يؤدي اعتماد العقد إلى تجهيز خطط الصيانة كمسودات لاعتمادها وتوليد الجدول.",
+						"Submitting an invoice or delivery prepares a draft contract, while delivery provisions equipment. Confirm installation, review the contract and cadence, then activate it to prepare draft maintenance plans for approval and scheduling.",
 					)
 				}}
 			</p>
@@ -287,7 +308,7 @@ onMounted(() => {
 					v-model="deliveryNote"
 					:label="t('إشعار التسليم المعتمد', 'Submitted Delivery Note')"
 					required
-					:search="(q) => searchLink('Delivery Note', q)"
+					:search="searchSubmittedDeliveryNotes"
 				/>
 			</div>
 			<KlButton type="submit" :disabled="loading || !deliveryNote">{{
@@ -352,23 +373,32 @@ onMounted(() => {
 						>{{ t("إعادة إنشاء المعدات", "Retry equipment provisioning") }}</KlButton
 					>
 					<KlButton
-						v-if="data.next_action.code === 'CONFIGURE_CONTRACT'"
+						v-if="
+							['PREPARE_CONTRACT', 'REVIEW_CONTRACT'].includes(data.next_action.code)
+						"
+						:disabled="Boolean(busy)"
 						@click="openContractSetup"
 						>{{
-							t("إنشاء عقد من هذه البيانات", "Create contract from this delivery")
+							data.next_action.code === "PREPARE_CONTRACT"
+								? t("تجهيز مسودة العقد", "Prepare draft contract")
+								: t("مراجعة واعتماد العقد", "Review and activate contract")
 						}}</KlButton
 					>
 					<KlButton
-						v-if="data.next_action.code === 'CONFIGURE_PM'"
+						v-if="data.next_action.code === 'PREPARE_PM'"
 						:disabled="Boolean(busy)"
 						@click="previewPlans"
 						>{{ t("معاينة خطط الصيانة", "Preview maintenance plans") }}</KlButton
 					>
 					<KlButton
-						v-if="data.next_action.code === 'GENERATE_SCHEDULE'"
+						v-if="
+							['APPROVE_PLANS', 'GENERATE_SCHEDULE'].includes(data.next_action.code)
+						"
 						:disabled="Boolean(busy)"
 						@click="generateSchedule"
-						>{{ t("تفعيل وتوليد الجدول", "Activate and generate schedule") }}</KlButton
+						>{{
+							t("اعتماد الخطط وتوليد الجدول", "Approve plans and generate schedule")
+						}}</KlButton
 					>
 					<RouterLink
 						v-if="data.next_action.code === 'READY'"
@@ -503,7 +533,9 @@ onMounted(() => {
 							variant="secondary"
 							@click="openContractSetup"
 							>{{
-								t("إنشاء عقد مرتبط بالمعدات", "Create equipment-scoped contract")
+								data.contracts.length
+									? t("مراجعة العقد المرتبط", "Review linked contract")
+									: t("تجهيز مسودة العقد", "Prepare draft contract")
 							}}</KlButton
 						>
 					</section>

@@ -59,6 +59,11 @@ export interface ContractDetail extends ContractSummary {
 	quotation?: string;
 	sales_order?: string;
 	sales_invoice?: string;
+	delivery_note?: string;
+	maintenance_service_type?: string;
+	maintenance_interval_count?: number;
+	maintenance_interval_unit?: "Days" | "Weeks" | "Months" | "Years";
+	first_maintenance_date?: string;
 	covered_equipment: Array<{
 		customer_site: string;
 		installed_equipment?: string;
@@ -92,6 +97,13 @@ export interface CreateContractInput {
 	emergency_visits?: number;
 	response_sla_hours?: number;
 	resolution_sla_hours?: number;
+	delivery_note?: string;
+	sales_order?: string;
+	sales_invoice?: string;
+	maintenance_service_type?: string;
+	maintenance_interval_count?: number;
+	maintenance_interval_unit?: "Days" | "Weeks" | "Months" | "Years";
+	first_maintenance_date?: string;
 	covered_equipment?: Array<Record<string, unknown>>;
 	coverage_rules: Array<Partial<ContractCoverageRule>>;
 	entitlements?: Array<Record<string, unknown>>;
@@ -120,6 +132,13 @@ export class ContractsApi {
 
 	create(values: CreateContractInput) {
 		return this.client.call<ContractDetail>("fsm.contracts.commands.create_contract", {
+			...values,
+		});
+	}
+
+	update(service_contract: string, values: Partial<CreateContractInput>) {
+		return this.client.call<ContractDetail>("fsm.contracts.commands.update_contract", {
+			service_contract,
 			...values,
 		});
 	}

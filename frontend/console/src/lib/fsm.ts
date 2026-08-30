@@ -1,5 +1,6 @@
 import { client } from "./api";
 import { ContractsApi, InstalledBaseApi, MaintenanceApi, ReportingApi } from "@digit/api";
+import type { ContractDetail } from "@digit/api";
 import type { JobSummary, JobStatus, LinkOption } from "@digit/ui";
 
 export const installedBase = new InstalledBaseApi(client);
@@ -225,6 +226,12 @@ export interface AfterSalesContract {
 	status: string;
 	start_date: string;
 	end_date: string;
+	delivery_note?: string;
+	sales_invoice?: string;
+	maintenance_service_type?: string;
+	maintenance_interval_count?: number;
+	maintenance_interval_unit?: string;
+	first_maintenance_date?: string;
 }
 
 export interface AfterSalesPlan {
@@ -243,6 +250,7 @@ export interface AfterSalesSetup {
 		posting_date: string;
 		project?: string;
 		provisioning_status?: string;
+		service_contract?: string;
 	};
 	equipment: AfterSalesEquipment[];
 	sites: Array<{ name: string; site_name: string; status: string }>;
@@ -273,7 +281,9 @@ export interface AfterSalesSetup {
 		missing_site: number;
 		missing_location: number;
 		contract_configured: boolean;
+		contract_active: boolean;
 		maintenance_configured: boolean;
+		plans_awaiting_approval: number;
 		schedule_generated: boolean;
 	};
 	next_action: { code: string; action: string };
@@ -294,6 +304,21 @@ export interface MaintenancePlanSeedResult {
 
 export function getAfterSalesSetup(delivery_note: string): Promise<AfterSalesSetup> {
 	return client.call("fsm.process.after_sales.get_after_sales_setup", { delivery_note }, "GET");
+}
+
+export function searchSubmittedDeliveryNotes(query = ""): Promise<LinkOption[]> {
+	return client.call(
+		"fsm.process.after_sales.search_submitted_delivery_notes",
+		{ query, limit: 20 },
+		"GET",
+	);
+}
+
+export function retryAfterSalesContract(delivery_note: string) {
+	return client.call<ContractDetail>(
+		"fsm.process.commercial_after_sales.retry_contract_from_delivery",
+		{ delivery_note },
+	);
 }
 
 export function provisionAfterSalesEquipment(delivery_note: string) {

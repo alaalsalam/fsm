@@ -23,6 +23,9 @@ const form = reactive({
 	start_date: new Date().toISOString().slice(0, 10),
 	end_date: "",
 	service_type: "Preventive Maintenance",
+	maintenance_interval_count: 3,
+	maintenance_interval_unit: "Months" as "Days" | "Weeks" | "Months" | "Years",
+	first_maintenance_date: new Date().toISOString().slice(0, 10),
 	included_visits: 1,
 	emergency_visits: 0,
 	response_sla_hours: 4,
@@ -98,6 +101,14 @@ async function create() {
 			emergency_visits: form.emergency_visits,
 			response_sla_hours: form.response_sla_hours,
 			resolution_sla_hours: form.resolution_sla_hours,
+			delivery_note:
+				typeof route.query.delivery_note === "string"
+					? route.query.delivery_note
+					: undefined,
+			maintenance_service_type: form.service_type,
+			maintenance_interval_count: form.maintenance_interval_count,
+			maintenance_interval_unit: form.maintenance_interval_unit,
+			first_maintenance_date: form.first_maintenance_date || form.start_date,
 			covered_equipment: scopeEquipment.value.map((row) => ({
 				customer_site: row.customer_site,
 				installed_equipment: row.name,
@@ -195,6 +206,7 @@ async function applyJourneyContext() {
 	form.customer = typeof route.query.customer === "string" ? route.query.customer : "";
 	form.company = typeof route.query.company === "string" ? route.query.company : "";
 	if (typeof route.query.posting_date === "string") form.start_date = route.query.posting_date;
+	form.first_maintenance_date = form.start_date;
 	if (form.start_date && !form.end_date) {
 		const end = new Date(form.start_date);
 		end.setFullYear(end.getFullYear() + 1);
@@ -219,8 +231,47 @@ async function transition(next: ContractStatus) {
 	try {
 		selected.value = await contracts.transition(selected.value.name, next);
 		await load();
-	} catch {
-		error.value = t("تعذّر تغيير حالة العقد.", "Couldn't change contract status.");
+		if (next === "Active" && selected.value.delivery_note) {
+			await router.push({
+				path: "/after-sales",
+				query: {
+					delivery_note: selected.value.delivery_note,
+					contract: selected.value.name,
+				},
+			});
+		}
+	} catch (e) {
+		error.value =
+			(e as { message?: string })?.message ||
+			t("تعذّر تغيير حالة العقد.", "Couldn't change contract status.");
+	} finally {
+		saving.value = false;
+	}
+}
+
+async function saveDraftReview() {
+	if (!selected.value || selected.value.status !== "Draft") return;
+	saving.value = true;
+	error.value = "";
+	try {
+		selected.value = await contracts.update(selected.value.name, {
+			start_date: selected.value.start_date,
+			end_date: selected.value.end_date,
+			included_visits: selected.value.included_visits,
+			response_sla_hours: selected.value.response_sla_hours,
+			resolution_sla_hours: selected.value.resolution_sla_hours,
+			maintenance_service_type:
+				selected.value.maintenance_service_type || "Preventive Maintenance",
+			maintenance_interval_count: selected.value.maintenance_interval_count || 3,
+			maintenance_interval_unit: selected.value.maintenance_interval_unit || "Months",
+			first_maintenance_date:
+				selected.value.first_maintenance_date || selected.value.start_date,
+		});
+		await load();
+	} catch (e) {
+		error.value =
+			(e as { message?: string })?.message ||
+			t("تعذّر حفظ مراجعة العقد.", "Couldn't save the contract review.");
 	} finally {
 		saving.value = false;
 	}
@@ -229,6 +280,10 @@ async function transition(next: ContractStatus) {
 onMounted(async () => {
 	await applyJourneyContext();
 	await load();
+	if (typeof route.query.contract === "string") {
+		const row = rows.value.find((item) => item.name === route.query.contract);
+		if (row) await open(row);
+	}
 });
 </script>
 
@@ -291,6 +346,33 @@ onMounted(async () => {
 				}}<input
 					v-model="form.service_type"
 					required
+					class="mt-1 w-full rounded-md border border-border bg-bg px-3 py-2"
+			/></label>
+			<label class="text-sm font-medium"
+				>{{ t("دورية الصيانة", "Maintenance interval") }}
+				<div class="mt-1 flex gap-2">
+					<input
+						v-model.number="form.maintenance_interval_count"
+						min="1"
+						type="number"
+						class="w-1/3 rounded-md border border-border bg-bg px-3 py-2"
+					/><select
+						v-model="form.maintenance_interval_unit"
+						class="flex-1 rounded-md border border-border bg-bg px-3 py-2"
+					>
+						<option value="Days">{{ t("أيام", "Days") }}</option>
+						<option value="Weeks">{{ t("أسابيع", "Weeks") }}</option>
+						<option value="Months">{{ t("أشهر", "Months") }}</option>
+						<option value="Years">{{ t("سنوات", "Years") }}</option>
+					</select>
+				</div></label
+			>
+			<label class="text-sm font-medium"
+				>{{ t("أول موعد صيانة", "First maintenance date")
+				}}<input
+					v-model="form.first_maintenance_date"
+					required
+					type="date"
 					class="mt-1 w-full rounded-md border border-border bg-bg px-3 py-2"
 			/></label>
 			<label class="text-sm font-medium"
@@ -465,6 +547,20 @@ onMounted(async () => {
 			</div>
 
 			<aside v-if="selected" class="rounded-2xl border border-border bg-bg p-5 shadow-card">
+				<div
+					v-if="selected.delivery_note || selected.sales_invoice"
+					class="mb-4 rounded-xl border border-primary/25 bg-primary/5 p-3 text-sm"
+				>
+					<strong>{{ t("مسودة مترابطة من المبيعات", "Sales-linked draft") }}</strong>
+					<p class="mt-1 text-fg-muted">
+						{{
+							t(
+								"راجع النطاق والشروط والدورية. عند الاعتماد ستنشأ خطط الصيانة كمسودات، ثم تعود إلى رحلة ما بعد البيع لاعتماد الجدول.",
+								"Review scope, terms, and cadence. Activation creates draft maintenance plans, then returns to the after-sales journey for schedule approval.",
+							)
+						}}
+					</p>
+				</div>
 				<div class="mb-4 flex items-start justify-between gap-3">
 					<div>
 						<p class="font-mono text-sm text-fg-muted">{{ selected.contract_no }}</p>
@@ -488,7 +584,78 @@ onMounted(async () => {
 							{{ selected.resolution_sla_hours || 0 }}h
 						</dd>
 					</div>
+					<div>
+						<dt class="text-fg-muted">{{ t("المصدر", "Source") }}</dt>
+						<dd class="font-mono text-xs">
+							{{ selected.delivery_note || selected.sales_invoice || "—" }}
+						</dd>
+					</div>
 				</dl>
+				<section
+					v-if="selected.status === 'Draft'"
+					class="mt-5 rounded-xl border border-border p-4"
+				>
+					<h3 class="font-semibold">
+						{{ t("مراجعة الجدول التعاقدي", "Review contract schedule") }}
+					</h3>
+					<div class="mt-3 grid grid-cols-2 gap-3 text-sm">
+						<label
+							>{{ t("بداية العقد", "Start")
+							}}<input
+								v-model="selected.start_date"
+								type="date"
+								class="mt-1 w-full rounded-lg border border-border bg-bg px-2 py-2"
+						/></label>
+						<label
+							>{{ t("نهاية العقد", "End")
+							}}<input
+								v-model="selected.end_date"
+								type="date"
+								class="mt-1 w-full rounded-lg border border-border bg-bg px-2 py-2"
+						/></label>
+						<label
+							>{{ t("نوع الخدمة", "Service type")
+							}}<input
+								v-model="selected.maintenance_service_type"
+								class="mt-1 w-full rounded-lg border border-border bg-bg px-2 py-2"
+						/></label>
+						<label
+							>{{ t("أول موعد", "First due")
+							}}<input
+								v-model="selected.first_maintenance_date"
+								type="date"
+								class="mt-1 w-full rounded-lg border border-border bg-bg px-2 py-2"
+						/></label>
+						<label
+							>{{ t("كل", "Every")
+							}}<input
+								v-model.number="selected.maintenance_interval_count"
+								min="1"
+								type="number"
+								class="mt-1 w-full rounded-lg border border-border bg-bg px-2 py-2"
+						/></label>
+						<label
+							>{{ t("الوحدة", "Unit")
+							}}<select
+								v-model="selected.maintenance_interval_unit"
+								class="mt-1 w-full rounded-lg border border-border bg-bg px-2 py-2"
+							>
+								<option value="Days">{{ t("أيام", "Days") }}</option>
+								<option value="Weeks">{{ t("أسابيع", "Weeks") }}</option>
+								<option value="Months">{{ t("أشهر", "Months") }}</option>
+								<option value="Years">{{ t("سنوات", "Years") }}</option>
+							</select></label
+						>
+					</div>
+					<KlButton
+						class="mt-3"
+						size="sm"
+						variant="secondary"
+						:disabled="saving"
+						@click="saveDraftReview"
+						>{{ t("حفظ المراجعة", "Save review") }}</KlButton
+					>
+				</section>
 				<h3 class="mb-2 mt-5 font-semibold">{{ t("التغطية", "Coverage") }}</h3>
 				<ul class="space-y-2 text-sm">
 					<li

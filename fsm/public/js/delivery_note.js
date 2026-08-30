@@ -17,6 +17,13 @@ frappe.ui.form.on("Delivery Note", {
 				},
 				__("Field Service"),
 			);
+			if (frm.doc.fsm_service_contract) {
+				frm.add_custom_button(
+					__("Review service contract"),
+					() => frappe.set_route("Form", "Service Contract", frm.doc.fsm_service_contract),
+					__("Field Service"),
+				);
+			}
 			frm.add_custom_button(
 				__("View installed equipment"),
 				() => {
