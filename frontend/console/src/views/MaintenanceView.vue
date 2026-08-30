@@ -10,9 +10,10 @@ import type {
 } from "@digit/api";
 import { EmptyState, KlButton, LinkField, PageHeader, Spinner } from "@digit/ui";
 import { maintenance, searchLink } from "@/lib/fsm";
+import MonthCalendar, { type CalendarItem } from "@/components/MonthCalendar.vue";
 import { lang, t } from "@/lib/i18n";
 
-type Tab = "plans" | "schedule" | "due" | "overdue" | "occurrences" | "jobs";
+type Tab = "plans" | "schedule" | "due" | "overdue" | "occurrences" | "jobs" | "calendar";
 
 const plans = ref<MaintenancePlanSummary[]>([]);
 const route = useRoute();
@@ -56,7 +57,25 @@ const tabs = computed(() => [
 		label: t("الأوامر المولدة", "Generated Jobs"),
 		count: summary.value?.released ?? 0,
 	},
+	{
+		key: "calendar" as Tab,
+		label: t("التقويم", "Calendar"),
+		count: occurrences.value.length,
+	},
 ]);
+
+const calendarItems = computed<CalendarItem[]>(() =>
+	occurrences.value.map((row) => ({
+		key: row.name,
+		date: row.due_date,
+		label: row.installed_equipment,
+		sublabel: row.maintenance_plan,
+		status: row.status,
+		to: row.released_job
+			? `/jobs/${row.released_job}`
+			: `/equipment/${row.installed_equipment}`,
+	})),
+);
 
 const visibleOccurrences = computed(() => {
 	if (tab.value === "schedule")
@@ -203,7 +222,11 @@ const planOccurrenceCount = (plan: string) =>
 
 onMounted(() => {
 	const requestedTab = typeof route.query.tab === "string" ? route.query.tab : "";
-	if (["plans", "schedule", "due", "overdue", "occurrences", "jobs"].includes(requestedTab))
+	if (
+		["plans", "schedule", "due", "overdue", "occurrences", "jobs", "calendar"].includes(
+			requestedTab,
+		)
+	)
 		tab.value = requestedTab as Tab;
 	load();
 });
@@ -447,6 +470,19 @@ onMounted(() => {
 					</div>
 				</article>
 			</div>
+		</template>
+		<template v-else-if="tab === 'calendar'">
+			<EmptyState
+				v-if="!occurrences.length"
+				:title="t('لا توجد استحقاقات', 'No occurrences')"
+				:description="
+					t(
+						'فعّل خطة وولّد الجدول لعرض المواعيد على التقويم.',
+						'Activate a plan and generate its schedule to see dates on the calendar.',
+					)
+				"
+			/>
+			<MonthCalendar v-else :items="calendarItems" />
 		</template>
 		<template v-else>
 			<EmptyState

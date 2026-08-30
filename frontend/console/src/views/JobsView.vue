@@ -12,10 +12,21 @@ import {
 	type JobStatus,
 } from "@digit/ui";
 import { getDispatchJobs } from "@/lib/fsm";
+import MonthCalendar, { type CalendarItem } from "@/components/MonthCalendar.vue";
 import { t } from "@/lib/i18n";
 
 const router = useRouter();
 const route = useRoute();
+
+type ViewMode = "table" | "calendar";
+const VIEW_KEY = "fsm-jobs-view";
+const storedView = typeof localStorage === "undefined" ? null : localStorage.getItem(VIEW_KEY);
+const view = ref<ViewMode>(storedView === "calendar" ? "calendar" : "table");
+
+function setView(mode: ViewMode) {
+	view.value = mode;
+	if (typeof localStorage !== "undefined") localStorage.setItem(VIEW_KEY, mode);
+}
 
 const jobs = ref<JobSummary[]>([]);
 const loading = ref(true);
@@ -54,6 +65,19 @@ const filtered = computed(() =>
 		const matchesStatus = !statusFilter.value || j.status === statusFilter.value;
 		return matchesSearch && matchesStatus;
 	}),
+);
+
+const calendarItems = computed<CalendarItem[]>(() =>
+	filtered.value
+		.filter((j) => j.scheduledAt)
+		.map((j) => ({
+			key: j.name,
+			date: j.scheduledAt as string,
+			label: j.customer,
+			sublabel: j.name,
+			status: j.status,
+			to: `/jobs/${j.name}`,
+		})),
 );
 
 const currency = (n?: number) =>
@@ -113,6 +137,24 @@ onMounted(() => {
 					{{ t(STATUS_LABEL_AR[s] || STATUS_LABEL[s], STATUS_LABEL[s]) }}
 				</option>
 			</select>
+			<div class="flex rounded-xl bg-surface p-1">
+				<button
+					type="button"
+					class="rounded-lg px-3 py-2 text-sm font-medium"
+					:class="view === 'table' ? 'bg-primary text-white' : 'text-muted'"
+					@click="setView('table')"
+				>
+					{{ t("جدول", "Table") }}
+				</button>
+				<button
+					type="button"
+					class="rounded-lg px-3 py-2 text-sm font-medium"
+					:class="view === 'calendar' ? 'bg-primary text-white' : 'text-muted'"
+					@click="setView('calendar')"
+				>
+					{{ t("تقويم", "Calendar") }}
+				</button>
+			</div>
 		</div>
 
 		<div v-if="loading" class="flex justify-center py-16"><Spinner :size="28" /></div>
@@ -129,6 +171,8 @@ onMounted(() => {
 				t('حاول تعديل بحثك أو فلتر الحالة.', 'Try adjusting your search or status filter.')
 			"
 		/>
+
+		<MonthCalendar v-else-if="view === 'calendar'" :items="calendarItems" />
 
 		<template v-else>
 			<!-- Mobile: cards -->
