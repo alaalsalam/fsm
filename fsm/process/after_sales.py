@@ -141,7 +141,6 @@ def get_after_sales_setup(delivery_note: str):
 			None,
 		),
 	}
-
 	pending_installation = sum(1 for row in equipment if row.status == "Pending Installation")
 	missing_site = sum(1 for row in equipment if not row.customer_site)
 	missing_location = sum(1 for row in equipment if row.customer_site and not row.equipment_location)
@@ -194,4 +193,48 @@ def get_after_sales_setup(delivery_note: str):
 			if plans and not occurrences
 			else {"code": "READY", "action": _("After-sales setup is operational")}
 		),
+	}
+
+
+@frappe.whitelist()
+def confirm_delivery_installations(delivery_note: str, customer_site: str):
+	"""Confirm every pending unit in one delivery at a validated customer site.
+
+	The command is retry-safe: already installed units are left untouched, while
+	the Delivery Note contract scope is synchronized by the canonical equipment
+	installation command.
+	"""
+	delivery = frappe.get_doc("Delivery Note", delivery_note)
+	frappe.has_permission("Delivery Note", "read", doc=delivery, throw=True)
+	require_manager_scope(delivery.company)
+	if delivery.docstatus != 1:
+		frappe.throw(_("After-sales setup requires a submitted Delivery Note."), frappe.ValidationError)
+
+	site = frappe.get_doc("Customer Site", customer_site)
+	if site.company != delivery.company or site.customer != delivery.customer:
+		frappe.throw(
+			_("Installation Site must belong to the Delivery Customer and Company."),
+			frappe.ValidationError,
+		)
+	if site.status != "Active":
+		frappe.throw(_("Select an active installation site."), frappe.ValidationError)
+
+	from fsm.installed_base.commands import confirm_installation
+
+	pending = frappe.get_all(
+		"Installed Equipment",
+		filters={"delivery_note": delivery.name, "status": "Pending Installation"},
+		pluck="name",
+		order_by="creation asc",
+		limit=10000,
+	)
+	for equipment in pending:
+		confirm_installation(equipment, site.name)
+
+	return {
+		"delivery_note": delivery.name,
+		"customer_site": site.name,
+		"confirmed": pending,
+		"count": len(pending),
+		"journey": get_after_sales_setup(delivery.name),
 	}

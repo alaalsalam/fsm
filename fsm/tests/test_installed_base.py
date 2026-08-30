@@ -22,7 +22,7 @@ from fsm.installed_base.commands import (
 	move_equipment_location,
 )
 from fsm.installed_base.provisioning import provision_delivery_note
-from fsm.process.after_sales import get_after_sales_setup
+from fsm.process.after_sales import confirm_delivery_installations, get_after_sales_setup
 from fsm.service_operations.commands import create_job_from_request
 from fsm.tests.test_security import SecurityFixture
 
@@ -234,6 +234,8 @@ class TestInstalledBaseOperations(FrappeTestCase):
 			frappe.db.count("Service Contract", {"delivery_note": delivery.name}),
 			1,
 		)
+		with self.assertRaises(frappe.ValidationError):
+			transition_contract(contract_name, "Active")
 
 		# Retrying the commercial workflow reuses the same contract.
 		from fsm.process.commercial_after_sales import sync_delivery_contract_scope
@@ -243,10 +245,11 @@ class TestInstalledBaseOperations(FrappeTestCase):
 			frappe.db.count("Service Contract", {"delivery_note": delivery.name}),
 			1,
 		)
-		for equipment in frappe.get_all(
-			"Installed Equipment", filters={"delivery_note": delivery.name}, pluck="name"
-		):
-			confirm_installation(equipment, self.site.name, installation_date=nowdate())
+		with self.assertRaises(frappe.ValidationError):
+			confirm_delivery_installations(delivery.name, self.other_site.name)
+		confirmed = confirm_delivery_installations(delivery.name, self.site.name)
+		self.assertEqual(confirmed["count"], 2)
+		self.assertEqual(confirm_delivery_installations(delivery.name, self.site.name)["count"], 0)
 
 		contract = frappe.get_doc("Service Contract", contract_name)
 		self.assertEqual(len(contract.covered_equipment), 2)

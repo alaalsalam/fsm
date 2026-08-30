@@ -85,11 +85,8 @@ def transition_contract(service_contract: str, status: str, reason: str | None =
 	if status not in TRANSITIONS.get(doc.status, set()):
 		frappe.throw(_("Illegal Contract transition from {0} to {1}.").format(doc.status, status))
 	previous = doc.status
-	if status == "Active" and doc.automation_key and not doc.covered_equipment:
-		frappe.throw(
-			_("Confirm installation and add the delivered equipment to the Contract before activation."),
-			frappe.ValidationError,
-		)
+	if status == "Active" and doc.automation_key:
+		_validate_commercial_contract_readiness(doc)
 	doc.flags.fsm_command = True
 	doc.status = status
 	doc.save()
@@ -117,6 +114,38 @@ def transition_contract(service_contract: str, status: str, reason: str | None =
 	result = _result(doc)
 	result["maintenance_plans"] = plans
 	return result
+
+
+def _validate_commercial_contract_readiness(contract) -> None:
+	if not contract.covered_equipment:
+		frappe.throw(
+			_("Confirm installation and add the delivered equipment to the Contract before activation."),
+			frappe.ValidationError,
+		)
+	if not contract.delivery_note:
+		return
+	delivered = frappe.get_all(
+		"Installed Equipment",
+		filters={
+			"delivery_note": contract.delivery_note,
+			"status": ["not in", ["Returned", "Replaced", "Disposed"]],
+		},
+		fields=["name", "status", "customer_site"],
+		limit=10000,
+	)
+	pending = [row.name for row in delivered if row.status == "Pending Installation" or not row.customer_site]
+	if pending:
+		frappe.throw(
+			_("Confirm all delivered equipment installations before activating the Contract."),
+			frappe.ValidationError,
+		)
+	covered = {row.installed_equipment for row in contract.covered_equipment if row.installed_equipment}
+	missing = [row.name for row in delivered if row.name not in covered]
+	if missing:
+		frappe.throw(
+			_("Synchronize all delivered equipment into the Contract scope before activation."),
+			frappe.ValidationError,
+		)
 
 
 @frappe.whitelist()
