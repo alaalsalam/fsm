@@ -3,7 +3,21 @@
 from __future__ import annotations
 
 import frappe
-from frappe.utils import add_days, flt, nowdate, nowtime
+from frappe.utils import add_days, flt, now_datetime, nowdate, nowtime
+
+from fsm.installed_base.commands import (
+	confirm_installation,
+	create_customer_site,
+	create_installed_equipment,
+)
+from fsm.service_operations.commands import (
+	create_job_from_request,
+	create_visit,
+	dispatch_visit,
+	open_request,
+	plan_job,
+	schedule_job,
+)
 
 
 ITEMS = (
@@ -21,6 +35,8 @@ ITEM_GROUP = "معدات وقطع غيار الصيانة"
 MAIN_WAREHOUSE = "مستودع الرياض للصيانة"
 VAN_WAREHOUSE = "مخزن سيارة فريق الرياض"
 PURCHASE_ORDER_REFERENCE = "طلب توريد أنظمة مبنى الإدارة - أغسطس 2026"
+SITE_CODE = "مصنع-الرواد-الرياض-01"
+OPERATION_KEY = "رحلة-الرواد-التشغيلية-01"
 
 
 def _root_item_group() -> str:
@@ -188,6 +204,103 @@ def _ensure_sales_order(company: str, customer: str, warehouse: str, currency: s
 	).insert().name
 
 
+def _ensure_installed_base(company: str, customer: str) -> tuple[str, list[str]]:
+	site = frappe.db.get_value("Customer Site", {"site_code": SITE_CODE}, "name")
+	if not site:
+		site = create_customer_site(
+			site_name="مصنع الرواد - المدينة الصناعية الثانية، الرياض",
+			site_code=SITE_CODE,
+			customer=customer,
+			company=company,
+			status="Active",
+			site_type="Industrial",
+			notes="موقع إنتاج صناعي تغطيه خدمات التشغيل والصيانة الوقائية.",
+		)["name"]
+
+	equipment_labels = {
+		"HVAC-RTU-20TR": "وحدة تكييف السطح - مبنى الإدارة",
+		"FIRE-PUMP-75KW": "مضخة الحريق الرئيسية - غرفة المضخات",
+		"FACP-08-LOOP": "لوحة إنذار الحريق - غرفة التحكم",
+		"GEN-500KVA": "المولد الاحتياطي - منطقة الخدمات",
+	}
+	equipment = []
+	for item_code, equipment_name in equipment_labels.items():
+		name = frappe.db.get_value(
+			"Installed Equipment",
+			{"customer_site": site, "item_code": item_code},
+			"name",
+		)
+		if not name:
+			name = create_installed_equipment(
+				equipment_name=equipment_name,
+				company=company,
+				customer=customer,
+				customer_site=site,
+				item_code=item_code,
+				notes="معدات تشغيلية مسجلة ضمن برنامج الصيانة الوقائية للمصنع.",
+			)["name"]
+			confirm_installation(name, site, installation_date=add_days(nowdate(), -90))
+		equipment.append(name)
+	return site, equipment
+
+
+def _ensure_operations(company: str, customer: str, site: str, equipment: list[str]) -> dict:
+	request = frappe.db.get_value(
+		"Service Request", {"company": company, "subject": "فحص جاهزية أنظمة السلامة والتشغيل"}, "name"
+	)
+	if not request:
+		request = frappe.get_doc(
+			{
+				"doctype": "Service Request",
+				"source": "Phone",
+				"priority": "High",
+				"service_type": "Inspection",
+				"company": company,
+				"customer": customer,
+				"customer_site": site,
+				"installed_equipment": equipment[2],
+				"subject": "فحص جاهزية أنظمة السلامة والتشغيل",
+				"description": "زيارة مجدولة لفحص لوحة الإنذار ومضخة الحريق والمولد الاحتياطي.",
+			}
+		).insert().name
+	if frappe.db.get_value("Service Request", request, "status") == "Draft":
+		open_request(request, source="System", correlation_id=f"{OPERATION_KEY}-طلب")
+
+	job = frappe.db.get_value("Service Job", {"request_idempotency_key": OPERATION_KEY}, "name")
+	if not job:
+		job = create_job_from_request(request, idempotency_key=OPERATION_KEY, source="System")["name"]
+		job_doc = frappe.get_doc("Service Job", job)
+		team = frappe.db.get_value("Service Team", {"company": company, "active": 1}, "name")
+		technician = frappe.db.get_value("Technician", {"company": company, "active": 1}, "name")
+		job_doc.assigned_service_team = team
+		job_doc.primary_technician = technician
+		job_doc.notes = "أمر عمل لعرض دورة الفحص والتوزيع والتقرير الميداني."
+		job_doc.save()
+		plan_job(job, source="System", correlation_id=f"{OPERATION_KEY}-تخطيط")
+		schedule_job(
+			job,
+			scheduled_start=add_days(now_datetime(), 2),
+			scheduled_end=add_days(now_datetime(), 3),
+			source="System",
+			correlation_id=f"{OPERATION_KEY}-جدولة",
+		)
+
+	visits = frappe.get_all("Service Visit", filters={"service_job": job}, pluck="name")
+	if not visits:
+		technician = frappe.db.get_value("Technician", {"company": company, "active": 1}, "name")
+		visit = create_visit(
+			job,
+			scheduled_start=add_days(now_datetime(), 2),
+			scheduled_end=add_days(now_datetime(), 3),
+			primary_technician=technician,
+			source="System",
+			correlation_id=f"{OPERATION_KEY}-زيارة",
+		)["name"]
+		dispatch_visit(visit, source="System", correlation_id=f"{OPERATION_KEY}-توزيع")
+		visits = [visit]
+	return {"request": request, "job": job, "visits": visits}
+
+
 def seed_showcase_inventory(company: str = "Digit", customer: str = CUSTOMER):
 	"""Create a realistic Saudi inventory and a draft after-sales journey."""
 	frappe.set_user("Administrator")
@@ -209,6 +322,8 @@ def seed_showcase_inventory(company: str = "Digit", customer: str = CUSTOMER):
 
 	reconciliation = _ensure_stock(company, main_warehouse, van_warehouse)
 	sales_order = _ensure_sales_order(company, customer, main_warehouse, currency)
+	site, equipment = _ensure_installed_base(company, customer)
+	operations = _ensure_operations(company, customer, site, equipment)
 	frappe.db.commit()
 	return {
 		"company": company,
@@ -219,4 +334,7 @@ def seed_showcase_inventory(company: str = "Digit", customer: str = CUSTOMER):
 		"item_prices": prices,
 		"stock_reconciliation": reconciliation,
 		"sales_order": sales_order,
+		"site": site,
+		"equipment": equipment,
+		"operations": operations,
 	}
