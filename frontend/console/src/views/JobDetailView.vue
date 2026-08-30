@@ -473,6 +473,7 @@ async function load() {
 async function runNextAction() {
 	if (!job.value || !hub.value) return;
 	const action = hub.value.next_action;
+	if (!action) return;
 	const blocker = hub.value.completion_blockers[0];
 	if (blocker && action.code === blocker.code) {
 		await router.push(blockerRoute(blocker));
@@ -641,7 +642,10 @@ onBeforeUnmount(() => offMessage?.());
 				</div>
 			</div>
 
-			<section v-if="hub" class="rounded-2xl border border-border bg-bg p-5 shadow-card">
+			<section
+				v-if="hub?.next_action"
+				class="rounded-2xl border border-border bg-bg p-5 shadow-card"
+			>
 				<div class="flex flex-wrap items-start justify-between gap-4">
 					<div>
 						<p class="text-xs uppercase tracking-wide text-fg-muted">

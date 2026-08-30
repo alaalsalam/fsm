@@ -22,7 +22,28 @@ const money = (value?: unknown, currency = "USD") => formatMoney(Number(value ||
 
 onMounted(async () => {
 	try {
-		hub.value = await getMyPortalHub();
+		const result = await getMyPortalHub();
+		// Keep the portal renderable during rolling API upgrades and when an older
+		// cached response does not yet contain newly introduced collections.
+		hub.value = {
+			...result,
+			dashboard: result.dashboard ?? {},
+			requests: result.requests ?? [],
+			jobs: result.jobs ?? [],
+			service_history: result.service_history ?? [],
+			upcoming_maintenance: result.upcoming_maintenance ?? [],
+			overdue_maintenance: result.overdue_maintenance ?? [],
+			contracts: result.contracts ?? [],
+			renewals: result.renewals ?? [],
+			reports: result.reports ?? [],
+			certificates: result.certificates ?? [],
+			quotations: result.quotations ?? [],
+			invoices: result.invoices ?? [],
+			visits: result.visits ?? [],
+			items: result.items ?? [],
+			services: result.services ?? [],
+			calendar: result.calendar ?? [],
+		};
 	} catch {
 		error.value = t(
 			"تعذر تحميل لوحة الخدمة. حاول مرة أخرى.",
@@ -81,11 +102,11 @@ onMounted(async () => {
 						{{ t("الموعد التالي", "Next appointment") }}
 					</p>
 					<strong class="mt-2 block text-lg text-cmd-fg">{{
-						hub.calendar[0]
+						hub.calendar?.[0]
 							? statusLabel(hub.calendar[0].title)
 							: t("لا يوجد موعد قريب", "No upcoming appointment")
 					}}</strong>
-					<p v-if="hub.calendar[0]" class="mt-1 text-sm text-cmd-fg-muted">
+					<p v-if="hub.calendar?.[0]" class="mt-1 text-sm text-cmd-fg-muted">
 						{{ date(hub.calendar[0].start) }} ·
 						{{ hub.calendar[0].site || hub.calendar[0].equipment }}
 					</p></RouterLink
